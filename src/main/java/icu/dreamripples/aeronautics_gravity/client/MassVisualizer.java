@@ -4,8 +4,8 @@ import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.physics.config.block_properties.PhysicsBlockPropertyHelper;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.simulated_team.simulated.index.SimSpecialTextures;
-import dev.simulated_team.simulated.util.SimColors;
 import net.createmod.catnip.outliner.Outliner;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
@@ -16,11 +16,14 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Vector3dc;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,6 +59,7 @@ public class MassVisualizer {
     }
 
     private static final float COM_SIZE = 0.4f;
+    private static final int COM_COLOR = 0xE000BFFF; // 亮蓝色（深天蓝），穿透方块显示
     private static final float OVERLAY_LINE_WIDTH = 0.0625f;
 
     public static void toggle(ClientSubLevel subLevel) {
@@ -86,7 +90,7 @@ public class MassVisualizer {
 
         for (var viz : ACTIVE.values()) {
             renderTypeGroups(viz, outliner, partialTick);
-            renderCenterOfMass(viz, outliner, partialTick);
+            renderCenterOfMass(viz, event, partialTick);
         }
     }
 
@@ -153,20 +157,27 @@ public class MassVisualizer {
     }
 
     private static void renderTypeGroups(Visualization viz, Outliner outliner, float partialTick) {
+        // 按颜色分组而非按 BlockState 分组,让相同颜色的方块合并进同一个 cluster。
+        // 这样同色交界处的边由 BlockClusterOutline 的 MergeEntry Set 自动去重,不会 z-fight。
+        // 异色交界处两个 cluster 的边框仍会重叠,但颜色不同视觉上是"双色边框"而非同色花斑闪烁。
+        Map<Integer, Set<BlockPos>> colorGroups = new LinkedHashMap<>();
         for (var entry : viz.typeGroups.entrySet()) {
-            BlockState state = entry.getKey();
+            if (entry.getValue().isEmpty()) continue;
+            double avgMass = viz.typeMasses.getOrDefault(entry.getKey(), 1.0);
+            int color = massToColor(avgMass);
+            colorGroups.computeIfAbsent(color, k -> new HashSet<>()).addAll(entry.getValue());
+        }
+
+        // key 带 subLevelId 前缀,避免多个 subLevel 的同色 cluster 互相覆盖。
+        String keyPrefix = "aeronautics_gravity:" + viz.subLevel.getUniqueId() + ":";
+        for (var entry : colorGroups.entrySet()) {
+            int color = entry.getKey();
             Set<BlockPos> positions = entry.getValue();
             if (positions.isEmpty()) continue;
 
-            double avgMass = viz.typeMasses.getOrDefault(state, 1.0);
-            int color = massToColor(avgMass);
-
-            // 用 showCluster 让 Catnip 的 BlockClusterOutline 自动合并相邻方块的边和面，
-            // 避免每个方块各画 12 条边导致的内部网格。Sable 的
-            // BlockClusterOutlineMixin.sable$projectFromSublevel 会遍历 BlockPos 找到
-            // 对应的 ClientSubLevel 并应用 renderPose（旋转 + 平移），所以这里直接传
-            // 子级本地 BlockPos 即可，不需要手动 transformBlockCenter。
-            outliner.showCluster(state, positions)
+            // Sable 的 BlockClusterOutlineMixin.sable$projectFromSublevel 会遍历 BlockPos 找到
+            // 对应的 ClientSubLevel 并应用 renderPose（旋转 + 平移），所以这里直接传子级本地 BlockPos。
+            outliner.showCluster(keyPrefix + color, positions)
                     .colored(color)
                     .withFaceTexture(SimSpecialTextures.HONEY_GLUE)
                     .lineWidth(OVERLAY_LINE_WIDTH)
@@ -174,28 +185,54 @@ public class MassVisualizer {
         }
     }
 
-    private static void renderCenterOfMass(Visualization viz, Outliner outliner, float partialTick) {
+    private static void renderCenterOfMass(Visualization viz, RenderLevelStageEvent event, float partialTick) {
         if (viz.totalMass <= 0) return;
         Pose3dc pose = viz.subLevel.renderPose(partialTick);
         if (pose == null) return;
 
-        // transformPosition(localCom) = orientation.transform(localCom - rotationPoint) + position
-        // Sable 的物理 pipeline 保证 rotationPoint = centerOfMass,所以
-        // transformPosition(localCom) = position,即重心世界坐标 = pose.position()
+        // Sable 的物理 pipeline 保证 rotationPoint = centerOfMass,
+        // 所以重心世界坐标 = pose.position()。
         Vector3dc position = pose.position();
-        AABB aabb = new AABB(
-                position.x() - COM_SIZE,
-                position.y() - COM_SIZE,
-                position.z() - COM_SIZE,
-                position.x() + COM_SIZE,
-                position.y() + COM_SIZE,
-                position.z() + COM_SIZE);
+        Vec3 camera = event.getCamera().getPosition();
 
-        outliner.showAABB("aeronautics_gravity:com_" + viz.subLevel.getUniqueId(), aabb)
-                .colored(SimColors.ACTIVE_YELLOW)
-                .withFaceTexture(SimSpecialTextures.HONEY_GLUE)
-                .lineWidth(OVERLAY_LINE_WIDTH * 1.5f)
-                .disableLineNormals();
+        // 用自定义 RenderType（NO_DEPTH_TEST）画重心标记,使其穿透方块显示不被遮挡。
+        // Outliner.showAABB 走 Catnip 默认 RenderType（有深度测试）,OutlineParams 无法禁用深度。
+        PoseStack poseStack = event.getPoseStack();
+        poseStack.pushPose();
+        poseStack.translate(position.x() - camera.x, position.y() - camera.y, position.z() - camera.z);
+
+        VertexConsumer buffer = Minecraft.getInstance().renderBuffers().bufferSource()
+                .getBuffer(MassRenderTypes.centerOfMass());
+        box(buffer, poseStack.last(), COM_SIZE, COM_COLOR);
+
+        Minecraft.getInstance().renderBuffers().bufferSource().endBatch(MassRenderTypes.centerOfMass());
+        poseStack.popPose();
+    }
+
+    private static void box(VertexConsumer vc, PoseStack.Pose pose, float s, int color) {
+        // 6 个面,每面 4 个顶点（逆时针,从外面看）,中心在原点,边长 2s
+        quad(vc, pose, color, -s, -s, -s,  s, -s, -s,  s, -s,  s, -s, -s,  s); // 底 y=-s
+        quad(vc, pose, color, -s,  s, -s, -s,  s,  s,  s,  s,  s,  s,  s, -s); // 顶 y= s
+        quad(vc, pose, color, -s, -s, -s, -s,  s, -s,  s,  s, -s,  s, -s, -s); // 北 z=-s
+        quad(vc, pose, color,  s, -s,  s,  s,  s,  s, -s,  s,  s, -s, -s,  s); // 南 z= s
+        quad(vc, pose, color, -s, -s, -s, -s, -s,  s, -s,  s,  s, -s,  s, -s); // 西 x=-s
+        quad(vc, pose, color,  s, -s,  s,  s, -s, -s,  s,  s, -s,  s,  s,  s); // 东 x= s
+    }
+
+    private static void quad(VertexConsumer vc, PoseStack.Pose pose, int color,
+                             float x0, float y0, float z0,
+                             float x1, float y1, float z1,
+                             float x2, float y2, float z2,
+                             float x3, float y3, float z3) {
+        vertex(vc, pose, x0, y0, z0, color);
+        vertex(vc, pose, x1, y1, z1, color);
+        vertex(vc, pose, x2, y2, z2, color);
+        vertex(vc, pose, x3, y3, z3, color);
+    }
+
+    private static void vertex(VertexConsumer vc, PoseStack.Pose pose,
+                               float x, float y, float z, int color) {
+        vc.addVertex(pose, x, y, z).setColor(color);
     }
 
     private static int massToColor(double mass) {
