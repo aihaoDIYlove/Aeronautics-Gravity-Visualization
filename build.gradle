@@ -120,6 +120,12 @@ configurations {
 }
 
 dependencies {
+    // Sable companion（编译期需要，从 Sable JAR 内部提取）
+    implementation files('libs/sable-companion.jar')
+    // Simulated（航空学 jarjar 运行时提供，编译期需要 SimSpecialTextures / SimColors）
+    compileOnly files('libs/simulated.jar')
+    // Catnip（Ponder jarjar 运行时提供旧版 Catnip，包名 net.createmod.catnip.outliner）
+    compileOnly files('libs/ponder.jar')
     // Create 机械动力
     implementation "maven.modrinth:LNytGWDc:UjX6dr61"
     // Sable 物理引擎库

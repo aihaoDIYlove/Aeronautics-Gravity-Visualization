@@ -38,3 +38,11 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+
+### Project-specific ###
+# 反编译/字节码分析中间产物
+tmp_decompile/
+# 临时构建错误日志
+build_err.txt
+# 根目录临时图片/截图
+/1.png
