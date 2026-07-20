@@ -1,3 +1,5 @@
 {
-  "item.aeronautics_gravity.spark_wand": "Spark Wand"
+  "item.aeronautics_gravity.spark_wand": "Spark Wand",
+  "itemGroup.aeronautics_gravity.main": "Aeronautics Gravity",
+  "block.aeronautics_gravity.convenient_analog_transmission": "Convenient Analog Transmission"
 }

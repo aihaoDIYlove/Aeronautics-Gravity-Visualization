@@ -1,3 +1,5 @@
 {
-  "item.aeronautics_gravity.spark_wand": "火花魔杖"
+  "item.aeronautics_gravity.spark_wand": "火花魔杖",
+  "itemGroup.aeronautics_gravity.main": "航空学：重力可视化",
+  "block.aeronautics_gravity.convenient_analog_transmission": "更方便的模拟传动器"
 }

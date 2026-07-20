@@ -58,7 +58,7 @@ public class MassVisualizer {
         }
     }
 
-    private static final float COM_SIZE = 0.4f;
+    private static final float COM_SIZE = 0.15f; // 重心球半径(原方块半边长 0.4,缩小后不挡周围方块)
     private static final int COM_COLOR = 0xE000BFFF; // 亮蓝色（深天蓝），穿透方块显示
     private static final float OVERLAY_LINE_WIDTH = 0.0625f;
 
@@ -87,10 +87,29 @@ public class MassVisualizer {
         // (AFTER_PARTICLES 阶段) 用的是同一帧插值,避免半帧错位。
         float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
         var outliner = Outliner.getInstance();
+        var stage = event.getStage();
 
         for (var viz : ACTIVE.values()) {
-            renderTypeGroups(viz, outliner, partialTick);
-            renderCenterOfMass(viz, event, partialTick);
+            // 方块遮罩分组:必须在 AFTER_TRANSLUCENT_BLOCKS 调用,让 Catnip Outliner 在
+            // AFTER_PARTICLES 阶段 renderOutlines 时能从队列里取到 cluster。
+            if (stage == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+                renderTypeGroups(viz, outliner, partialTick);
+            }
+            // 重心标记:放在 AFTER_PARTICLES 阶段渲染。原因:
+            // 1. NO_DEPTH_TEST 只让 COM 自己不被已有深度挡住,但不阻止后续绘制覆盖。
+            //    Sable 子级渲染(FancySubLevelRenderDispatcher / Flywheel)通常在
+            //    AFTER_TRANSLUCENT_BLOCKS 到 AFTER_PARTICLES 之间提交,会写颜色 + 深度,
+            //    若 COM 在它们之前画,就会被结构像素直接覆盖。
+            // 2. 不能用 AFTER_LEVEL:那个 stage 在 LevelRenderer.renderLevel() 末尾的
+            //    popPose() 之后触发,PoseStack 已经弹出相机变换,只剩 identity。此时
+            //    translate(pos - camera) 只做平移不做旋转,COM 会像 HUD 一样贴在屏幕上,
+            //    视角背对结构也不消失。AFTER_PARTICLES 在 particles 渲染后触发,相机变换
+            //    仍在 PoseStack 上,顶点能被正确变换到世界空间。
+            // 3. 配合 @SubscribeEvent(priority = LOWEST) 确保本 subscriber 在同 stage 的
+            //    Catnip Outliner.renderOutlines 和 Sable 子级 hook 之后执行,COM 真正最后画。
+            if (stage == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
+                renderCenterOfMass(viz, event, partialTick);
+            }
         }
     }
 
@@ -203,20 +222,39 @@ public class MassVisualizer {
 
         VertexConsumer buffer = Minecraft.getInstance().renderBuffers().bufferSource()
                 .getBuffer(MassRenderTypes.centerOfMass());
-        box(buffer, poseStack.last(), COM_SIZE, COM_COLOR);
+        sphere(buffer, poseStack.last(), COM_SIZE, COM_COLOR);
 
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch(MassRenderTypes.centerOfMass());
         poseStack.popPose();
     }
 
-    private static void box(VertexConsumer vc, PoseStack.Pose pose, float s, int color) {
-        // 6 个面,每面 4 个顶点（逆时针,从外面看）,中心在原点,边长 2s
-        quad(vc, pose, color, -s, -s, -s,  s, -s, -s,  s, -s,  s, -s, -s,  s); // 底 y=-s
-        quad(vc, pose, color, -s,  s, -s, -s,  s,  s,  s,  s,  s,  s,  s, -s); // 顶 y= s
-        quad(vc, pose, color, -s, -s, -s, -s,  s, -s,  s,  s, -s,  s, -s, -s); // 北 z=-s
-        quad(vc, pose, color,  s, -s,  s,  s,  s,  s, -s,  s,  s, -s, -s,  s); // 南 z= s
-        quad(vc, pose, color, -s, -s, -s, -s, -s,  s, -s,  s,  s, -s,  s, -s); // 西 x=-s
-        quad(vc, pose, color,  s, -s,  s,  s, -s, -s,  s,  s, -s,  s,  s,  s); // 东 x= s
+    private static void sphere(VertexConsumer vc, PoseStack.Pose pose, float radius, int color) {
+        // UV sphere: 经度 segments 切片 × 纬度 rings 段。NO_CULL 下正反面都画,
+        // 任意角度投影都是圆,圆心即几何中心,配平时肉眼判断是否居中更直观。
+        int segments = 12;
+        int rings = 8;
+        // 预计算 (rings+1)×(segments+1) 顶点,相邻 quad 共用顶点避免重复。
+        float[][][] v = new float[rings + 1][segments + 1][3];
+        for (int i = 0; i <= rings; i++) {
+            double theta = Math.PI * i / rings;          // 0..π, 北极到南极
+            double sinT = Math.sin(theta);
+            double cosT = Math.cos(theta);
+            for (int j = 0; j <= segments; j++) {
+                double phi = 2 * Math.PI * j / segments;  // 0..2π
+                v[i][j][0] = (float) (radius * sinT * Math.cos(phi));
+                v[i][j][1] = (float) (radius * cosT);
+                v[i][j][2] = (float) (radius * sinT * Math.sin(phi));
+            }
+        }
+        for (int i = 0; i < rings; i++) {
+            for (int j = 0; j < segments; j++) {
+                quad(vc, pose, color,
+                        v[i][j][0], v[i][j][1], v[i][j][2],
+                        v[i][j + 1][0], v[i][j + 1][1], v[i][j + 1][2],
+                        v[i + 1][j + 1][0], v[i + 1][j + 1][1], v[i + 1][j + 1][2],
+                        v[i + 1][j][0], v[i + 1][j][1], v[i + 1][j][2]);
+            }
+        }
     }
 
     private static void quad(VertexConsumer vc, PoseStack.Pose pose, int color,

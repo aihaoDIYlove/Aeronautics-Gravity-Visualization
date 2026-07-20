@@ -126,6 +126,8 @@ dependencies {
     compileOnly files('libs/simulated.jar')
     // Catnip（Ponder jarjar 运行时提供旧版 Catnip，包名 net.createmod.catnip.outliner）
     compileOnly files('libs/ponder.jar')
+    // Flywheel（Create jarjar 运行时提供，编译期需要 SimpleBlockEntityVisualizer 用于 Visualizer 注册）
+    compileOnly files('libs/flywheel.jar')
     // Create 机械动力
     implementation "maven.modrinth:LNytGWDc:UjX6dr61"
     // Sable 物理引擎库

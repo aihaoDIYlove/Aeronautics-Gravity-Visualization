@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "icu.dreamripples.aeronautics_gravity.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "RotationPropagatorMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
