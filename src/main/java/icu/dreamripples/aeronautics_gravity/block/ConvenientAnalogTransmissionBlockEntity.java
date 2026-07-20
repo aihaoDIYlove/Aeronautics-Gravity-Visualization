@@ -34,11 +34,7 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
         Level level = getLevel();
         int signal = (level != null) ? level.getBestNeighborSignal(getBlockPos()) : 0;
         signal = Math.max(0, Math.min(15, signal));
-        BlockState state = getBlockState();
-        boolean reversed = state.hasProperty(ConvenientAnalogTransmissionBlock.REVERSED)
-                && state.getValue(ConvenientAnalogTransmissionBlock.REVERSED);
-        int idx = reversed ? (15 - signal) : signal;
-        return RPM_TABLE[idx];
+        return RPM_TABLE[signal];
     }
 
     @Override
