@@ -2,11 +2,10 @@
   "selector": "aeronautics_gravity:counterweight",
 
   "properties": {
-    "sable:mass": 0
+    "sable:mass": 1
   },
 
   "overrides": {
-    "mass_tier=1":  { "sable:mass": 1 },
     "mass_tier=2":  { "sable:mass": 2 },
     "mass_tier=3":  { "sable:mass": 3 },
     "mass_tier=4":  { "sable:mass": 4 },

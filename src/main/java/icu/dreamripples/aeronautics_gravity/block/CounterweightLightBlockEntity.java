@@ -21,82 +21,71 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 /**
- * 配重方块 BE - 注册 ScrollValueBehaviour,玩家右键弹板调档(1..20)。
- * 值变化时通过 callback 把新档位写入 BlockState.MASS_TIER,Sable 自动检测并增量更新质量。
+ * 配"轻"块 BE - 注册 ScrollValueBehaviour,玩家右键弹板调档(0..36)。
+ * 值变化时通过 callback 把新档位写入 BlockState.LIFT_TIER,Sable 自动检测并重新计算浮力 cluster。
  * 同时在 tick 中反向同步 BlockState -> behaviour.value(防止外部修改 BlockState 时 UI 不同步)。
  */
-public class CounterweightBlockEntity extends SmartBlockEntity {
+public class CounterweightLightBlockEntity extends SmartBlockEntity {
 
     private static final int MIN_TIER = 1;
-    private static final int MAX_TIER = 20;
+    private static final int MAX_TIER = 36;
 
-    private ScrollValueBehaviour massTier;
+    private ScrollValueBehaviour liftTier;
 
-    public CounterweightBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public CounterweightLightBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
-        massTier = new MassTierScrollValueBehaviour(
-                Component.translatable("block.aeronautics_gravity.counterweight.mass_tier"),
+        liftTier = new LiftTierScrollValueBehaviour(
+                Component.translatable("block.aeronautics_gravity.counterweight_light.lift_tier"),
                 this,
-                new MassTierValueBoxTransform()
+                new LiftTierValueBoxTransform()
         ).between(MIN_TIER, MAX_TIER).withCallback(this::applyTier);
-        massTier.value = MIN_TIER;
-        behaviours.add(massTier);
+        liftTier.value = MIN_TIER;
+        behaviours.add(liftTier);
     }
 
     private void applyTier(int tier) {
         if (level == null || level.isClientSide) return;
         BlockState state = getBlockState();
-        if (state.getValue(CounterweightBlock.MASS_TIER) == tier) return;
-        level.setBlockAndUpdate(worldPosition, state.setValue(CounterweightBlock.MASS_TIER, tier));
+        if (state.getValue(CounterweightLightBlock.LIFT_TIER) == tier) return;
+        level.setBlockAndUpdate(worldPosition, state.setValue(CounterweightLightBlock.LIFT_TIER, tier));
     }
 
     @Override
     public void tick() {
         super.tick();
         // 反向同步:外部修改 BlockState(命令、clipboard 等)时把 behaviour.value 同步过来
-        if (!isVirtual() && massTier != null) {
-            int stateTier = getBlockState().getValue(CounterweightBlock.MASS_TIER);
-            if (massTier.value != stateTier) {
-                massTier.setValue(stateTier);
+        if (!isVirtual() && liftTier != null) {
+            int stateTier = getBlockState().getValue(CounterweightLightBlock.LIFT_TIER);
+            if (liftTier.value != stateTier) {
+                liftTier.setValue(stateTier);
             }
         }
     }
 
-    /**
-     * ScrollValueBehaviour 子类 - 自定义弹板内容(标题、刻度、单位)与数字格式化。
-     * createBoard 返回的 ValueSettingsBoard 决定右键弹出的设置板外观。
-     * formatSettings 决定弹板中滑条上方显示的数字。
-     * withFormatter 决定鼠标悬停时白框中的数字。
-     */
-    private static class MassTierScrollValueBehaviour extends ScrollValueBehaviour {
-        public MassTierScrollValueBehaviour(Component label, SmartBlockEntity be, ValueBoxTransform slot) {
+    private static class LiftTierScrollValueBehaviour extends ScrollValueBehaviour {
+        public LiftTierScrollValueBehaviour(Component label, SmartBlockEntity be, ValueBoxTransform slot) {
             super(label, be, slot);
-            withFormatter(i -> i + " kpg");
+            withFormatter(i -> i + " pN");
         }
 
         @Override
         public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
             return new ValueSettingsBoard(label, MAX_TIER, 1,
-                    ImmutableList.of(Component.translatable("aeronautics_gravity.unit.mass_kpg")),
+                    ImmutableList.of(Component.translatable("aeronautics_gravity.unit.lift_kpg")),
                     new ValueSettingsFormatter(this::formatSettings));
         }
 
         public MutableComponent formatSettings(ValueSettings settings) {
             int value = Math.max(MIN_TIER, Math.min(MAX_TIER, settings.value()));
-            return Component.literal(value + " kpg");
+            return Component.literal(value + " pN");
         }
     }
 
-    /**
-     * ValueBoxTransform.Sided 子类 - 决定白框显示在方块哪个面、哪个位置。
-     * isSideActive 返回 true 让所有面都能弹板(玩家从任意方向右键都能调)。
-     * getSouthLocation 返回 voxel 坐标 (8,8,15.5) 即 south 面中心,基类自动旋转到任意 Direction。
-     */
-    private static class MassTierValueBoxTransform extends ValueBoxTransform.Sided {
+    private static class LiftTierValueBoxTransform extends ValueBoxTransform.Sided {
         @Override
         protected boolean isSideActive(BlockState state, Direction direction) {
             return true;

@@ -20,6 +20,7 @@ public class ModCreativeTabs {
                         output.accept(ModItems.SPARK_WAND.get());
                         output.accept(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_ITEM.get());
                         output.accept(ModBlocks.COUNTERWEIGHT_ITEM.get());
+                        output.accept(ModBlocks.COUNTERWEIGHT_LIGHT_ITEM.get());
                     })
                     .build());
 }

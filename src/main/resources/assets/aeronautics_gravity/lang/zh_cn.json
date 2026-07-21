@@ -4,5 +4,8 @@
   "block.aeronautics_gravity.convenient_analog_transmission": "更方便的模拟传动器",
   "block.aeronautics_gravity.counterweight": "配重块",
   "block.aeronautics_gravity.counterweight.mass_tier": "质量档位",
-  "aeronautics_gravity.unit.mass_kpg": "质量 (kpg)"
+  "block.aeronautics_gravity.counterweight_light": "配“轻”块",
+  "block.aeronautics_gravity.counterweight_light.lift_tier": "浮力档位",
+  "aeronautics_gravity.unit.mass_kpg": "质量 (kpg)",
+  "aeronautics_gravity.unit.lift_kpg": "升力 (pN)"
 }

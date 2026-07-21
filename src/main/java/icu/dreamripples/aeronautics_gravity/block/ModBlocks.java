@@ -63,11 +63,35 @@ public class ModBlocks {
             ModItems.ITEMS.register("counterweight",
                     () -> new BlockItem(COUNTERWEIGHT_BLOCK.get(), new Item.Properties()));
 
+    public static final DeferredHolder<Block, CounterweightLightBlock> COUNTERWEIGHT_LIGHT_BLOCK =
+            BLOCKS.register("counterweight_light",
+                    () -> new CounterweightLightBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CounterweightLightBlockEntity>> COUNTERWEIGHT_LIGHT_BE =
+            BLOCK_ENTITIES.register("counterweight_light",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createCounterweightLightBlockEntity, COUNTERWEIGHT_LIGHT_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_LIGHT_ITEM =
+            ModItems.ITEMS.register("counterweight_light",
+                    () -> new BlockItem(COUNTERWEIGHT_LIGHT_BLOCK.get(), new Item.Properties()));
+
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);
     }
 
     private static CounterweightBlockEntity createCounterweightBlockEntity(BlockPos pos, BlockState state) {
         return new CounterweightBlockEntity(COUNTERWEIGHT_BE.get(), pos, state);
+    }
+
+    private static CounterweightLightBlockEntity createCounterweightLightBlockEntity(BlockPos pos, BlockState state) {
+        return new CounterweightLightBlockEntity(COUNTERWEIGHT_LIGHT_BE.get(), pos, state);
     }
 }
