@@ -2,15 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "LIL",
-    "BTB",
-    "LIL"
+    " L ",
+    "LCL",
+    " L "
   ],
   "key": {
     "L": { "item": "aeronautics:levitite_blend_bucket" },
-    "I": { "item": "minecraft:iron_block" },
-    "B": { "item": "create:brass_casing" },
-    "T": { "item": "simulated:throttle_lever" }
+    "C": { "item": "aeronautics_gravity:counterweight" }
   },
   "result": {
     "count": 1,
