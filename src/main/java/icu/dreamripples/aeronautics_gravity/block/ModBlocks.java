@@ -43,7 +43,31 @@ public class ModBlocks {
             ModItems.ITEMS.register("convenient_analog_transmission",
                     () -> new BlockItem(CONVENIENT_ANALOG_TRANSMISSION_BLOCK.get(), new Item.Properties()));
 
+    public static final DeferredHolder<Block, CounterweightBlock> COUNTERWEIGHT_BLOCK =
+            BLOCKS.register("counterweight",
+                    () -> new CounterweightBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CounterweightBlockEntity>> COUNTERWEIGHT_BE =
+            BLOCK_ENTITIES.register("counterweight",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createCounterweightBlockEntity, COUNTERWEIGHT_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_ITEM =
+            ModItems.ITEMS.register("counterweight",
+                    () -> new BlockItem(COUNTERWEIGHT_BLOCK.get(), new Item.Properties()));
+
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);
+    }
+
+    private static CounterweightBlockEntity createCounterweightBlockEntity(BlockPos pos, BlockState state) {
+        return new CounterweightBlockEntity(COUNTERWEIGHT_BE.get(), pos, state);
     }
 }

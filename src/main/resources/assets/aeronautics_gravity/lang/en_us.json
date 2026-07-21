@@ -1,5 +1,8 @@
 {
   "item.aeronautics_gravity.spark_wand": "Spark Wand",
   "itemGroup.aeronautics_gravity.main": "Aeronautics Gravity",
-  "block.aeronautics_gravity.convenient_analog_transmission": "Convenient Analog Transmission"
+  "block.aeronautics_gravity.convenient_analog_transmission": "Convenient Analog Transmission",
+  "block.aeronautics_gravity.counterweight": "Counterweight",
+  "block.aeronautics_gravity.counterweight.mass_tier": "Mass Tier",
+  "aeronautics_gravity.unit.mass_kpg": "Mass (kpg)"
 }
