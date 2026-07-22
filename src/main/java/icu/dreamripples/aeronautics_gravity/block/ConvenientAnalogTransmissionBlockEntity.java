@@ -1,7 +1,9 @@
 package icu.dreamripples.aeronautics_gravity.block;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
+import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlock;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlockEntity;
+import dev.simulated_team.simulated.mixin_interface.extra_kinetics.KineticBlockEntityExtension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -13,9 +15,13 @@ import net.minecraft.world.level.block.state.BlockState;
  * <p>
  * 实现方式：
  * - 继承原版 AnalogTransmissionBlockEntity，复用其 tick() 中信号变化检测 + detach/attach 流程
- * - 重写 propagateRotationTo，让内部连接（主方块 <-> extraWheel）保持 1:1 传动
- *   （原版会按 signal 修改齿数比，与"查表固定值"语义冲突）
- * - 边界连接的速度注入由 RotationPropagatorMixin 拦截 getConveyedSpeed 完成
+ * - 重写 propagateRotationTo，内部连接（主BE <-> extraWheel）保持 1:1 传动
+ * - 齿轮面（extraWheel）↔ 外部齿轮：Mixin 放行，由 Create 原版齿轮逻辑处理（pass-through）
+ * - extraWheel → 主BE（内部连接）：Mixin 注入查表 RPM，实现齿轮速度→传动杆输出转速的转换
+ * - 传动杆面 ↔ 外部传动杆/齿轮：Mixin 注入查表 RPM
+ * <p>
+ * 信号 0 时 getTargetSpeed() 返回 0，Mixin 注入 0——传动杆与齿轮环断开，
+ * 齿轮环可独立作为普通齿轮传递应力——类似离合器效果。
  */
 public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionBlockEntity {
 
@@ -24,6 +30,9 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
             0f, 32f, 48f, 64f, 80f, 96f, 112f, 128f,
             144f, 160f, 176f, 192f, 208f, 224f, 240f, 256f
     };
+
+    /** 当前红石信号值，替代父类 private signal 字段用于检测变化。 */
+    private int lastSignal = 0;
 
     public ConvenientAnalogTransmissionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -38,9 +47,49 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
     }
 
     @Override
+    public void tick() {
+        if (getLevel() == null) return;
+
+        final int bestNeighborSignal = getLevel().getBestNeighborSignal(getBlockPos());
+
+        if (!getLevel().isClientSide) {
+            if (bestNeighborSignal != lastSignal) {
+                KineticBlockEntity extraWheel = getExtraKinetics();
+
+                // 父类原有的 detach/reattach 逻辑
+                this.detachKinetics();
+                extraWheel.detachKinetics();
+                this.removeSource();
+                extraWheel.removeSource();
+
+                lastSignal = bestNeighborSignal;
+                getLevel().setBlockAndUpdate(getBlockPos(),
+                        getBlockState().setValue(AnalogTransmissionBlock.POWERED, lastSignal > 0));
+
+                // 关键修复：在 re-attach 前为新网络分配 ID，
+                // 防止 propagateNewSource 的循环检测因 hasNetwork()=false 而误杀方块
+                this.getOrCreateNetwork();
+                extraWheel.getOrCreateNetwork();
+
+                if (((KineticBlockEntityExtension) this).simulated$getConnectedToExtraKinetics()) {
+                    this.attachKinetics();
+                    extraWheel.attachKinetics();
+                } else {
+                    extraWheel.attachKinetics();
+                    this.attachKinetics();
+                }
+            }
+        }
+
+        getExtraKinetics().tick();
+        super.tick();
+    }
+
+    @Override
     public float propagateRotationTo(KineticBlockEntity target, BlockState state, BlockState state2,
                                      BlockPos pos, boolean b1, boolean b2) {
-        // 内部连接（主方块 <-> extraWheel）保持 1:1 传动，绕过原版按 signal 修改齿数比的逻辑
+        // 内部连接（主方块 <-> extraWheel）保持 1:1 传动
+        // 齿轮面→传动杆面 的转速转换由 RotationPropagatorMixin 在内部连接上注入查表 RPM 完成
         if (target == this) return 1f;
         if (target instanceof AnalogTransmissionBlockEntity.AnalogTransmissionCogwheel cog
                 && cog.getParentBlockEntity() == this) {
