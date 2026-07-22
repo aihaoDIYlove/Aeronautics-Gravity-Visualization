@@ -1,5 +1,6 @@
 package icu.dreamripples.aeronautics_gravity.block;
 
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
@@ -14,7 +15,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
  * 无需 Mixin 或手动通知。质量到 mass_tier 的映射由 physics_block_properties/counterweight.json 的
  * overrides 字段定义。
  */
-public class CounterweightBlock extends Block implements IBE<CounterweightBlockEntity> {
+public class CounterweightBlock extends Block implements IBE<CounterweightBlockEntity>, IWrenchable {
 
     public static final IntegerProperty MASS_TIER = IntegerProperty.create("mass_tier", 1, 20);
 

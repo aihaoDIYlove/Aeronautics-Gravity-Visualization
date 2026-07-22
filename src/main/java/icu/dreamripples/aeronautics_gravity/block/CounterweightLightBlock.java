@@ -1,5 +1,6 @@
 package icu.dreamripples.aeronautics_gravity.block;
 
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
@@ -15,7 +16,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
  * 自身 mass=1(避免 MassTracker.build 在 mass=0 时除零 NaN),浮力由 floating_material + floating_scale 提供,
  * prevent_self_lift=true 保证浮力不超重力(不飞天)。
  */
-public class CounterweightLightBlock extends Block implements IBE<CounterweightLightBlockEntity> {
+public class CounterweightLightBlock extends Block implements IBE<CounterweightLightBlockEntity>, IWrenchable {
 
     public static final IntegerProperty LIFT_TIER = IntegerProperty.create("lift_tier", 1, 36);
 
