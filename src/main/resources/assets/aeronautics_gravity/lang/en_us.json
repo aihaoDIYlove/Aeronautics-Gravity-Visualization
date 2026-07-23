@@ -4,8 +4,8 @@
   "block.aeronautics_gravity.convenient_analog_transmission": "Convenient Analog Transmission",
   "block.aeronautics_gravity.counterweight": "Counterweight",
   "block.aeronautics_gravity.counterweight.mass_tier": "Mass Tier",
-  "block.aeronautics_gravity.counterweight_light": "Counterweight Light",
-  "block.aeronautics_gravity.counterweight_light.lift_tier": "Lift Tier",
+  "block.aeronautics_gravity.counterweight_light": "Buoyant Counterweight",
+  "block.aeronautics_gravity.counterweight_light.lift_tier": "Buoyancy Tier",
   "aeronautics_gravity.unit.mass_kpg": "Mass (kpg)",
-  "aeronautics_gravity.unit.lift_kpg": "Lift (pN)"
+  "aeronautics_gravity.unit.lift_kpg": "Buoyancy (kpg)"
 }
