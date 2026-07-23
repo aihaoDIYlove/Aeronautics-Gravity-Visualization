@@ -7,5 +7,5 @@
   "block.aeronautics_gravity.counterweight_light": "配“轻”块",
   "block.aeronautics_gravity.counterweight_light.lift_tier": "浮力档位",
   "aeronautics_gravity.unit.mass_kpg": "质量 (kpg)",
-  "aeronautics_gravity.unit.lift_kpg": "升力 (pN)"
+  "aeronautics_gravity.unit.lift_kpg": "浮力 (pN)"
 }
