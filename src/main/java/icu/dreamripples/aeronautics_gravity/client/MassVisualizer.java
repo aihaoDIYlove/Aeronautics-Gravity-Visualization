@@ -7,6 +7,7 @@ import dev.simulated_team.simulated.index.SimSpecialTextures;
 import net.createmod.catnip.outliner.Outliner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
@@ -20,6 +21,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.joml.Quaterniondc;
+import org.joml.Quaternionf;
 import org.joml.Vector3dc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -38,29 +41,31 @@ public class MassVisualizer {
 
     private static final Map<UUID, Visualization> ACTIVE = new LinkedHashMap<>();
     private static final long DEFAULT_EXPIRE_MS = 6 * 60 * 1000;
+    private static final int RESCAN_INTERVAL_TICKS = 10;
 
     private static class Visualization {
         final ClientSubLevel subLevel;
-        final Map<BlockState, Set<BlockPos>> typeGroups;
-        final Map<BlockState, Double> typeMasses;
-        final double totalMass;
-        final long expiresAt;
+        final Map<BlockState, Set<BlockPos>> typeGroups = new LinkedHashMap<>();
+        final Map<BlockState, Double> typeMasses = new IdentityHashMap<>();
+        double totalMass;
+        long expiresAt;
 
-        Visualization(ClientSubLevel subLevel,
-                      Map<BlockState, Set<BlockPos>> typeGroups,
-                      Map<BlockState, Double> typeMasses,
-                      double totalMass, long expiresAt) {
+        Visualization(ClientSubLevel subLevel, long expiresAt) {
             this.subLevel = subLevel;
-            this.typeGroups = typeGroups;
-            this.typeMasses = typeMasses;
-            this.totalMass = totalMass;
             this.expiresAt = expiresAt;
         }
     }
 
-    private static final float COM_SIZE = 0.15f; // 重心球半径(原方块半边长 0.4,缩小后不挡周围方块)
-    private static final int COM_COLOR = 0xE000BFFF; // 亮蓝色（深天蓝），穿透方块显示
-    private static final float OVERLAY_LINE_WIDTH = 0.0625f;
+    // 重心标记:3 轴十字准星,跟船本地轴旋转,NO_DEPTH_TEST 穿墙可见。
+    // 臂长与臂粗都随相机距离缩放:<=近端用小值(近处精),>=远端用大值(远处仍可见),
+    // 之间线性插值,让屏幕上的视大小大致恒定。
+    private static final float COM_ARM_LENGTH_NEAR = 0.125f; // 距离<=COM_DIST_NEAR 时的单臂半长
+    private static final float COM_ARM_LENGTH_FAR = 2.0f;    // 距离>=COM_DIST_FAR 时的单臂半长
+    private static final float COM_ARM_HALF_NEAR = 0.0125f; // 距离<=COM_DIST_NEAR 时的臂半粗
+    private static final float COM_ARM_HALF_FAR = 0.1f;      // 距离>=COM_DIST_FAR 时的臂半粗
+    private static final double COM_DIST_NEAR = 4.0;          // 近端距离(格)
+    private static final double COM_DIST_FAR = 64.0;          // 远端距离(格)
+    private static final int COM_COLOR = 0xE000BFFF;         // 亮蓝,穿透方块显示
 
     public static void toggle(ClientSubLevel subLevel) {
         UUID id = subLevel.getUniqueId();
@@ -76,8 +81,15 @@ public class MassVisualizer {
         return !ACTIVE.isEmpty();
     }
 
+    private static int tickCounter = 0;
+
     public static void clientTick() {
         ACTIVE.entrySet().removeIf(e -> e.getValue().expiresAt < System.currentTimeMillis());
+        // 每 RESCAN_INTERVAL_TICKS 重扫一次,让遮罩反映最新的方块摧毁/放置。
+        // showCluster 每帧从 viz.typeGroups 重建 cluster mesh,就地改 Set 下一帧自动生效,无刷新闪烁。
+        if (!ACTIVE.isEmpty() && (tickCounter++ % RESCAN_INTERVAL_TICKS) == 0) {
+            for (var viz : ACTIVE.values()) rescan(viz);
+        }
     }
 
     public static void renderOverlay(RenderLevelStageEvent event) {
@@ -114,10 +126,22 @@ public class MassVisualizer {
     }
 
     private static void activate(ClientSubLevel cs) {
-        Map<BlockState, Set<BlockPos>> typeGroups = new LinkedHashMap<>();
+        Visualization viz = new Visualization(cs, System.currentTimeMillis() + DEFAULT_EXPIRE_MS);
+        ACTIVE.put(cs.getUniqueId(), viz);
+        rescan(viz);
+    }
+
+    /**
+     * 就地重建 viz 的质量分组。每 {@link #RESCAN_INTERVAL_TICKS} tick 调一次,
+     * 让遮罩反映最新的方块摧毁/放置。
+     */
+    private static void rescan(Visualization viz) {
+        ClientSubLevel cs = viz.subLevel;
+        viz.typeGroups.clear();
+        viz.typeMasses.clear();
+
         Map<BlockState, Double> typeMassSums = new IdentityHashMap<>();
         Map<BlockState, Integer> typeCounts = new IdentityHashMap<>();
-
         double totalM = 0;
         BlockPos.MutableBlockPos holdingPos = new BlockPos.MutableBlockPos();
 
@@ -154,7 +178,7 @@ public class MassVisualizer {
                             double mass = PhysicsBlockPropertyHelper.getMass(bg, holdingPos, state);
                             if (mass <= 0) continue;
 
-                            typeGroups.computeIfAbsent(state, k -> new HashSet<>()).add(holdingPos.immutable());
+                            viz.typeGroups.computeIfAbsent(state, k -> new HashSet<>()).add(holdingPos.immutable());
                             typeMassSums.merge(state, mass, Double::sum);
                             typeCounts.merge(state, 1, Integer::sum);
 
@@ -165,20 +189,15 @@ public class MassVisualizer {
             }
         }
 
-        Map<BlockState, Double> typeMasses = new IdentityHashMap<>();
         for (var entry : typeMassSums.entrySet()) {
-            typeMasses.put(entry.getKey(), entry.getValue() / typeCounts.get(entry.getKey()));
+            viz.typeMasses.put(entry.getKey(), entry.getValue() / typeCounts.get(entry.getKey()));
         }
-
-        ACTIVE.put(cs.getUniqueId(), new Visualization(
-                cs, typeGroups, typeMasses, totalM,
-                System.currentTimeMillis() + DEFAULT_EXPIRE_MS));
+        viz.totalMass = totalM;
     }
 
     private static void renderTypeGroups(Visualization viz, Outliner outliner, float partialTick) {
         // 按颜色分组而非按 BlockState 分组,让相同颜色的方块合并进同一个 cluster。
-        // 这样同色交界处的边由 BlockClusterOutline 的 MergeEntry Set 自动去重,不会 z-fight。
-        // 异色交界处两个 cluster 的边框仍会重叠,但颜色不同视觉上是"双色边框"而非同色花斑闪烁。
+        // 这样同色交界处的面由 BlockClusterOutline 的 MergeEntry Set 自动去重。
         Map<Integer, Set<BlockPos>> colorGroups = new LinkedHashMap<>();
         for (var entry : viz.typeGroups.entrySet()) {
             if (entry.getValue().isEmpty()) continue;
@@ -196,11 +215,13 @@ public class MassVisualizer {
 
             // Sable 的 BlockClusterOutlineMixin.sable$projectFromSublevel 会遍历 BlockPos 找到
             // 对应的 ClientSubLevel 并应用 renderPose（旋转 + 平移），所以这里直接传子级本地 BlockPos。
+            // 关闭边线(lineWidth 0):Catnip 的线走 outlineSolid() 会写深度,异色 cluster 边界
+            // 处两条共面线 z-fight 闪烁。只保留 outlineTranslucent() 面填充(不写深度),
+            // 边界处两层半透明面自然混合,稳定不闪。
             outliner.showCluster(keyPrefix + color, positions)
                     .colored(color)
                     .withFaceTexture(SimSpecialTextures.HONEY_GLUE)
-                    .lineWidth(OVERLAY_LINE_WIDTH)
-                    .disableLineNormals();
+                    .lineWidth(0);
         }
     }
 
@@ -212,6 +233,7 @@ public class MassVisualizer {
         // Sable 的物理 pipeline 保证 rotationPoint = centerOfMass,
         // 所以重心世界坐标 = pose.position()。
         Vector3dc position = pose.position();
+        Quaterniondc orientation = pose.orientation();
         Vec3 camera = event.getCamera().getPosition();
 
         // 用自定义 RenderType（NO_DEPTH_TEST）画重心标记,使其穿透方块显示不被遮挡。
@@ -219,42 +241,44 @@ public class MassVisualizer {
         PoseStack poseStack = event.getPoseStack();
         poseStack.pushPose();
         poseStack.translate(position.x() - camera.x, position.y() - camera.y, position.z() - camera.z);
+        // 跟船本地轴旋转:准星随子级 orientation 转,顺带当朝向指示器。位置用 pose.position()
+        // (世界 COM),旋转用 orientation,完全不依赖未同步的 rotationPoint。
+        poseStack.mulPose(new Quaternionf(orientation));
+
+        // 臂长与臂粗都按相机到 COM 的世界距离缩放:position 和 camera 都是世界坐标,
+        // 直接欧氏距离即可,不涉及子级/本地坐标转换。近端小远端大,屏幕视大小大致恒定。
+        double dist = Math.sqrt(position.distanceSquared(camera.x, camera.y, camera.z));
+        double t = (dist - COM_DIST_NEAR) / (COM_DIST_FAR - COM_DIST_NEAR);
+        float l = (float) Mth.clampedLerp(COM_ARM_LENGTH_NEAR, COM_ARM_LENGTH_FAR, t);
+        float h = (float) Mth.clampedLerp(COM_ARM_HALF_NEAR, COM_ARM_HALF_FAR, t);
 
         VertexConsumer buffer = Minecraft.getInstance().renderBuffers().bufferSource()
                 .getBuffer(MassRenderTypes.centerOfMass());
-        sphere(buffer, poseStack.last(), COM_SIZE, COM_COLOR);
+        // 3 轴十字:三段细方体沿 X/Y/Z 过原点,交点即 COM。
+        box(buffer, poseStack.last(), -l, -h, -h, l, h, h, COM_COLOR); // X
+        box(buffer, poseStack.last(), -h, -l, -h, h, l, h, COM_COLOR); // Y
+        box(buffer, poseStack.last(), -h, -h, -l, h, h, l, COM_COLOR); // Z
 
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch(MassRenderTypes.centerOfMass());
         poseStack.popPose();
     }
 
-    private static void sphere(VertexConsumer vc, PoseStack.Pose pose, float radius, int color) {
-        // UV sphere: 经度 segments 切片 × 纬度 rings 段。NO_CULL 下正反面都画,
-        // 任意角度投影都是圆,圆心即几何中心,配平时肉眼判断是否居中更直观。
-        int segments = 12;
-        int rings = 8;
-        // 预计算 (rings+1)×(segments+1) 顶点,相邻 quad 共用顶点避免重复。
-        float[][][] v = new float[rings + 1][segments + 1][3];
-        for (int i = 0; i <= rings; i++) {
-            double theta = Math.PI * i / rings;          // 0..π, 北极到南极
-            double sinT = Math.sin(theta);
-            double cosT = Math.cos(theta);
-            for (int j = 0; j <= segments; j++) {
-                double phi = 2 * Math.PI * j / segments;  // 0..2π
-                v[i][j][0] = (float) (radius * sinT * Math.cos(phi));
-                v[i][j][1] = (float) (radius * cosT);
-                v[i][j][2] = (float) (radius * sinT * Math.sin(phi));
-            }
-        }
-        for (int i = 0; i < rings; i++) {
-            for (int j = 0; j < segments; j++) {
-                quad(vc, pose, color,
-                        v[i][j][0], v[i][j][1], v[i][j][2],
-                        v[i][j + 1][0], v[i][j + 1][1], v[i][j + 1][2],
-                        v[i + 1][j + 1][0], v[i + 1][j + 1][1], v[i + 1][j + 1][2],
-                        v[i + 1][j][0], v[i + 1][j][1], v[i + 1][j][2]);
-            }
-        }
+    /** 画一个轴对齐方体(6 面,NO_CULL 下正反面都可见)。用于构成十字准星的三段臂。 */
+    private static void box(VertexConsumer vc, PoseStack.Pose pose,
+                            float x0, float y0, float z0,
+                            float x1, float y1, float z1, int color) {
+        quad(vc, pose, color,
+                x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1); // 下 (y0)
+        quad(vc, pose, color,
+                x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0); // 上 (y1)
+        quad(vc, pose, color,
+                x0, y0, z0, x0, y1, z0, x1, y1, z0, x1, y0, z0); // -Z (z0)
+        quad(vc, pose, color,
+                x1, y0, z1, x1, y1, z1, x0, y1, z1, x0, y0, z1); // +Z (z1)
+        quad(vc, pose, color,
+                x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0); // -X (x0)
+        quad(vc, pose, color,
+                x1, y0, z0, x1, y1, z0, x1, y1, z1, x1, y0, z1); // +X (x1)
     }
 
     private static void quad(VertexConsumer vc, PoseStack.Pose pose, int color,
