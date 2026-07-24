@@ -3,10 +3,12 @@ package icu.dreamripples.aeronautics_gravity.client;
 import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.physics.config.block_properties.PhysicsBlockPropertyHelper;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
-import dev.simulated_team.simulated.index.SimSpecialTextures;
-import net.createmod.catnip.outliner.Outliner;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
@@ -21,8 +23,10 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import org.joml.Matrix4f;
 import org.joml.Quaterniondc;
 import org.joml.Quaternionf;
+import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -32,6 +36,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -49,6 +54,7 @@ public class MassVisualizer {
         final Map<BlockState, Double> typeMasses = new IdentityHashMap<>();
         double totalMass;
         long expiresAt;
+        SubLevelBlockGetter blockGetter; // rescan 时建,渲染时查裸露面邻居
 
         Visualization(ClientSubLevel subLevel, long expiresAt) {
             this.subLevel = subLevel;
@@ -66,6 +72,11 @@ public class MassVisualizer {
     private static final double COM_DIST_NEAR = 4.0;          // 近端距离(格)
     private static final double COM_DIST_FAR = 64.0;          // 远端距离(格)
     private static final int COM_COLOR = 0xE000BFFF;         // 亮蓝,穿透方块显示
+
+    // 质量数字:公告板,画在方块中心,只画表面方块(任一面接触空气),只画玩家半径内的方块。
+    private static final double NUMBER_RADIUS = 16.0;        // 玩家半径(格),超出不画
+    private static final double NUMBER_RADIUS_SQ = NUMBER_RADIUS * NUMBER_RADIUS;
+    private static final float NUMBER_SCALE = 0.02f;          // 字号(scale 后 Y 取负翻转)
 
     public static void toggle(ClientSubLevel subLevel) {
         UUID id = subLevel.getUniqueId();
@@ -95,17 +106,15 @@ public class MassVisualizer {
     public static void renderOverlay(RenderLevelStageEvent event) {
         if (ACTIVE.isEmpty()) return;
 
-        // 用 RenderLevelStageEvent 的 partialTick,与 Catnip 的 Outliner.renderOutlines
-        // (AFTER_PARTICLES 阶段) 用的是同一帧插值,避免半帧错位。
+        // 用 RenderLevelStageEvent 的 partialTick,与子级 renderPose 同帧插值,避免半帧错位。
         float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
-        var outliner = Outliner.getInstance();
         var stage = event.getStage();
 
         for (var viz : ACTIVE.values()) {
-            // 方块遮罩分组:必须在 AFTER_TRANSLUCENT_BLOCKS 调用,让 Catnip Outliner 在
-            // AFTER_PARTICLES 阶段 renderOutlines 时能从队列里取到 cluster。
+            // 质量数字:在 AFTER_TRANSLUCENT_BLOCKS 画,走 Font + SEE_THROUGH(无深度测试),
+            // 让中心数字穿透本体方块显示。代价是也会穿透其他方块,靠表面剔除+半径裁剪缓解。
             if (stage == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
-                renderTypeGroups(viz, outliner, partialTick);
+                renderMassNumbers(viz, event, partialTick);
             }
             // 重心标记:放在 AFTER_PARTICLES 阶段渲染。原因:
             // 1. NO_DEPTH_TEST 只让 COM 自己不被已有深度挡住,但不阻止后续绘制覆盖。
@@ -149,6 +158,7 @@ public class MassVisualizer {
         // 若用 cs.getLevel() 作为 BlockGetter,VoxelNeighborhoodState.isSolid 会读到 air,
         // 导致 getMass 返回 0、方块被过滤。这里用子级 chunk 自建 BlockGetter。
         var bg = new SubLevelBlockGetter(cs);
+        viz.blockGetter = bg;
 
         for (var holder : cs.getPlot().getLoadedChunks()) {
             LevelChunk chunk = holder.getChunk();
@@ -195,34 +205,90 @@ public class MassVisualizer {
         viz.totalMass = totalM;
     }
 
-    private static void renderTypeGroups(Visualization viz, Outliner outliner, float partialTick) {
-        // 按颜色分组而非按 BlockState 分组,让相同颜色的方块合并进同一个 cluster。
-        // 这样同色交界处的面由 BlockClusterOutline 的 MergeEntry Set 自动去重。
-        Map<Integer, Set<BlockPos>> colorGroups = new LinkedHashMap<>();
+    private static void renderMassNumbers(Visualization viz, RenderLevelStageEvent event, float partialTick) {
+        if (viz.blockGetter == null) return;
+        Pose3dc pose = viz.subLevel.renderPose(partialTick);
+        if (pose == null) return;
+
+        Vector3dc position = pose.position();
+        Quaterniondc orientation = pose.orientation();
+        Vector3dc rotationPoint = pose.rotationPoint();
+        Vec3 camera = event.getCamera().getPosition();
+
+        // localPlayer = R^-1 * (camera - position) + rotationPoint。旋转保长,本地距离=世界距离,
+        // 逐方块只做平方距离比较,无需逐块旋转。position/orientation/rotationPoint 都取自 renderPose。
+        Vector3d localPlayer = new Vector3d(camera.x, camera.y, camera.z).sub(position);
+        orientation.transformInverse(localPlayer);
+        localPlayer.add(rotationPoint);
+
+        Font font = Minecraft.getInstance().font;
+        MultiBufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
+        // 公告板:cameraOrientation = R_cam^-1,mulPose 后文字始终正对相机。
+        // 参考 SmartBlockEntityRenderer.renderNameplateOnHover 的 billboard 写法。
+        Quaternionf billboard = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        int light = LightTexture.FULL_BRIGHT;
+        PoseStack poseStack = event.getPoseStack();
+        BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
+        Vector3d localFace = new Vector3d();
+        Vector3d worldFace = new Vector3d();
+
         for (var entry : viz.typeGroups.entrySet()) {
-            if (entry.getValue().isEmpty()) continue;
-            double avgMass = viz.typeMasses.getOrDefault(entry.getKey(), 1.0);
-            int color = massToColor(avgMass);
-            colorGroups.computeIfAbsent(color, k -> new HashSet<>()).addAll(entry.getValue());
-        }
+            BlockState state = entry.getKey();
+            Double massBoxed = viz.typeMasses.get(state);
+            if (massBoxed == null) continue;
+            double mass = massBoxed;
+            // drawInBatch 的 color 是 ARGB,alpha 会被尊重(不像 Catnip 的 colored(int)),这里强制不透明。
+            int color = massToColor(mass) | 0xFF000000;
+            String text = formatMass(mass);
+            float textX = -font.width(text) / 2f;
 
-        // key 带 subLevelId 前缀,避免多个 subLevel 的同色 cluster 互相覆盖。
-        String keyPrefix = "aeronautics_gravity:" + viz.subLevel.getUniqueId() + ":";
-        for (var entry : colorGroups.entrySet()) {
-            int color = entry.getKey();
-            Set<BlockPos> positions = entry.getValue();
-            if (positions.isEmpty()) continue;
+            for (BlockPos pos : entry.getValue()) {
+                // 半径裁剪(本地空间)
+                double dx = pos.getX() + 0.5 - localPlayer.x();
+                double dy = pos.getY() + 0.5 - localPlayer.y();
+                double dz = pos.getZ() + 0.5 - localPlayer.z();
+                if (dx * dx + dy * dy + dz * dz > NUMBER_RADIUS_SQ) continue;
 
-            // Sable 的 BlockClusterOutlineMixin.sable$projectFromSublevel 会遍历 BlockPos 找到
-            // 对应的 ClientSubLevel 并应用 renderPose（旋转 + 平移），所以这里直接传子级本地 BlockPos。
-            // 关闭边线(lineWidth 0):Catnip 的线走 outlineSolid() 会写深度,异色 cluster 边界
-            // 处两条共面线 z-fight 闪烁。只保留 outlineTranslucent() 面填充(不写深度),
-            // 边界处两层半透明面自然混合,稳定不闪。
-            outliner.showCluster(keyPrefix + color, positions)
-                    .colored(color)
-                    .withFaceTexture(SimSpecialTextures.HONEY_GLUE)
-                    .lineWidth(0);
+                // 表面剔除:任一面接触空气才算表面方块,六面被围的内部方块跳过。
+                // 内部方块的中心数字在 NORMAL 下被周围方块挡死、在 SEE_THROUGH 下穿透出来糊脸,
+                // 两种情况渲染都无意义,直接跳过省掉大量 drawInBatch(实心结构内部占比过半)。
+                boolean exposed = false;
+                for (Direction dir : Direction.values()) {
+                    neighborPos.set(pos.getX() + dir.getStepX(), pos.getY() + dir.getStepY(), pos.getZ() + dir.getStepZ());
+                    if (viz.blockGetter.getBlockState(neighborPos).isAir()) {
+                        exposed = true;
+                        break;
+                    }
+                }
+                if (!exposed) continue;
+
+                // 数字画在方块中心(本地),用 SEE_THROUGH 穿透本体方块显示。
+                // 为何必须 SEE_THROUGH:MC 深度缓冲全局共享,不透明方块已写满深度,
+                // 中心位置深度比表面远,NORMAL 深度测试会被自身方块面深度剔除 -> 完全看不到。
+                // 代价:SEE_THROUGH 无深度测试,也会穿透其他方块。无法"只穿透本体"--
+                // 那需要自定义 framebuffer 多 pass,在 MC 管线内极 hacky。靠表面剔除+半径裁剪缓解。
+                localFace.set(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+                // 世界坐标: worldFace = R * (localFace - rotationPoint) + position
+                // 与 COM 准星同一套变换,绕开 posePlotToProjected 的 +R*cam 坑。
+                worldFace.set(localFace).sub(rotationPoint);
+                orientation.transform(worldFace);
+                worldFace.add(position);
+
+                poseStack.pushPose();
+                poseStack.translate(worldFace.x - camera.x, worldFace.y - camera.y, worldFace.z - camera.z);
+                poseStack.mulPose(billboard);
+                poseStack.scale(NUMBER_SCALE, -NUMBER_SCALE, NUMBER_SCALE);
+                Matrix4f matrix = poseStack.last().pose();
+                font.drawInBatch(text, textX, 0, color, false, matrix, buffer, Font.DisplayMode.SEE_THROUGH, 0, light);
+                poseStack.popPose();
+            }
         }
+    }
+
+    private static String formatMass(double mass) {
+        return mass < 1.0
+                ? String.format(Locale.ROOT, "%.2f", mass)
+                : String.format(Locale.ROOT, "%.1f", mass);
     }
 
     private static void renderCenterOfMass(Visualization viz, RenderLevelStageEvent event, float partialTick) {
