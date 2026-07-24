@@ -31,8 +31,9 @@ public class SparkWandItem extends Item {
                     hitPos, subLevel);
 
             if (subLevel instanceof ClientSubLevel cs) {
-                MassVisualizer.toggle(cs);
-                AeronauticsGravityVisualization.LOGGER.info("[SparkWand] => toggled!");
+                boolean heavy = context.getPlayer() != null && context.getPlayer().isShiftKeyDown();
+                MassVisualizer.toggle(cs, heavy);
+                AeronauticsGravityVisualization.LOGGER.info("[SparkWand] => toggled (heavy={})!", heavy);
             }
         }
         return InteractionResult.SUCCESS;

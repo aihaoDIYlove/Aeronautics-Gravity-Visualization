@@ -55,10 +55,12 @@ public class MassVisualizer {
         double totalMass;
         long expiresAt;
         SubLevelBlockGetter blockGetter; // rescan 时建,渲染时查裸露面邻居
+        boolean heavy; // true=重块模式(只 >=2,不剔除,穿透找重块配平); false=全量模式(朝向玩家剔除)
 
-        Visualization(ClientSubLevel subLevel, long expiresAt) {
+        Visualization(ClientSubLevel subLevel, long expiresAt, boolean heavy) {
             this.subLevel = subLevel;
             this.expiresAt = expiresAt;
+            this.heavy = heavy;
         }
     }
 
@@ -77,14 +79,20 @@ public class MassVisualizer {
     private static final double NUMBER_RADIUS = 16.0;        // 玩家半径(格),超出不画
     private static final double NUMBER_RADIUS_SQ = NUMBER_RADIUS * NUMBER_RADIUS;
     private static final float NUMBER_SCALE = 0.02f;          // 字号(scale 后 Y 取负翻转)
+    private static final double HEAVY_MASS_THRESHOLD = 2.0;   // 重块模式阈值:>=2 才画(配平分析)
 
-    public static void toggle(ClientSubLevel subLevel) {
+    public static void toggle(ClientSubLevel subLevel, boolean heavy) {
         UUID id = subLevel.getUniqueId();
-        if (ACTIVE.containsKey(id)) {
-            ACTIVE.remove(id);
+        Visualization existing = ACTIVE.get(id);
+        if (existing != null) {
+            if (existing.heavy == heavy) {
+                ACTIVE.remove(id); // 同模式再点 -> 关
+            } else {
+                existing.heavy = heavy; // 异模式 -> 切换,复用已扫数据
+            }
         } else {
             ACTIVE.clear();
-            activate(subLevel);
+            activate(subLevel, heavy);
         }
     }
 
@@ -134,8 +142,8 @@ public class MassVisualizer {
         }
     }
 
-    private static void activate(ClientSubLevel cs) {
-        Visualization viz = new Visualization(cs, System.currentTimeMillis() + DEFAULT_EXPIRE_MS);
+    private static void activate(ClientSubLevel cs, boolean heavy) {
+        Visualization viz = new Visualization(cs, System.currentTimeMillis() + DEFAULT_EXPIRE_MS, heavy);
         ACTIVE.put(cs.getUniqueId(), viz);
         rescan(viz);
     }
@@ -231,12 +239,16 @@ public class MassVisualizer {
         BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
         Vector3d localFace = new Vector3d();
         Vector3d worldFace = new Vector3d();
+        Direction[] facing = new Direction[3]; // 朝向玩家的面,逐方块复用避免 GC
 
         for (var entry : viz.typeGroups.entrySet()) {
             BlockState state = entry.getKey();
             Double massBoxed = viz.typeMasses.get(state);
             if (massBoxed == null) continue;
             double mass = massBoxed;
+            // 重块模式:类型级过滤,跳过 <2 的轻块。同类型质量相同(平均=单块),
+            // 整类型跳过比逐方块判断省。大部分方块质量1,这步砍掉绝大多数,留配平关键重块。
+            if (viz.heavy && mass < HEAVY_MASS_THRESHOLD) continue;
             // drawInBatch 的 color 是 ARGB,alpha 会被尊重(不像 Catnip 的 colored(int)),这里强制不透明。
             int color = massToColor(mass) | 0xFF000000;
             String text = formatMass(mass);
@@ -249,18 +261,22 @@ public class MassVisualizer {
                 double dz = pos.getZ() + 0.5 - localPlayer.z();
                 if (dx * dx + dy * dy + dz * dz > NUMBER_RADIUS_SQ) continue;
 
-                // 表面剔除:任一面接触空气才算表面方块,六面被围的内部方块跳过。
-                // 内部方块的中心数字在 NORMAL 下被周围方块挡死、在 SEE_THROUGH 下穿透出来糊脸,
-                // 两种情况渲染都无意义,直接跳过省掉大量 drawInBatch(实心结构内部占比过半)。
-                boolean exposed = false;
-                for (Direction dir : Direction.values()) {
-                    neighborPos.set(pos.getX() + dir.getStepX(), pos.getY() + dir.getStepY(), pos.getZ() + dir.getStepZ());
-                    if (viz.blockGetter.getBlockState(neighborPos).isAir()) {
-                        exposed = true;
-                        break;
+                // 全量模式:朝向玩家的面(每轴按分量正负选一个,最多3面)任一 air 才画,
+                // 砍背面缓解花眼。重块模式跳过剔除--重块稀疏不花眼,且要穿透找到所有重块配平。
+                if (!viz.heavy) {
+                    double ddx = localPlayer.x() - (pos.getX() + 0.5);
+                    double ddy = localPlayer.y() - (pos.getY() + 0.5);
+                    double ddz = localPlayer.z() - (pos.getZ() + 0.5);
+                    facing[0] = ddx >= 0 ? Direction.EAST : Direction.WEST;
+                    facing[1] = ddy >= 0 ? Direction.UP : Direction.DOWN;
+                    facing[2] = ddz >= 0 ? Direction.SOUTH : Direction.NORTH;
+                    boolean exposed = false;
+                    for (Direction dir : facing) {
+                        neighborPos.set(pos.getX() + dir.getStepX(), pos.getY() + dir.getStepY(), pos.getZ() + dir.getStepZ());
+                        if (viz.blockGetter.getBlockState(neighborPos).isAir()) { exposed = true; break; }
                     }
+                    if (!exposed) continue;
                 }
-                if (!exposed) continue;
 
                 // 数字画在方块中心(本地),用 SEE_THROUGH 穿透本体方块显示。
                 // 为何必须 SEE_THROUGH:MC 深度缓冲全局共享,不透明方块已写满深度,
