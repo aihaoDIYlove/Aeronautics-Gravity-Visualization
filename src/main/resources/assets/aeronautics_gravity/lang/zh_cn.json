@@ -4,9 +4,12 @@
   "tooltip.aeronautics_gravity.spark_wand.heavy": "Shift+右键：重块视图（质量≥2，穿透显示）",
   "itemGroup.aeronautics_gravity.main": "航空学：重力可视化",
   "block.aeronautics_gravity.convenient_analog_transmission": "更方便的模拟传动器",
-  "block.aeronautics_gravity.counterweight": "配重块",
+  "block.aeronautics_gravity.counterweight": "配重块（铁质）",
+  "block.aeronautics_gravity.counterweight_coal": "配重块（煤质）",
+  "block.aeronautics_gravity.counterweight_gold": "配重块（金质）",
   "block.aeronautics_gravity.counterweight.mass_tier": "质量档位",
   "block.aeronautics_gravity.counterweight_light": "配“轻”块",
+  "block.aeronautics_gravity.counterweight_light_pearl": "珠光配“轻”块",
   "block.aeronautics_gravity.counterweight_light.lift_tier": "浮力档位",
   "aeronautics_gravity.unit.mass_kpg": "质量 (kpg)",
   "aeronautics_gravity.unit.lift_kpg": "浮力 (kpg)"

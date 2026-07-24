@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IBI",
+    "LTL",
+    "IBI"
+  ],
+  "key": {
+    "I": { "item": "minecraft:coal_block" },
+    "B": { "item": "create:brass_casing" },
+    "L": { "item": "aeronautics:levitite_blend_bucket" },
+    "T": { "item": "simulated:throttle_lever" }
+  },
+  "result": {
+    "count": 1,
+    "id": "aeronautics_gravity:counterweight_coal"
+  }
+}
