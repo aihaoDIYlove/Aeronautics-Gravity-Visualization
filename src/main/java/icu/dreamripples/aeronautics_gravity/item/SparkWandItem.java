@@ -5,10 +5,16 @@ import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
 import icu.dreamripples.aeronautics_gravity.client.MassVisualizer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+
+import java.util.List;
 
 public class SparkWandItem extends Item {
     public SparkWandItem() {
@@ -37,5 +43,11 @@ public class SparkWandItem extends Item {
             }
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.spark_wand.full").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.spark_wand.heavy").withStyle(ChatFormatting.GRAY));
     }
 }
