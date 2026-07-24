@@ -69,7 +69,7 @@ public class CounterweightLightBlockEntity extends SmartBlockEntity {
     private static class LiftTierScrollValueBehaviour extends ScrollValueBehaviour {
         public LiftTierScrollValueBehaviour(Component label, SmartBlockEntity be, ValueBoxTransform slot) {
             super(label, be, slot);
-            withFormatter(i -> i + " pN");
+            withFormatter(i -> i + " kpg");
         }
 
         @Override
@@ -81,7 +81,7 @@ public class CounterweightLightBlockEntity extends SmartBlockEntity {
 
         public MutableComponent formatSettings(ValueSettings settings) {
             int value = Math.max(MIN_TIER, Math.min(MAX_TIER, settings.value()));
-            return Component.literal(value + " pN");
+            return Component.literal(value + " kpg");
         }
     }
 
