@@ -4,6 +4,7 @@ import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlock;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlockEntity;
 import dev.simulated_team.simulated.mixin_interface.extra_kinetics.KineticBlockEntityExtension;
+import icu.dreamripples.aeronautics_gravity.mixin.AnalogTransmissionBlockEntityAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -63,6 +64,10 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
                 extraWheel.removeSource();
 
                 lastSignal = bestNeighborSignal;
+                // 同步父类 signal 字段，防止 super.tick() 重复进入信号变化分支
+                // （否则 super.tick 会再次 attachKinetics -> propagateNewSource，触发第二次
+                // destroyBlock，且 setBlockAndUpdate 会用 BlockEntity 内部 state 重新放回方块，掉落第二个物品）
+                ((AnalogTransmissionBlockEntityAccessor) this).aeronautics_gravity$setSignal(bestNeighborSignal);
                 getLevel().setBlockAndUpdate(getBlockPos(),
                         getBlockState().setValue(AnalogTransmissionBlock.POWERED, lastSignal > 0));
 
@@ -81,8 +86,14 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
             }
         }
 
-        getExtraKinetics().tick();
+        // 不调用 getExtraKinetics().tick()：super.tick()（AnalogTransmissionBlockEntity.tick）
+        // 在信号变化分支已被同步跳过后，仍会执行 extraWheel.tick() + KineticBlockEntity.tick
         super.tick();
+    }
+
+    /** 返回主BE是否被指定邻居驱动（用于 Mixin 判断反向传播到 source，避免 overpower source）。 */
+    public boolean isDrivenBy(KineticBlockEntity neighbor) {
+        return hasSource() && source.equals(neighbor.getBlockPos());
     }
 
     @Override
