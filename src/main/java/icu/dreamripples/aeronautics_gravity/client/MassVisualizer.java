@@ -8,7 +8,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
@@ -239,7 +238,6 @@ public class MassVisualizer {
         BlockPos.MutableBlockPos neighborPos = new BlockPos.MutableBlockPos();
         Vector3d localFace = new Vector3d();
         Vector3d worldFace = new Vector3d();
-        Direction[] facing = new Direction[3]; // 朝向玩家的面,逐方块复用避免 GC
 
         for (var entry : viz.typeGroups.entrySet()) {
             BlockState state = entry.getKey();
@@ -264,16 +262,27 @@ public class MassVisualizer {
                 // 全量模式:朝向玩家的面(每轴按分量正负选一个,最多3面)任一 air 才画,
                 // 砍背面缓解花眼。重块模式跳过剔除--重块稀疏不花眼,且要穿透找到所有重块配平。
                 if (!viz.heavy) {
+                    // 朝向玩家的遮挡剔除:沿玩家主方向(最大分量轴)查第一格邻居是否 air。
+                    // 只查主方向面(分量接近最大值的轴),不查侧面/顶面--
+                    // 否则 1 格厚墙的后方块会因侧面 air 误画,热气球等薄结构近乎全量显示。
+                    // 45 度棱处两/三分量并列时查所有并列主面,避免棱误杀。
                     double ddx = localPlayer.x() - (pos.getX() + 0.5);
                     double ddy = localPlayer.y() - (pos.getY() + 0.5);
                     double ddz = localPlayer.z() - (pos.getZ() + 0.5);
-                    facing[0] = ddx >= 0 ? Direction.EAST : Direction.WEST;
-                    facing[1] = ddy >= 0 ? Direction.UP : Direction.DOWN;
-                    facing[2] = ddz >= 0 ? Direction.SOUTH : Direction.NORTH;
+                    double adx = Math.abs(ddx), ady = Math.abs(ddy), adz = Math.abs(ddz);
+                    double maxComp = Math.max(adx, Math.max(ady, adz));
                     boolean exposed = false;
-                    for (Direction dir : facing) {
-                        neighborPos.set(pos.getX() + dir.getStepX(), pos.getY() + dir.getStepY(), pos.getZ() + dir.getStepZ());
-                        if (viz.blockGetter.getBlockState(neighborPos).isAir()) { exposed = true; break; }
+                    if (adx >= maxComp - 0.1) {
+                        neighborPos.set(pos.getX() + (ddx >= 0 ? 1 : -1), pos.getY(), pos.getZ());
+                        if (viz.blockGetter.getBlockState(neighborPos).isAir()) exposed = true;
+                    }
+                    if (!exposed && ady >= maxComp - 0.1) {
+                        neighborPos.set(pos.getX(), pos.getY() + (ddy >= 0 ? 1 : -1), pos.getZ());
+                        if (viz.blockGetter.getBlockState(neighborPos).isAir()) exposed = true;
+                    }
+                    if (!exposed && adz >= maxComp - 0.1) {
+                        neighborPos.set(pos.getX(), pos.getY(), pos.getZ() + (ddz >= 0 ? 1 : -1));
+                        if (viz.blockGetter.getBlockState(neighborPos).isAir()) exposed = true;
                     }
                     if (!exposed) continue;
                 }
