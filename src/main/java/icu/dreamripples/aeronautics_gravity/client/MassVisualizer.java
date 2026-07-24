@@ -230,7 +230,7 @@ public class MassVisualizer {
         localPlayer.add(rotationPoint);
 
         Font font = Minecraft.getInstance().font;
-        MultiBufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
+        MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         // 公告板:cameraOrientation = R_cam^-1,mulPose 后文字始终正对相机。
         // 参考 SmartBlockEntityRenderer.renderNameplateOnHover 的 billboard 写法。
         Quaternionf billboard = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
@@ -320,6 +320,11 @@ public class MassVisualizer {
 
         // 用自定义 RenderType（NO_DEPTH_TEST）画重心标记,使其穿透方块显示不被遮挡。
         // Outliner.showAABB 走 Catnip 默认 RenderType（有深度测试）,OutlineParams 无法禁用深度。
+        // 先 flush 所有 pending(含 AFTER_TRANSLUCENT_BLOCKS 写入的 textSeeThrough 数字顶点):
+        // 让数字在 AFTER_PARTICLES 画(在半透明地形/particles 之后,穿墙可见),再画 COM,
+        // 使 COM 盖在数字之上。否则 text 拖到 vanilla final endBatch 才画,会盖住先画的 COM,
+        // 导致 COM 看似不穿墙。NO_DEPTH_TEST 内容之间,画图顺序决定谁盖谁--COM 必须最后画。
+        Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
         PoseStack poseStack = event.getPoseStack();
         poseStack.pushPose();
         poseStack.translate(position.x() - camera.x, position.y() - camera.y, position.z() - camera.z);
@@ -341,7 +346,10 @@ public class MassVisualizer {
         box(buffer, poseStack.last(), -h, -l, -h, h, l, h, COM_COLOR); // Y
         box(buffer, poseStack.last(), -h, -h, -l, h, h, l, COM_COLOR); // Z
 
-        Minecraft.getInstance().renderBuffers().bufferSource().endBatch(MassRenderTypes.centerOfMass());
+        // 不主动 endBatch(centerOfMass):让 COM 顶点随 vanilla final endBatch 最晚画,
+        // 使 COM 成为最后画的世界空间内容(NO_DEPTH_TEST 内容最晚画才不被后续覆盖/遮挡)。
+        // 顶点 Matrix4f 是 AFTER_PARTICLES poseStack 的快照(含相机世界变换),
+        // final endBatch 时 modelview 已 popPose 为 identity,projection*poseMatrix 仍正确。
         poseStack.popPose();
     }
 
