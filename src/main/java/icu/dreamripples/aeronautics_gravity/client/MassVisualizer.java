@@ -262,28 +262,25 @@ public class MassVisualizer {
                 // 全量模式:朝向玩家的面(每轴按分量正负选一个,最多3面)任一 air 才画,
                 // 砍背面缓解花眼。重块模式跳过剔除--重块稀疏不花眼,且要穿透找到所有重块配平。
                 if (!viz.heavy) {
-                    // 朝向玩家的遮挡剔除:沿玩家主方向(最大分量轴)查第一格邻居是否 air。
-                    // 只查主方向面(分量接近最大值的轴),不查侧面/顶面--
-                    // 否则 1 格厚墙的后方块会因侧面 air 误画,热气球等薄结构近乎全量显示。
-                    // 45 度棱处两/三分量并列时查所有并列主面,避免棱误杀。
+                    // 主方向轴 DDA 遮挡剔除:沿主方向(分量接近最大值的轴)从方块向玩家逐格步进,
+                    // 遇任何实心方块即遮挡。比"只查第一格"强:能剔除 U 形墙空气腔后的第二面墙
+                    // (第一格是空气腔 air,但第二格才是遮挡墙)。
+                    // 并列主轴(45 度棱)都做 DDA,任一全 air 就画,避免棱误杀。
                     double ddx = localPlayer.x() - (pos.getX() + 0.5);
                     double ddy = localPlayer.y() - (pos.getY() + 0.5);
                     double ddz = localPlayer.z() - (pos.getZ() + 0.5);
                     double adx = Math.abs(ddx), ady = Math.abs(ddy), adz = Math.abs(ddz);
                     double maxComp = Math.max(adx, Math.max(ady, adz));
                     boolean exposed = false;
-                    if (adx >= maxComp - 0.1) {
-                        neighborPos.set(pos.getX() + (ddx >= 0 ? 1 : -1), pos.getY(), pos.getZ());
-                        if (viz.blockGetter.getBlockState(neighborPos).isAir()) exposed = true;
-                    }
-                    if (!exposed && ady >= maxComp - 0.1) {
-                        neighborPos.set(pos.getX(), pos.getY() + (ddy >= 0 ? 1 : -1), pos.getZ());
-                        if (viz.blockGetter.getBlockState(neighborPos).isAir()) exposed = true;
-                    }
-                    if (!exposed && adz >= maxComp - 0.1) {
-                        neighborPos.set(pos.getX(), pos.getY(), pos.getZ() + (ddz >= 0 ? 1 : -1));
-                        if (viz.blockGetter.getBlockState(neighborPos).isAir()) exposed = true;
-                    }
+                    if (adx >= maxComp - 0.1)
+                        exposed = isAxisClear(viz.blockGetter, neighborPos, pos.getX(), pos.getY(), pos.getZ(),
+                                ddx >= 0 ? 1 : -1, 0, 0, (int) adx);
+                    if (!exposed && ady >= maxComp - 0.1)
+                        exposed = isAxisClear(viz.blockGetter, neighborPos, pos.getX(), pos.getY(), pos.getZ(),
+                                0, ddy >= 0 ? 1 : -1, 0, (int) ady);
+                    if (!exposed && adz >= maxComp - 0.1)
+                        exposed = isAxisClear(viz.blockGetter, neighborPos, pos.getX(), pos.getY(), pos.getZ(),
+                                0, 0, ddz >= 0 ? 1 : -1, (int) adz);
                     if (!exposed) continue;
                 }
 
@@ -314,6 +311,20 @@ public class MassVisualizer {
         return mass < 1.0
                 ? String.format(Locale.ROOT, "%.2f", mass)
                 : String.format(Locale.ROOT, "%.1f", mass);
+    }
+
+    /**
+     * 沿 (stepX,stepY,stepZ) 方向从 (x,y,z)+step 起逐格步进 maxSteps 格,
+     * 遇非 air 方块返回 false(路径被遮挡)。用于主方向轴 DDA 遮挡剔除。
+     */
+    private static boolean isAxisClear(BlockGetter bg, BlockPos.MutableBlockPos pos, int x, int y, int z,
+                                       int stepX, int stepY, int stepZ, int maxSteps) {
+        for (int i = 0; i < maxSteps; i++) {
+            x += stepX; y += stepY; z += stepZ;
+            pos.set(x, y, z);
+            if (!bg.getBlockState(pos).isAir()) return false;
+        }
+        return true;
     }
 
     private static void renderCenterOfMass(Visualization viz, RenderLevelStageEvent event, float partialTick) {
