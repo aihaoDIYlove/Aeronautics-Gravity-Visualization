@@ -24,6 +24,11 @@ public class ModCreativeTabs {
                         output.accept(ModBlocks.COUNTERWEIGHT_GOLD_ITEM.get());
                         output.accept(ModBlocks.COUNTERWEIGHT_LIGHT_ITEM.get());
                         output.accept(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_ITEM.get());
+                        output.accept(ModBlocks.COUNTERWEIGHT_REDSTONE_ITEM.get());
+                        output.accept(ModBlocks.COUNTERWEIGHT_COAL_REDSTONE_ITEM.get());
+                        output.accept(ModBlocks.COUNTERWEIGHT_GOLD_REDSTONE_ITEM.get());
+                        output.accept(ModBlocks.COUNTERWEIGHT_LIGHT_REDSTONE_ITEM.get());
+                        output.accept(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_ITEM.get());
                     })
                     .build());
 }

@@ -95,6 +95,49 @@ public class ModBlocks {
             ModItems.ITEMS.register("counterweight_gold",
                     () -> new BlockItem(COUNTERWEIGHT_GOLD_BLOCK.get(), new Item.Properties()));
 
+    // 红石配重块系列:铁/煤/金三种皮,共用 RedstoneCounterweightBlock(MASS_TIER 1..16),红stone信号驱动,无 BE
+    public static final DeferredHolder<Block, RedstoneCounterweightBlock> COUNTERWEIGHT_REDSTONE_BLOCK =
+            BLOCKS.register("counterweight_redstone",
+                    () -> new RedstoneCounterweightBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<Block, RedstoneCounterweightBlock> COUNTERWEIGHT_COAL_REDSTONE_BLOCK =
+            BLOCKS.register("counterweight_coal_redstone",
+                    () -> new RedstoneCounterweightBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<Block, RedstoneCounterweightBlock> COUNTERWEIGHT_GOLD_REDSTONE_BLOCK =
+            BLOCKS.register("counterweight_gold_redstone",
+                    () -> new RedstoneCounterweightBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_REDSTONE_ITEM =
+            ModItems.ITEMS.register("counterweight_redstone",
+                    () -> new BlockItem(COUNTERWEIGHT_REDSTONE_BLOCK.get(), new Item.Properties()));
+
+    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_COAL_REDSTONE_ITEM =
+            ModItems.ITEMS.register("counterweight_coal_redstone",
+                    () -> new BlockItem(COUNTERWEIGHT_COAL_REDSTONE_BLOCK.get(), new Item.Properties()));
+
+    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_GOLD_REDSTONE_ITEM =
+            ModItems.ITEMS.register("counterweight_gold_redstone",
+                    () -> new BlockItem(COUNTERWEIGHT_GOLD_REDSTONE_BLOCK.get(), new Item.Properties()));
+
     public static final DeferredHolder<Block, CounterweightLightBlock> COUNTERWEIGHT_LIGHT_BLOCK =
             BLOCKS.register("counterweight_light",
                     () -> new CounterweightLightBlock(
@@ -131,6 +174,35 @@ public class ModBlocks {
     public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_LIGHT_PEARL_ITEM =
             ModItems.ITEMS.register("counterweight_light_pearl",
                     () -> new BlockItem(COUNTERWEIGHT_LIGHT_PEARL_BLOCK.get(), new Item.Properties()));
+
+    // 红石配"轻"块系列:普通/珠光两种皮,共用 RedstoneCounterweightLightBlock(LIFT_TIER 1..16),红stone信号驱动,无 BE
+    public static final DeferredHolder<Block, RedstoneCounterweightLightBlock> COUNTERWEIGHT_LIGHT_REDSTONE_BLOCK =
+            BLOCKS.register("counterweight_light_redstone",
+                    () -> new RedstoneCounterweightLightBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<Block, RedstoneCounterweightLightBlock> COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_BLOCK =
+            BLOCKS.register("counterweight_light_pearl_redstone",
+                    () -> new RedstoneCounterweightLightBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_LIGHT_REDSTONE_ITEM =
+            ModItems.ITEMS.register("counterweight_light_redstone",
+                    () -> new BlockItem(COUNTERWEIGHT_LIGHT_REDSTONE_BLOCK.get(), new Item.Properties()));
+
+    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_ITEM =
+            ModItems.ITEMS.register("counterweight_light_pearl_redstone",
+                    () -> new BlockItem(COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_BLOCK.get(), new Item.Properties()));
 
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);

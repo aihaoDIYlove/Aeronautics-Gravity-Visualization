@@ -12,5 +12,10 @@
   "block.aeronautics_gravity.counterweight_light_pearl": "Pearlescent Buoyant Counterweight",
   "block.aeronautics_gravity.counterweight_light.lift_tier": "Buoyancy Tier",
   "aeronautics_gravity.unit.mass_kpg": "Mass (kpg)",
-  "aeronautics_gravity.unit.lift_kpg": "Buoyancy (kpg)"
+  "aeronautics_gravity.unit.lift_kpg": "Buoyancy (kpg)",
+  "block.aeronautics_gravity.counterweight_redstone": "Redstone Counterweight (Iron)",
+  "block.aeronautics_gravity.counterweight_coal_redstone": "Redstone Counterweight (Coal)",
+  "block.aeronautics_gravity.counterweight_gold_redstone": "Redstone Counterweight (Gold)",
+  "block.aeronautics_gravity.counterweight_light_redstone": "Redstone Buoyant Counterweight",
+  "block.aeronautics_gravity.counterweight_light_pearl_redstone": "Redstone Pearlescent Buoyant Counterweight"
 }

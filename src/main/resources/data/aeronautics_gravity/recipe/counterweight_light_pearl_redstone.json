@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RRR",
+    "RCR",
+    "RRR"
+  ],
+  "key": {
+    "R": { "item": "minecraft:redstone" },
+    "C": { "item": "aeronautics_gravity:counterweight_light_pearl" }
+  },
+  "result": {
+    "count": 1,
+    "id": "aeronautics_gravity:counterweight_light_pearl_redstone"
+  }
+}

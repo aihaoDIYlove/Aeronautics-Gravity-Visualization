@@ -12,5 +12,10 @@
   "block.aeronautics_gravity.counterweight_light_pearl": "珠光配“轻”块",
   "block.aeronautics_gravity.counterweight_light.lift_tier": "浮力档位",
   "aeronautics_gravity.unit.mass_kpg": "质量 (kpg)",
-  "aeronautics_gravity.unit.lift_kpg": "浮力 (kpg)"
+  "aeronautics_gravity.unit.lift_kpg": "浮力 (kpg)",
+  "block.aeronautics_gravity.counterweight_redstone": "红石配重块（铁质）",
+  "block.aeronautics_gravity.counterweight_coal_redstone": "红石配重块（煤质）",
+  "block.aeronautics_gravity.counterweight_gold_redstone": "红石配重块（金质）",
+  "block.aeronautics_gravity.counterweight_light_redstone": "红石配“轻”块",
+  "block.aeronautics_gravity.counterweight_light_pearl_redstone": "红石珠光配“轻”块"
 }
