@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": ["G"],
+  "key": {
+    "G": { "item": "minecraft:glass" }
+  },
+  "result": { "id": "aeronautics_gravity:lightweight_glass", "count": 4 }
+}

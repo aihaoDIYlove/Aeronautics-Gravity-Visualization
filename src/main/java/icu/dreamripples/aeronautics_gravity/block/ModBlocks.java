@@ -209,6 +209,25 @@ public class ModBlocks {
             ModItems.ITEMS.register("counterweight_light_pearl_redstone",
                     () -> new BlockItem(COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_BLOCK.get(), new Item.Properties()));
 
+    // 轻质玻璃: 继承 Create 的 ConnectedGlassBlock, 复用 skipRendering(相邻同类不画内面,视觉上连成一片)。
+    // 质量 0.25(Create/原版玻璃默认 1), 用于给物理载具减重。单帧贴图, 不做 CT 连接纹理。
+    public static final DeferredHolder<Block, LightweightGlassBlock> LIGHTWEIGHT_GLASS_BLOCK =
+            BLOCKS.register("lightweight_glass",
+                    () -> new LightweightGlassBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.NONE)
+                                    .sound(SoundType.GLASS)
+                                    .strength(0.3f)
+                                    .noOcclusion()
+                                    .isValidSpawn((state, level, pos, entity) -> false)
+                                    .isRedstoneConductor((state, level, pos) -> false)
+                                    .isSuffocating((state, level, pos) -> false)
+                                    .isViewBlocking((state, level, pos) -> false)));
+
+    public static final DeferredHolder<Item, BlockItem> LIGHTWEIGHT_GLASS_ITEM =
+            ModItems.ITEMS.register("lightweight_glass",
+                    () -> new BlockItem(LIGHTWEIGHT_GLASS_BLOCK.get(), new Item.Properties()));
+
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);
     }
