@@ -220,4 +220,30 @@ public class ModBlocks {
     private static CounterweightLightBlockEntity createCounterweightLightBlockEntity(BlockPos pos, BlockState state) {
         return new CounterweightLightBlockEntity(COUNTERWEIGHT_LIGHT_BE.get(), pos, state);
     }
+
+    // 红石配重/配轻块的轻量 BE - 仅为挂 Flywheel visual(灯带染色),无 tick 无 NBT
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RedstoneCounterweightBlockEntity>> REDSTONE_COUNTERWEIGHT_BE =
+            BLOCK_ENTITIES.register("redstone_counterweight",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createRedstoneCounterweightBlockEntity,
+                                    COUNTERWEIGHT_REDSTONE_BLOCK.get(),
+                                    COUNTERWEIGHT_COAL_REDSTONE_BLOCK.get(),
+                                    COUNTERWEIGHT_GOLD_REDSTONE_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RedstoneCounterweightLightBlockEntity>> REDSTONE_COUNTERWEIGHT_LIGHT_BE =
+            BLOCK_ENTITIES.register("redstone_counterweight_light",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createRedstoneCounterweightLightBlockEntity,
+                                    COUNTERWEIGHT_LIGHT_REDSTONE_BLOCK.get(),
+                                    COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_BLOCK.get())
+                            .build(null));
+
+    private static RedstoneCounterweightBlockEntity createRedstoneCounterweightBlockEntity(BlockPos pos, BlockState state) {
+        return new RedstoneCounterweightBlockEntity(REDSTONE_COUNTERWEIGHT_BE.get(), pos, state);
+    }
+
+    private static RedstoneCounterweightLightBlockEntity createRedstoneCounterweightLightBlockEntity(BlockPos pos, BlockState state) {
+        return new RedstoneCounterweightLightBlockEntity(REDSTONE_COUNTERWEIGHT_LIGHT_BE.get(), pos, state);
+    }
 }
