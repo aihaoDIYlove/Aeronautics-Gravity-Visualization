@@ -32,9 +32,6 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
             144f, 160f, 176f, 192f, 208f, 224f, 240f, 256f
     };
 
-    /** 当前红石信号值，替代父类 private signal 字段用于检测变化。 */
-    private int lastSignal = 0;
-
     public ConvenientAnalogTransmissionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -54,7 +51,10 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
         final int bestNeighborSignal = getLevel().getBestNeighborSignal(getBlockPos());
 
         if (!getLevel().isClientSide) {
-            if (bestNeighborSignal != lastSignal) {
+            // 复用父类持久化的 signal 字段检测变化（signal 从 NBT 恢复，重进后与 bestNeighborSignal 一致，
+            // 避免自维护 lastSignal 重进后重置为 0 误判信号变化，触发不必要的 detach/reattach）
+            int currentSignal = ((AnalogTransmissionBlockEntityAccessor) this).aeronautics_gravity$getSignal();
+            if (bestNeighborSignal != currentSignal) {
                 KineticBlockEntity extraWheel = getExtraKinetics();
 
                 // 父类原有的 detach/reattach 逻辑
@@ -63,13 +63,12 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
                 this.removeSource();
                 extraWheel.removeSource();
 
-                lastSignal = bestNeighborSignal;
                 // 同步父类 signal 字段，防止 super.tick() 重复进入信号变化分支
                 // （否则 super.tick 会再次 attachKinetics -> propagateNewSource，触发第二次
                 // destroyBlock，且 setBlockAndUpdate 会用 BlockEntity 内部 state 重新放回方块，掉落第二个物品）
                 ((AnalogTransmissionBlockEntityAccessor) this).aeronautics_gravity$setSignal(bestNeighborSignal);
                 getLevel().setBlockAndUpdate(getBlockPos(),
-                        getBlockState().setValue(AnalogTransmissionBlock.POWERED, lastSignal > 0));
+                        getBlockState().setValue(AnalogTransmissionBlock.POWERED, bestNeighborSignal > 0));
 
                 // 关键修复：在 re-attach 前为新网络分配 ID，
                 // 防止 propagateNewSource 的循环检测因 hasNetwork()=false 而误杀方块
