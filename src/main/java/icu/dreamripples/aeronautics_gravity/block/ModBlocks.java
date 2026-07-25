@@ -104,6 +104,7 @@ public class ModBlocks {
                                     .sound(SoundType.COPPER)
                                     .strength(3.5f)
                                     .noOcclusion()
+                                    .isRedstoneConductor((state, level, pos) -> false)
                                     .requiresCorrectToolForDrops()));
 
     public static final DeferredHolder<Block, RedstoneCounterweightBlock> COUNTERWEIGHT_COAL_REDSTONE_BLOCK =
@@ -114,6 +115,7 @@ public class ModBlocks {
                                     .sound(SoundType.COPPER)
                                     .strength(3.5f)
                                     .noOcclusion()
+                                    .isRedstoneConductor((state, level, pos) -> false)
                                     .requiresCorrectToolForDrops()));
 
     public static final DeferredHolder<Block, RedstoneCounterweightBlock> COUNTERWEIGHT_GOLD_REDSTONE_BLOCK =
@@ -124,6 +126,7 @@ public class ModBlocks {
                                     .sound(SoundType.COPPER)
                                     .strength(3.5f)
                                     .noOcclusion()
+                                    .isRedstoneConductor((state, level, pos) -> false)
                                     .requiresCorrectToolForDrops()));
 
     public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_REDSTONE_ITEM =
@@ -184,6 +187,7 @@ public class ModBlocks {
                                     .sound(SoundType.COPPER)
                                     .strength(3.5f)
                                     .noOcclusion()
+                                    .isRedstoneConductor((state, level, pos) -> false)
                                     .requiresCorrectToolForDrops()));
 
     public static final DeferredHolder<Block, RedstoneCounterweightLightBlock> COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_BLOCK =
@@ -194,6 +198,7 @@ public class ModBlocks {
                                     .sound(SoundType.COPPER)
                                     .strength(3.5f)
                                     .noOcclusion()
+                                    .isRedstoneConductor((state, level, pos) -> false)
                                     .requiresCorrectToolForDrops()));
 
     public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_LIGHT_REDSTONE_ITEM =
