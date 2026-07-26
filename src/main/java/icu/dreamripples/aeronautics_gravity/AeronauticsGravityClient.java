@@ -62,9 +62,10 @@ public class AeronauticsGravityClient {
         ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "lightweight_glass");
         Block block = BuiltInRegistries.BLOCK.get(blockId);
         if (block == Blocks.AIR) return;
-        // original=lightweight_glass(16x16 单帧, model 用), target=lightweight_glass_connected(64x64 CROSS sprite sheet)
+        // original=lightweight_glass(16x16 单帧, model 用), target=lightweight_glass_connected(128x128 OMNIDIRECTIONAL sprite sheet)
+        // OMNIDIRECTIONAL 看 4 正方向 + 4 对角: 区分"十字中心"(4对角不连->补4角像素)和"大片内部"(4对角连->全透明), 解决 CROSS 的内角缺像素问题。
         CTSpriteShiftEntry shift = CTSpriteShifter.getCT(
-                AllCTTypes.CROSS,
+                AllCTTypes.OMNIDIRECTIONAL,
                 ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/lightweight_glass"),
                 ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/lightweight_glass_connected"));
         ConnectedTextureBehaviour behaviour = new SimpleCTBehaviour(shift);
