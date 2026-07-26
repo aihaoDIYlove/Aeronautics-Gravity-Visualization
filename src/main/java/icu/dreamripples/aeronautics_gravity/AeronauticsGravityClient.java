@@ -57,17 +57,24 @@ public class AeronauticsGravityClient {
     // 轻质玻璃 CT 连接纹理: 用 CTModel 包装 BakedModel, 相邻方向的边框在 sprite sheet 子格层面消失。
     // 不走 CreateRegistrate(它 extends Registrate, Registrate 是 Create 的 jarjar, 不在 compile classpath),
     // 直接监听 ModelEvent.ModifyBakingResult 自己包装, 等价于 Create 内部的 registerCTBehviour。
+    // 给玻璃方块注册 CT 连接纹理: 用 CTModel 包装 BakedModel, 相邻方向的边框在 sprite sheet 子格层面消失。
+    // original=block/<name>.png(单帧, model 用), target=block/<name>_connected.png(8x8 OMNIDIRECTIONAL sprite sheet, 64格)。
+    // 不走 CreateRegistrate(它 extends Registrate, Registrate 是 Create 的 jarjar, 不在 compile classpath),
+    // 直接监听 ModelEvent.ModifyBakingResult 自己包装, 等价于 Create 内部的 registerCTBehviour。
     @SubscribeEvent
     public static void onModifyBaking(ModelEvent.ModifyBakingResult event) {
-        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "lightweight_glass");
+        registerGlassCT(event, "lightweight_glass");
+        registerGlassCT(event, "ultralight_glass");
+    }
+
+    private static void registerGlassCT(ModelEvent.ModifyBakingResult event, String name) {
+        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", name);
         Block block = BuiltInRegistries.BLOCK.get(blockId);
         if (block == Blocks.AIR) return;
-        // original=lightweight_glass(16x16 单帧, model 用), target=lightweight_glass_connected(128x128 OMNIDIRECTIONAL sprite sheet)
-        // OMNIDIRECTIONAL 看 4 正方向 + 4 对角: 区分"十字中心"(4对角不连->补4角像素)和"大片内部"(4对角连->全透明), 解决 CROSS 的内角缺像素问题。
         CTSpriteShiftEntry shift = CTSpriteShifter.getCT(
                 AllCTTypes.OMNIDIRECTIONAL,
-                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/lightweight_glass"),
-                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/lightweight_glass_connected"));
+                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/" + name),
+                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/" + name + "_connected"));
         ConnectedTextureBehaviour behaviour = new SimpleCTBehaviour(shift);
         for (BlockState state : block.getStateDefinition().getPossibleStates()) {
             ModelResourceLocation mrl = BlockModelShaper.stateToModelLocation(blockId, state);

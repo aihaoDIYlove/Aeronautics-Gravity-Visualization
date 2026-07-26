@@ -228,6 +228,24 @@ public class ModBlocks {
             ModItems.ITEMS.register("lightweight_glass",
                     () -> new BlockItem(LIGHTWEIGHT_GLASS_BLOCK.get(), new Item.Properties()));
 
+    // 超轻玻璃: 32x32 贴图(边框更细), 质量 0.125, 易碎(sable:fragile)。CT 连接纹理同轻质玻璃。
+    public static final DeferredHolder<Block, UltralightGlassBlock> ULTRALIGHT_GLASS_BLOCK =
+            BLOCKS.register("ultralight_glass",
+                    () -> new UltralightGlassBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.NONE)
+                                    .sound(SoundType.GLASS)
+                                    .strength(0.3f)
+                                    .noOcclusion()
+                                    .isValidSpawn((state, level, pos, entity) -> false)
+                                    .isRedstoneConductor((state, level, pos) -> false)
+                                    .isSuffocating((state, level, pos) -> false)
+                                    .isViewBlocking((state, level, pos) -> false)));
+
+    public static final DeferredHolder<Item, BlockItem> ULTRALIGHT_GLASS_ITEM =
+            ModItems.ITEMS.register("ultralight_glass",
+                    () -> new BlockItem(ULTRALIGHT_GLASS_BLOCK.get(), new Item.Properties()));
+
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);
     }

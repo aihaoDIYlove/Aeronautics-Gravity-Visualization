@@ -20,5 +20,6 @@
   "block.aeronautics_gravity.counterweight_light_pearl_redstone": "Redstone Pearlescent Buoyant Counterweight",
   "tooltip.aeronautics_gravity.current_mass": "Current Mass",
   "tooltip.aeronautics_gravity.current_lift": "Current Buoyancy",
-  "block.aeronautics_gravity.lightweight_glass": "Lightweight Glass"
+  "block.aeronautics_gravity.lightweight_glass": "Lightweight Glass",
+  "block.aeronautics_gravity.ultralight_glass": "Ultralight Glass"
 }

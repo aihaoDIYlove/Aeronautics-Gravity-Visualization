@@ -1,0 +1,8 @@
+{
+  "selector": "aeronautics_gravity:ultralight_glass",
+
+  "properties": {
+    "sable:mass": 0.125,
+    "sable:fragile": true
+  }
+}

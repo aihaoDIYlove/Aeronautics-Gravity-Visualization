@@ -20,5 +20,6 @@
   "block.aeronautics_gravity.counterweight_light_pearl_redstone": "红石珠光配“轻”块",
   "tooltip.aeronautics_gravity.current_mass": "当前质量",
   "tooltip.aeronautics_gravity.current_lift": "当前浮力",
-  "block.aeronautics_gravity.lightweight_glass": "轻质玻璃"
+  "block.aeronautics_gravity.lightweight_glass": "轻质玻璃",
+  "block.aeronautics_gravity.ultralight_glass": "超轻玻璃"
 }
