@@ -21,5 +21,13 @@
   "tooltip.aeronautics_gravity.current_mass": "Current Mass",
   "tooltip.aeronautics_gravity.current_lift": "Current Buoyancy",
   "block.aeronautics_gravity.lightweight_glass": "Lightweight Glass",
-  "block.aeronautics_gravity.ultralight_glass": "Ultralight Glass"
+  "block.aeronautics_gravity.ultralight_glass": "Ultralight Glass",
+  "block.aeronautics_gravity.stabilizer": "Stabilizer",
+  "block.aeronautics_gravity.stabilizer.deadband": "Deadband",
+  "tooltip.aeronautics_gravity.stabilizer.mode": "Mode",
+  "tooltip.aeronautics_gravity.stabilizer.mass_mode": "Mass (Down-force)",
+  "tooltip.aeronautics_gravity.stabilizer.lift_mode": "Lift (Up-force)",
+  "tooltip.aeronautics_gravity.stabilizer.idle": "Idle",
+  "tooltip.aeronautics_gravity.stabilizer.output": "Output",
+  "aeronautics_gravity.unit.deadband_deg": "deg"
 }

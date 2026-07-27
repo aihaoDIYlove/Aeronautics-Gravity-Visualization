@@ -31,6 +31,7 @@ public class ModCreativeTabs {
                         output.accept(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_ITEM.get());
                         output.accept(ModBlocks.LIGHTWEIGHT_GLASS_ITEM.get());
                         output.accept(ModBlocks.ULTRALIGHT_GLASS_ITEM.get());
+                        output.accept(ModBlocks.STABILIZER_ITEM.get());
                     })
                     .build());
 }

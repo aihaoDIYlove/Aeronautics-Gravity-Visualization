@@ -246,6 +246,29 @@ public class ModBlocks {
             ModItems.ITEMS.register("ultralight_glass",
                     () -> new BlockItem(ULTRALIGHT_GLASS_BLOCK.get(), new Item.Properties()));
 
+    // 自稳定方块:姿态感知 + P 控制律,互斥调节 MASS_TIER(1..16)/LIFT_TIER(1..16)维持载具水平。
+    // 红石信号控制死区(signal=0 停用,15->2°,1->30°);右键 ScrollValueBehaviour 调响应宽度阈值(1..15°)。
+    public static final DeferredHolder<Block, StabilizerBlock> STABILIZER_BLOCK =
+            BLOCKS.register("stabilizer",
+                    () -> new StabilizerBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .isRedstoneConductor((state, level, pos) -> false)
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StabilizerBlockEntity>> STABILIZER_BE =
+            BLOCK_ENTITIES.register("stabilizer",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createStabilizerBlockEntity, STABILIZER_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> STABILIZER_ITEM =
+            ModItems.ITEMS.register("stabilizer",
+                    () -> new BlockItem(STABILIZER_BLOCK.get(), new Item.Properties()));
+
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);
     }
@@ -282,5 +305,9 @@ public class ModBlocks {
 
     private static RedstoneCounterweightLightBlockEntity createRedstoneCounterweightLightBlockEntity(BlockPos pos, BlockState state) {
         return new RedstoneCounterweightLightBlockEntity(REDSTONE_COUNTERWEIGHT_LIGHT_BE.get(), pos, state);
+    }
+
+    private static StabilizerBlockEntity createStabilizerBlockEntity(BlockPos pos, BlockState state) {
+        return new StabilizerBlockEntity(STABILIZER_BE.get(), pos, state);
     }
 }

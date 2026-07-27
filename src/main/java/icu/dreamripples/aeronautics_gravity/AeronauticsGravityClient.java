@@ -13,6 +13,7 @@ import icu.dreamripples.aeronautics_gravity.client.MassVisualizer;
 import icu.dreamripples.aeronautics_gravity.client.ModPartialModels;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightVisual;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightLightVisual;
+import icu.dreamripples.aeronautics_gravity.client.StabilizerVisual;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -51,6 +52,9 @@ public class AeronauticsGravityClient {
                     .factory(RedstoneCounterweightVisual::new).apply();
             SimpleBlockEntityVisualizer.builder(ModBlocks.REDSTONE_COUNTERWEIGHT_LIGHT_BE.get())
                     .factory(RedstoneCounterweightLightVisual::new).apply();
+            // 自稳定方块灯带染色 visual(mass 模式红/lift 模式青/休眠灰,档位越高越亮)
+            SimpleBlockEntityVisualizer.builder(ModBlocks.STABILIZER_BE.get())
+                    .factory(StabilizerVisual::new).apply();
         });
     }
 

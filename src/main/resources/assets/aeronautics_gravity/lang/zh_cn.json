@@ -21,5 +21,13 @@
   "tooltip.aeronautics_gravity.current_mass": "当前质量",
   "tooltip.aeronautics_gravity.current_lift": "当前浮力",
   "block.aeronautics_gravity.lightweight_glass": "轻质玻璃",
-  "block.aeronautics_gravity.ultralight_glass": "超轻玻璃"
+  "block.aeronautics_gravity.ultralight_glass": "超轻玻璃",
+  "block.aeronautics_gravity.stabilizer": "自稳定方块",
+  "block.aeronautics_gravity.stabilizer.deadband": "死区",
+  "tooltip.aeronautics_gravity.stabilizer.mode": "模式",
+  "tooltip.aeronautics_gravity.stabilizer.mass_mode": "质量(向下力)",
+  "tooltip.aeronautics_gravity.stabilizer.lift_mode": "浮力(向上力)",
+  "tooltip.aeronautics_gravity.stabilizer.idle": "休眠",
+  "tooltip.aeronautics_gravity.stabilizer.output": "输出",
+  "aeronautics_gravity.unit.deadband_deg": "度"
 }

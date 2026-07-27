@@ -8,7 +8,7 @@
   ],
   "key": {
     "L": { "item": "aeronautics:levitite_blend_bucket" },
-    "C": { "item": "aeronautics_gravity:counterweight" }
+    "C": { "tag": "aeronautics_gravity:counterweights" }
   },
   "result": {
     "count": 1,
