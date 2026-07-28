@@ -1,5 +1,6 @@
 package icu.dreamripples.aeronautics_gravity;
 
+import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.foundation.block.connected.AllCTTypes;
 import com.simibubi.create.foundation.block.connected.CTModel;
 import com.simibubi.create.foundation.block.connected.CTSpriteShifter;
@@ -9,6 +10,7 @@ import com.simibubi.create.foundation.block.connected.SimpleCTBehaviour;
 import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionVisual;
 import icu.dreamripples.aeronautics_gravity.block.ModBlocks;
+import icu.dreamripples.aeronautics_gravity.item.ModItems;
 import icu.dreamripples.aeronautics_gravity.client.MassVisualizer;
 import icu.dreamripples.aeronautics_gravity.client.ModPartialModels;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightVisual;
@@ -55,6 +57,13 @@ public class AeronauticsGravityClient {
                     .factory(RedstoneCounterweightVisual::new).apply();
             SimpleBlockEntityVisualizer.builder(ModBlocks.REDSTONE_COUNTERWEIGHT_LIGHT_BE.get())
                     .factory(RedstoneCounterweightLightVisual::new).apply();
+            // 手持火花魔杖时获得护目镜视野: Create 的 GogglesItem 用一组 Predicate<Player> 判定
+            // "是否佩戴护目镜",默认只查 HEAD 槽。addIsWearingPredicate 是官方为"手持替代品"预留的
+            // 扩展点(GogglesItem Javadoc 原文)。注册后 3 处调用点同时生效: 准星瞄准方块的 overlay
+            // (GoggleOverlayRenderer)、kinetic 物品 tooltip 应力数值(KineticStats)、旋转方向粒子。
+            GogglesItem.addIsWearingPredicate(player ->
+                    player.getMainHandItem().is(ModItems.SPARK_WAND.get())
+                            || player.getOffhandItem().is(ModItems.SPARK_WAND.get()));
         });
     }
 

@@ -8,10 +8,10 @@
   ],
   "key": {
     "E": { "item": "minecraft:ender_eye" },
-    "C": { "item": "aeronautics_gravity:counterweight_light_pearl_redstone" },
+    "C": { "tag": "aeronautics_gravity:counterweight_lights_redstone" },
     "L": { "item": "aeronautics_gravity:lightweight_glass" },
     "G": { "item": "simulated:gimbal_sensor" },
-    "T": { "item": "aeronautics_gravity:counterweight" }
+    "T": { "tag": "aeronautics_gravity:counterweights_redstone" }
 
   },
   "result": {

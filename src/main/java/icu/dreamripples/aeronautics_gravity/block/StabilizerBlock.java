@@ -2,27 +2,20 @@ package icu.dreamripples.aeronautics_gravity.block;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-/**
- * 自稳定方块 - 同时持有 MASS_TIER(1..16)与 LIFT_TIER(1..16)两个 BlockState 属性。
- * BE 每 5 tick 读取所在载具的姿态 + 质心方位,按 P 控制律互斥地调高其中一个 tier,
- * 另一个保持 1(基线 = 0 贡献:mass=1 kpg + 基础浮力 mat_1)。
- *
- * BlockState 变化由 Sable 自动检测并增量更新:
- *   - mass_tier -> SubLevelPhysicsSystem.handleBlockChange 重算 MassTracker
- *   - lift_tier -> SableCommonEvents.handleBlockChange -> FloatingBlockController 重算 cluster 浮力
- *
- * 互斥输出语义:
- *   - mass 模式 (N, 1):向下力(增重),用于压低"我这一侧在高端"的倾斜
- *   - lift 模式 (1, N):向上力(增浮),用于抬起"我这一侧在低端"的倾斜
- *   - 中性 (1, 1):休眠/停用
- */
+import java.util.List;
+
 public class StabilizerBlock extends Block implements IBE<StabilizerBlockEntity>, IWrenchable {
 
     public static final IntegerProperty MASS_TIER = IntegerProperty.create("mass_tier", 1, 16);
@@ -48,6 +41,12 @@ public class StabilizerBlock extends Block implements IBE<StabilizerBlockEntity>
     @Override
     public BlockEntityType<? extends StabilizerBlockEntity> getBlockEntityType() {
         return ModBlocks.STABILIZER_BE.get();
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.stabilizer.placement")
+                .withStyle(ChatFormatting.GRAY));
     }
 
     @Override
