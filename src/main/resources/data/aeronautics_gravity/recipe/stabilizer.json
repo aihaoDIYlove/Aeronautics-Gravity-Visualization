@@ -2,13 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "RRR",
-    "RCR",
-    "RRR"
+    "LCL",
+    "EGE",
+    "LTL"
   ],
   "key": {
-    "R": { "item": "minecraft:redstone" },
-    "C": { "item": "aeronautics_gravity:counterweight_light_pearl_redstone" }
+    "E": { "item": "minecraft:ender_eye" },
+    "C": { "item": "aeronautics_gravity:counterweight_light_pearl_redstone" },
+    "L": { "item": "aeronautics_gravity:lightweight_glass" },
+    "G": { "item": "simulated:gimbal_sensor" },
+    "T": { "item": "aeronautics_gravity:counterweight" }
+
   },
   "result": {
     "count": 1,

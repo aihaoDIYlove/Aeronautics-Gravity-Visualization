@@ -13,8 +13,9 @@ import icu.dreamripples.aeronautics_gravity.client.MassVisualizer;
 import icu.dreamripples.aeronautics_gravity.client.ModPartialModels;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightVisual;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightLightVisual;
-import icu.dreamripples.aeronautics_gravity.client.StabilizerVisual;
+import icu.dreamripples.aeronautics_gravity.client.StabilizerRenderer;
 import net.minecraft.client.renderer.block.BlockModelShaper;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -41,8 +42,10 @@ public class AeronauticsGravityClient {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        // 注册 Simulated 的 AnalogTransmissionVisual 作为我们的 BlockEntity Visualizer。
-        // 它内部会创建 cogInstance（侧边齿轮旋转实例），跟随 extraWheel 转速渲染齿轮转动。
+        // StabilizerRenderer 同时画灯带(染色)和 portal 星空。不用 Flywheel Visual:
+        // Flywheel 的 SectionCompilerMixin 对有 Visualizer 的 BE cancel renderable,BER.render 不被调。
+        // BER 注册同步调用(不 enqueueWork),确保在 BlockEntityRenderDispatcher 构造前注册到 BY_TYPE map。
+        BlockEntityRenderers.register(ModBlocks.STABILIZER_BE.get(), StabilizerRenderer::new);
         event.enqueueWork(() -> {
             ModPartialModels.init();
             SimpleBlockEntityVisualizer.builder(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_BE.get())
@@ -52,9 +55,6 @@ public class AeronauticsGravityClient {
                     .factory(RedstoneCounterweightVisual::new).apply();
             SimpleBlockEntityVisualizer.builder(ModBlocks.REDSTONE_COUNTERWEIGHT_LIGHT_BE.get())
                     .factory(RedstoneCounterweightLightVisual::new).apply();
-            // 自稳定方块灯带染色 visual(mass 模式红/lift 模式青/休眠灰,档位越高越亮)
-            SimpleBlockEntityVisualizer.builder(ModBlocks.STABILIZER_BE.get())
-                    .factory(StabilizerVisual::new).apply();
         });
     }
 
