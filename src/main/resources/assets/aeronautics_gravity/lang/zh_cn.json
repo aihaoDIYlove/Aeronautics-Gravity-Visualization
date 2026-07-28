@@ -33,5 +33,8 @@
   "tooltip.aeronautics_gravity.stabilizer.idle": "休眠",
   "tooltip.aeronautics_gravity.stabilizer.output": "输出",
   "tooltip.aeronautics_gravity.stabilizer.placement": "请放置在远离载具中心的位置，否则其不会起效",
-  "aeronautics_gravity.unit.deadband_deg": "度"
+  "aeronautics_gravity.unit.deadband_deg": "度",
+  "tooltip.aeronautics_gravity.stabilizer.redstone_mode": "红石模式",
+  "tooltip.aeronautics_gravity.stabilizer.redstone_mode.active_when_off": "无红石时开启",
+  "tooltip.aeronautics_gravity.stabilizer.redstone_mode.active_when_on": "有红石时开启"
 }

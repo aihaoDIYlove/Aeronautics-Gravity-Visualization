@@ -3,11 +3,15 @@ package icu.dreamripples.aeronautics_gravity.block;
 import com.google.common.collect.ImmutableList;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBoard;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsFormatter;
+import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIconOptions;
+import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
+import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.utility.CreateLang;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
@@ -20,6 +24,8 @@ import net.createmod.catnip.math.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
@@ -38,7 +44,7 @@ import java.util.List;
  * **P 项(恢复力,调 mass/lift tier)**:每游戏 tick 在 tick() 里算。
  *   - 姿态:世界 DOWN 经 orientation.transformInverse 到本地 = ld。
  *     pitch = atan2(ld.z, -ld.y);roll = atan2(ld.x, -ld.y);tilt = sqrt(pitch²+roll²)。
- *   - 死区(总倾斜角)由右键 ScrollValueBehaviour 调 0..30°。tilt < deadband -> tier (1,1) 休眠。
+ *   - 死区(总倾斜角)由侧面 4 面 ScrollValueBehaviour 调 0..30°。tilt < deadband -> tier (1,1) 休眠。
  *   - 方位 r = (getBlockPos + 0.5) - 质心。|r| < 0.5 -> 无力臂,休眠。
  *   - 误差 error = rz*pitch + rx*roll(力臂加权倾斜投影)。projection = |error|/|r|,projDeg = toDeg(projection)。
  *   - **自适应满档角**(按倾斜速度):tiltSpeed = sqrt(ωx²+ωz²)(本地 pitch/roll 角速度,从 D 项缓存读)。
@@ -57,9 +63,10 @@ import java.util.List;
  *   - D 是外力矩(非角动量交换),不储存角动量,无陀螺进动,不影响 yaw。
  *
  * **自适应的动机**:固定 KP 下,大(早满档)则震荡,小(晚满档)则 45°+ 才触发(物理已失效)。
- *   按倾斜速度调度增益:快→激进(早满档+强阻尼,抢救),慢→温和(防震)。这是增益调度,比真自适应控制简单稳定。
+ *   按倾斜速度调度增益:快->激进(早满档+强阻尼,抢救),慢->温和(防震)。这是增益调度,比真自适应控制简单稳定。
  *
- * **红石仅使能**:signal=0 时 P 项归 (1,1)、D 项不施力。
+ * **红石模式(上下两面 ScrollOptionBehaviour 切换)**:ACTIVE_WHEN_OFF(默认,无红石时工作) /
+ *   ACTIVE_WHEN_ON(有红石时工作)。非工作状态时 P 项归 (1,1)、D 项不施力。
  * KD_BASE/ALPHA/MAX_ANGLE_BASE/BETA 是代码常量(开发者实测调);死区是玩家右键调。
  */
 public class StabilizerBlockEntity extends SmartBlockEntity
@@ -76,6 +83,10 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     private static final double ALPHA = 0.5;            // D 自适应系数 [s/rad]
 
     private ScrollValueBehaviour deadbandBehaviour;
+    // 红石控制模式(上下两面切换)。value=0 -> ACTIVE_WHEN_OFF(默认,无红石时工作)。
+    // 用 RedstoneModeBehaviour(独立 BehaviourType)而非裸 ScrollOptionBehaviour:后者继承
+    // ScrollValueBehaviour.TYPE,会与 deadbandBehaviour 在 SmartBlockEntity 的 behaviours map 里冲突覆盖。
+    private RedstoneModeBehaviour redstoneModeBehaviour;
     // sable$physicsTick 写,tick 读(最新物理 tick 的本地角速度)。初始 0。
     private final Vector3d angVelLocalCache = new Vector3d();
 
@@ -88,10 +99,19 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         deadbandBehaviour = new DeadbandScrollValueBehaviour(
                 Component.translatable("block.aeronautics_gravity.stabilizer.deadband"),
                 this,
-                new DeadbandValueBoxTransform()
+                new DeadbandValueBoxTransform()  // 侧面 4 面
         ).between(MIN_DEADBAND, MAX_DEADBAND);
         deadbandBehaviour.value = 3;
         behaviours.add(deadbandBehaviour);
+
+        redstoneModeBehaviour = new RedstoneModeBehaviour(
+                RedstoneMode.class,
+                Component.translatable("tooltip.aeronautics_gravity.stabilizer.redstone_mode"),
+                this,
+                new RedstoneModeValueBoxTransform()  // 上下 2 面
+        );
+        redstoneModeBehaviour.value = 0;  // 默认 ACTIVE_WHEN_OFF(无红石时开启)
+        behaviours.add(redstoneModeBehaviour);
     }
 
     @Override
@@ -100,7 +120,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         if (level == null || level.isClientSide) return;
 
         int signal = level.getBestNeighborSignal(worldPosition);
-        if (signal == 0) {
+        if (!redstoneModeBehaviour.get().isActiveFor(signal)) {
             setTiers(1, 1);
             return;
         }
@@ -168,7 +188,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     @Override
     public void sable$physicsTick(ServerSubLevel subLevel, RigidBodyHandle handle, double timeStep) {
         if (level == null || level.isClientSide) return;
-        if (level.getBestNeighborSignal(worldPosition) == 0) return;  // 停用
+        if (!redstoneModeBehaviour.get().isActiveFor(level.getBestNeighborSignal(worldPosition))) return;  // 停用
 
         Pose3dc pose = subLevel.logicalPose();
         Vector3d angVelGlobal = handle.getAngularVelocity(new Vector3d());
@@ -253,6 +273,17 @@ public class StabilizerBlockEntity extends SmartBlockEntity
                 .style(ChatFormatting.AQUA)
                 .forGoggles(tooltip, 2);
 
+        // 红石模式(上下两面切换的当前值)
+        RedstoneMode mode = redstoneModeBehaviour.get();
+        CreateLang.builder()
+                .add(Component.translatable("tooltip.aeronautics_gravity.stabilizer.redstone_mode")
+                        .withStyle(ChatFormatting.GRAY))
+                .add(Component.literal(": ")
+                        .withStyle(ChatFormatting.DARK_GRAY))
+                .add(Component.translatable(mode.getTranslationKey())
+                        .withStyle(ChatFormatting.YELLOW))
+                .forGoggles(tooltip, 1);
+
         return true;
     }
 
@@ -279,17 +310,105 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     }
 
     /**
-     * ValueBoxTransform.Sided 子类 - 所有面都能弹板,voxel 中心。
+     * 死区 ValueBoxTransform - 只在侧面 4 个面弹板(上下两面留给红石模式)。
      */
     private static class DeadbandValueBoxTransform extends ValueBoxTransform.Sided {
         @Override
         protected boolean isSideActive(BlockState state, Direction direction) {
-            return true;
+            return direction.getAxis() != Direction.Axis.Y;
         }
 
         @Override
         protected Vec3 getSouthLocation() {
             return VecHelper.voxelSpace(8, 8, 15.5);
+        }
+    }
+
+    /**
+     * 红石模式 ValueBoxTransform - 只在上下 2 个面弹板。
+     */
+    private static class RedstoneModeValueBoxTransform extends ValueBoxTransform.Sided {
+        @Override
+        protected boolean isSideActive(BlockState state, Direction direction) {
+            return direction.getAxis() == Direction.Axis.Y;
+        }
+
+        @Override
+        protected Vec3 getSouthLocation() {
+            return VecHelper.voxelSpace(8, 8, 15.5);
+        }
+    }
+
+    /**
+     * 红石模式 ScrollOptionBehaviour - 独立 BehaviourType,避免与死区 ScrollValueBehaviour
+     * 共用 ScrollValueBehaviour.TYPE 而在 SmartBlockEntity 的 behaviours map 里互相覆盖
+     * (后者会覆盖前者,导致死区弹板丢失)。仍 extends ScrollOptionBehaviour,所以
+     * ScrollValueRenderer(instanceof ScrollValueBehaviour)和 ValueSettingsInputHandler 照常处理。
+     */
+    private static class RedstoneModeBehaviour extends ScrollOptionBehaviour<RedstoneMode> {
+        public static final BehaviourType<RedstoneModeBehaviour> TYPE = new BehaviourType<>();
+
+        public RedstoneModeBehaviour(Class<RedstoneMode> enumClass, Component label,
+                                     SmartBlockEntity be, ValueBoxTransform slot) {
+            super(enumClass, label, be, slot);
+        }
+
+        @Override
+        public BehaviourType<?> getType() {
+            return TYPE;
+        }
+
+        // 独立 netId:ValueSettingsPacket 用 behaviourIndex(=behaviour.netId()) 路由 setValueSettings,
+        // 默认 netId=0 与 deadbandBehaviour 冲突 -> 调整红石模式时 packet 路由到死区(死区变 1、红石没变)。
+        @Override
+        public int netId() {
+            return 1;
+        }
+
+        // 独立 NBT key:ScrollValueBehaviour.write/read 用固定 key "ScrollValue",而
+        // SmartBlockEntity 所有 behaviour 共享同一个 BE tag,两个 ScrollValueBehaviour 共存时
+        // "ScrollValue" 会被后 write 的覆盖(本类会覆盖 deadbandBehaviour,导致死区值总被重置为 0)。
+        @Override
+        public void write(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket) {
+            nbt.putInt("RedstoneMode", value);
+        }
+
+        @Override
+        public void read(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket) {
+            value = nbt.getInt("RedstoneMode");
+        }
+    }
+
+    /**
+     * 红石控制模式 - 上下两面 ScrollOptionBehaviour 切换。
+     * ACTIVE_WHEN_OFF: 无红石时工作(默认);ACTIVE_WHEN_ON: 有红石时工作。
+     * 图标复用 Create 的 I_PASSIVE(被动/无红石)/I_ACTIVE(主动/有红石)。
+     */
+    public enum RedstoneMode implements INamedIconOptions {
+        ACTIVE_WHEN_OFF(AllIcons.I_PASSIVE),
+        ACTIVE_WHEN_ON(AllIcons.I_ACTIVE);
+
+        private final AllIcons icon;
+        private final String translationKey;
+
+        RedstoneMode(AllIcons icon) {
+            this.icon = icon;
+            this.translationKey = "tooltip.aeronautics_gravity.stabilizer.redstone_mode." + name().toLowerCase();
+        }
+
+        @Override
+        public AllIcons getIcon() {
+            return icon;
+        }
+
+        @Override
+        public String getTranslationKey() {
+            return translationKey;
+        }
+
+        /** 给定红石信号,返回本模式是否应工作。 */
+        public boolean isActiveFor(int signal) {
+            return this == ACTIVE_WHEN_ON ? signal > 0 : signal == 0;
         }
     }
 }

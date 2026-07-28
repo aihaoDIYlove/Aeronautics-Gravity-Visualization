@@ -33,5 +33,8 @@
   "tooltip.aeronautics_gravity.stabilizer.idle": "Idle",
   "tooltip.aeronautics_gravity.stabilizer.output": "Output",
   "tooltip.aeronautics_gravity.stabilizer.placement": "Place it away from the contraption's center, otherwise it will have no effect",
-  "aeronautics_gravity.unit.deadband_deg": "deg"
+  "aeronautics_gravity.unit.deadband_deg": "deg",
+  "tooltip.aeronautics_gravity.stabilizer.redstone_mode": "Redstone Mode",
+  "tooltip.aeronautics_gravity.stabilizer.redstone_mode.active_when_off": "Active when unpowered",
+  "tooltip.aeronautics_gravity.stabilizer.redstone_mode.active_when_on": "Active when powered"
 }
