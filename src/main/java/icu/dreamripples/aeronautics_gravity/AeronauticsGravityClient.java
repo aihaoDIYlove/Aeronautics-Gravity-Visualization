@@ -67,13 +67,10 @@ public class AeronauticsGravityClient {
         });
     }
 
-    // 轻质玻璃 CT 连接纹理: 用 CTModel 包装 BakedModel, 相邻方向的边框在 sprite sheet 子格层面消失。
-    // 不走 CreateRegistrate(它 extends Registrate, Registrate 是 Create 的 jarjar, 不在 compile classpath),
-    // 直接监听 ModelEvent.ModifyBakingResult 自己包装, 等价于 Create 内部的 registerCTBehviour。
     // 给玻璃方块注册 CT 连接纹理: 用 CTModel 包装 BakedModel, 相邻方向的边框在 sprite sheet 子格层面消失。
     // original=block/<name>.png(单帧, model 用), target=block/<name>_connected.png(8x8 OMNIDIRECTIONAL sprite sheet, 64格)。
     // 不走 CreateRegistrate(它 extends Registrate, Registrate 是 Create 的 jarjar, 不在 compile classpath),
-    // 直接监听 ModelEvent.ModifyBakingResult 自己包装, 等价于 Create 内部的 registerCTBehviour。
+    // 直接监听 ModelEvent.ModifyBakingResult 自己包装, 等价于 Create 内部的 CreateRegistrate.connectedTextures。
     @SubscribeEvent
     public static void onModifyBaking(ModelEvent.ModifyBakingResult event) {
         registerGlassCT(event, "lightweight_glass");

@@ -21,7 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 /**
- * 配"轻"块 BE - 注册 ScrollValueBehaviour,玩家右键弹板调档(0..36)。
+ * 配"轻"块 BE - 注册 ScrollValueBehaviour,玩家右键弹板调档(1..36)。
  * 值变化时通过 callback 把新档位写入 BlockState.LIFT_TIER,Sable 自动检测并重新计算浮力 cluster。
  * 同时在 tick 中反向同步 BlockState -> behaviour.value(防止外部修改 BlockState 时 UI 不同步)。
  */

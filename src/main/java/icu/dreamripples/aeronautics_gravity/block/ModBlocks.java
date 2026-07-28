@@ -95,7 +95,8 @@ public class ModBlocks {
             ModItems.ITEMS.register("counterweight_gold",
                     () -> new BlockItem(COUNTERWEIGHT_GOLD_BLOCK.get(), new Item.Properties()));
 
-    // 红石配重块系列:铁/煤/金三种皮,共用 RedstoneCounterweightBlock(MASS_TIER 1..16),红stone信号驱动,无 BE
+    // 红石配重块系列:铁/煤/金三种皮,共用 RedstoneCounterweightBlock(MASS_TIER 1..16),红stone信号驱动。
+    // 轻量 BE(无 tick 无 NBT)仅为挂载灯带染色 Flywheel visual。
     public static final DeferredHolder<Block, RedstoneCounterweightBlock> COUNTERWEIGHT_REDSTONE_BLOCK =
             BLOCKS.register("counterweight_redstone",
                     () -> new RedstoneCounterweightBlock(
@@ -178,7 +179,8 @@ public class ModBlocks {
             ModItems.ITEMS.register("counterweight_light_pearl",
                     () -> new BlockItem(COUNTERWEIGHT_LIGHT_PEARL_BLOCK.get(), new Item.Properties()));
 
-    // 红石配"轻"块系列:普通/珠光两种皮,共用 RedstoneCounterweightLightBlock(LIFT_TIER 1..16),红stone信号驱动,无 BE
+    // 红石配"轻"块系列:普通/珠光两种皮,共用 RedstoneCounterweightLightBlock(LIFT_TIER 1..16),红stone信号驱动。
+    // 轻量 BE(无 tick 无 NBT)仅为挂载灯带染色 Flywheel visual。
     public static final DeferredHolder<Block, RedstoneCounterweightLightBlock> COUNTERWEIGHT_LIGHT_REDSTONE_BLOCK =
             BLOCKS.register("counterweight_light_redstone",
                     () -> new RedstoneCounterweightLightBlock(
@@ -246,8 +248,8 @@ public class ModBlocks {
             ModItems.ITEMS.register("ultralight_glass",
                     () -> new BlockItem(ULTRALIGHT_GLASS_BLOCK.get(), new Item.Properties()));
 
-    // 自稳定方块:姿态感知 + P 控制律,互斥调节 MASS_TIER(1..16)/LIFT_TIER(1..16)维持载具水平。
-    // 红石信号控制死区(signal=0 停用,15->2°,1->30°);右键 ScrollValueBehaviour 调响应宽度阈值(1..15°)。
+    // 自稳定方块:PD 混合 + 倾斜速度自适应增益调度,互斥调节 MASS_TIER(1..16)/LIFT_TIER(1..16)维持载具水平。
+    // 红石仅使能(signal=0 停用);右键 ScrollValueBehaviour 调死区 0..30°(默认 3°)。详见 StabilizerBlockEntity Javadoc。
     public static final DeferredHolder<Block, StabilizerBlock> STABILIZER_BLOCK =
             BLOCKS.register("stabilizer",
                     () -> new StabilizerBlock(

@@ -46,9 +46,17 @@ displayName="${mod_name}" #mandatory
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Adds a Mass Visualizer tool for Create: Aeronautics.
-Hold the tool to see block mass as color overlays
-and the center of mass of assembled contraptions.
+Tools and blocks for Create: Aeronautics contraption tuning.
+
+Spark Wand: visualize block mass and center of mass on contraptions; also a combat item with fire damage, the Creeper Buster enchantment, and a handheld goggle substitute.
+
+Convenient Analog Transmission: fixed-RPM analog transmission driven by redstone signal (0-15).
+
+Counterweight / Counterweight-Light blocks: per-block mass and buoyancy tuning via scroll board or redstone signal, with multiple skins.
+
+Lightweight / Ultralight Glass: low-mass glass with connected textures for shedding weight off contraptions.
+
+Stabilizer: self-stabilizing block that keeps a contraption level via a tilt-speed-adaptive PD controller.
 '''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
