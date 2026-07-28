@@ -125,6 +125,7 @@ public class SparkWandItem extends Item {
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.spark_wand.full").withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.spark_wand.heavy").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.spark_wand.goggles").withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.spark_wand.fire").withStyle(ChatFormatting.GOLD));
     }
 }

@@ -2,6 +2,7 @@
   "item.aeronautics_gravity.spark_wand": "Spark Wand",
   "tooltip.aeronautics_gravity.spark_wand.full": "Right-click: Full mass view",
   "tooltip.aeronautics_gravity.spark_wand.heavy": "Shift+Right-click: Heavy blocks (mass >= 2, see-through)",
+  "tooltip.aeronautics_gravity.spark_wand.goggles": "When held: Shows block info like Goggles",
   "tooltip.aeronautics_gravity.spark_wand.fire": "Left-click attack: +4 fire damage",
   "enchantment.aeronautics_gravity.creeper_buster": "Creeper Buster",
   "itemGroup.aeronautics_gravity.main": "Aeronautics Gravity",
@@ -31,5 +32,6 @@
   "tooltip.aeronautics_gravity.stabilizer.lift_mode": "Lift (Up-force)",
   "tooltip.aeronautics_gravity.stabilizer.idle": "Idle",
   "tooltip.aeronautics_gravity.stabilizer.output": "Output",
+  "tooltip.aeronautics_gravity.stabilizer.placement": "Place it away from the contraption's center, otherwise it will have no effect",
   "aeronautics_gravity.unit.deadband_deg": "deg"
 }
