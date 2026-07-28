@@ -2,6 +2,8 @@
   "item.aeronautics_gravity.spark_wand": "Spark Wand",
   "tooltip.aeronautics_gravity.spark_wand.full": "Right-click: Full mass view",
   "tooltip.aeronautics_gravity.spark_wand.heavy": "Shift+Right-click: Heavy blocks (mass >= 2, see-through)",
+  "tooltip.aeronautics_gravity.spark_wand.fire": "Left-click attack: +4 fire damage",
+  "enchantment.aeronautics_gravity.creeper_buster": "Creeper Buster",
   "itemGroup.aeronautics_gravity.main": "Aeronautics Gravity",
   "block.aeronautics_gravity.convenient_analog_transmission": "Convenient Analog Transmission",
   "block.aeronautics_gravity.counterweight": "Counterweight (Iron)",
