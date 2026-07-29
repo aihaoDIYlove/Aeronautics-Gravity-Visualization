@@ -2,6 +2,7 @@ package icu.dreamripples.aeronautics_gravity.client;
 
 import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.physics.config.block_properties.PhysicsBlockPropertyHelper;
+import dev.ryanhcode.sable.physics.floating_block.FloatingBlockMaterial;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -51,10 +52,11 @@ public class MassVisualizer {
         final ClientSubLevel subLevel;
         final Map<BlockState, Set<BlockPos>> typeGroups = new LinkedHashMap<>();
         final Map<BlockState, Double> typeMasses = new IdentityHashMap<>();
+        final Map<BlockState, Double> typeLifts = new IdentityHashMap<>(); // 单块标称浮力 = liftStrength * floatingScale;同类型同值,首次遇到时算一次
         double totalMass;
         long expiresAt;
         SubLevelBlockGetter blockGetter; // rescan 时建,渲染时查裸露面邻居
-        boolean heavy; // true=重块模式(只 >=2,不剔除,穿透找重块配平); false=全量模式(朝向玩家剔除)
+        boolean heavy; // true=重块模式(只 >=2 或有浮力,不剔除,穿透找重块/浮力块配平); false=全量模式(朝向玩家剔除,只画质量)
 
         Visualization(ClientSubLevel subLevel, long expiresAt, boolean heavy) {
             this.subLevel = subLevel;
@@ -79,6 +81,7 @@ public class MassVisualizer {
     private static final double NUMBER_RADIUS_SQ = NUMBER_RADIUS * NUMBER_RADIUS;
     private static final float NUMBER_SCALE = 0.02f;          // 字号(scale 后 Y 取负翻转)
     private static final double HEAVY_MASS_THRESHOLD = 2.0;   // 重块模式阈值:>=2 才画(配平分析)
+    private static final float LINE_OFFSET_PX = 6f;           // 双行时行偏移(像素,scale 前);±6px -> ±0.12格,约半字高,不重叠
 
     public static void toggle(ClientSubLevel subLevel, boolean heavy) {
         UUID id = subLevel.getUniqueId();
@@ -155,6 +158,7 @@ public class MassVisualizer {
         ClientSubLevel cs = viz.subLevel;
         viz.typeGroups.clear();
         viz.typeMasses.clear();
+        viz.typeLifts.clear();
 
         Map<BlockState, Double> typeMassSums = new IdentityHashMap<>();
         Map<BlockState, Integer> typeCounts = new IdentityHashMap<>();
@@ -200,6 +204,14 @@ public class MassVisualizer {
                             typeCounts.merge(state, 1, Integer::sum);
 
                             totalM += mass;
+
+                            // 浮力:同 BlockState 同值(来自 floating_material override),首次遇到算一次。
+                            // 标称浮力 = liftStrength * floatingScale。getFloatingMaterial/getFloatingScale 只读
+                            // state 属性,不涉及 isSolid,所以不依赖 bg(与 getMass 不同)。
+                            if (!viz.typeLifts.containsKey(state)) {
+                                FloatingBlockMaterial mat = PhysicsBlockPropertyHelper.getFloatingMaterial(state);
+                                viz.typeLifts.put(state, mat == null ? 0.0 : mat.liftStrength() * PhysicsBlockPropertyHelper.getFloatingScale(state));
+                            }
                         }
                     }
                 }
@@ -244,13 +256,25 @@ public class MassVisualizer {
             Double massBoxed = viz.typeMasses.get(state);
             if (massBoxed == null) continue;
             double mass = massBoxed;
-            // 重块模式:类型级过滤,跳过 <2 的轻块。同类型质量相同(平均=单块),
-            // 整类型跳过比逐方块判断省。大部分方块质量1,这步砍掉绝大多数,留配平关键重块。
-            if (viz.heavy && mass < HEAVY_MASS_THRESHOLD) continue;
+            double lift = viz.typeLifts.getOrDefault(state, 0.0);
+            // 普通模式:只画质量(照旧)。重块模式:画质量(mass>=2) 和/或 浮力(lift>0)。
+            // 重块模式过滤放宽:既不重(mass<2)又无浮力(lift<=0)的轻普通块才跳过--
+            // 否则 counterweight_light(mass=1) 这类纯浮力块会被 mass<2 踢掉,看不到浮力。
+            boolean drawMass = !viz.heavy || mass >= HEAVY_MASS_THRESHOLD;
+            boolean drawLift = viz.heavy && lift > 0;
+            if (!drawMass && !drawLift) continue;
             // drawInBatch 的 color 是 ARGB,alpha 会被尊重(不像 Catnip 的 colored(int)),这里强制不透明。
-            int color = massToColor(mass) | 0xFF000000;
-            String text = formatMass(mass);
-            float textX = -font.width(text) / 2f;
+            int massColor = massToColor(mass) | 0xFF000000;
+            int liftColor = liftToColor(lift) | 0xFF000000;
+            String massText = drawMass ? formatMass(mass) : null;
+            String liftText = drawLift ? formatLift(lift) : null;
+            float massTextX = massText != null ? -font.width(massText) / 2f : 0f;
+            float liftTextX = liftText != null ? -font.width(liftText) / 2f : 0f;
+            // 双行时浮力在上、质量在下。scale 是 (s,-s,s),drawInBatch 传 y=+k 经 scale 后世界 y=-k*s(向下),
+            // y=-k -> 世界 y=+k*s(向上)。所以质量行 y=+OFFSET(下),浮力行 y=-OFFSET(上)。
+            boolean both = drawMass && drawLift;
+            float massY = both ? LINE_OFFSET_PX : 0f;
+            float liftY = both ? -LINE_OFFSET_PX : 0f;
 
             for (BlockPos pos : entry.getValue()) {
                 // 半径裁剪(本地空间)
@@ -301,7 +325,13 @@ public class MassVisualizer {
                 poseStack.mulPose(billboard);
                 poseStack.scale(NUMBER_SCALE, -NUMBER_SCALE, NUMBER_SCALE);
                 Matrix4f matrix = poseStack.last().pose();
-                font.drawInBatch(text, textX, 0, color, false, matrix, buffer, Font.DisplayMode.SEE_THROUGH, 0, light);
+                // 同一 matrix 下先画浮力(上)再画质量(下),避免重复 translate/scale。
+                if (drawLift) {
+                    font.drawInBatch(liftText, liftTextX, liftY, liftColor, false, matrix, buffer, Font.DisplayMode.SEE_THROUGH, 0, light);
+                }
+                if (drawMass) {
+                    font.drawInBatch(massText, massTextX, massY, massColor, false, matrix, buffer, Font.DisplayMode.SEE_THROUGH, 0, light);
+                }
                 poseStack.popPose();
             }
         }
@@ -311,6 +341,12 @@ public class MassVisualizer {
         return mass < 1.0
                 ? String.format(Locale.ROOT, "%.2f", mass)
                 : String.format(Locale.ROOT, "%.1f", mass);
+    }
+
+    private static String formatLift(double lift) {
+        return lift < 1.0
+                ? String.format(Locale.ROOT, "%.2f", lift)
+                : String.format(Locale.ROOT, "%.1f", lift);
     }
 
     /**
@@ -416,6 +452,16 @@ public class MassVisualizer {
         if (mass <= 2.0) return 0x80FF9800;
         if (mass <= 4.0) return 0x80F44336;
         return 0x80B71C1C;
+    }
+
+    private static int liftToColor(double lift) {
+        // 青色系 = "升力"语义,与 RedstoneCounterweightLightVisual 配轻灯带同色系(暗青->亮青)。
+        // 范围:手调配轻 1..36, 红石配轻/stabilizer lift 1..16。分级让强度差异可读。
+        if (lift <= 0) return 0x40013A3A;
+        if (lift <= 8) return 0xFF013A3A;   // 暗青
+        if (lift <= 16) return 0xFF008B8B;  // 中青
+        if (lift <= 24) return 0xFF00CDCD;  // 亮青
+        return 0xFF00FFFF;                  // 极亮青
     }
 
     /**

@@ -1,7 +1,7 @@
 {
   "item.aeronautics_gravity.spark_wand": "火花魔杖",
   "tooltip.aeronautics_gravity.spark_wand.full": "右键：质量显示",
-  "tooltip.aeronautics_gravity.spark_wand.heavy": "Shift+右键：重块视图（质量≥2，穿透显示）",
+  "tooltip.aeronautics_gravity.spark_wand.heavy": "Shift+右键：重块/浮力视图",
   "tooltip.aeronautics_gravity.spark_wand.goggles": "手持：可代替护目镜显示方块信息",
   "tooltip.aeronautics_gravity.spark_wand.fire": "左键攻击：提供 4 点燃烧伤害",
   "enchantment.aeronautics_gravity.creeper_buster": "苦力怕克星",
