@@ -3,3 +3,7 @@
 # are changed when only line endings change.
 src/generated/**/.cache/* text eol=lf
 src/generated/**/*.json text eol=lf
+
+# Keep shell scripts with LF so Linux CI can execute them
+gradlew text eol=lf
+*.bat text eol=crlf
