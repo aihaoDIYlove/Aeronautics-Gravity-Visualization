@@ -3,7 +3,7 @@
   "tooltip.aeronautics_gravity.spark_wand.full": "右键：质量显示",
   "tooltip.aeronautics_gravity.spark_wand.heavy": "Shift+右键：重块/浮力视图",
   "tooltip.aeronautics_gravity.spark_wand.goggles": "手持：可代替护目镜显示方块信息",
-  "tooltip.aeronautics_gravity.spark_wand.fire": "左键攻击：提供 4 点燃烧伤害",
+  "tooltip.aeronautics_gravity.spark_wand.fire": "左键攻击：提供 4 点燃烧伤害（对节肢生物翻倍）",
   "enchantment.aeronautics_gravity.creeper_buster": "苦力怕克星",
   "itemGroup.aeronautics_gravity.main": "航空学：重力可视化",
   "block.aeronautics_gravity.convenient_analog_transmission": "更方便的模拟传动器",

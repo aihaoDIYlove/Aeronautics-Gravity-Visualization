@@ -12,6 +12,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -95,15 +96,19 @@ public class SparkWandItem extends Item {
         // damageSources().onFire() 基于 vanilla 的 on_fire 伤害类型,该类型 effects=burning,
         // 所以会被 IS_FIRE 标签包含(抗火药水免疫、死亡消息"被烧死"、屏幕灼烧特效),
         // 但 LivingEntity.hurt 路径不会调用 setSecondsOnFire —— 生物不会持续起火。
+        // 节肢生物怕火:对 EntityTypeTags.ARTHROPOD(蜘蛛/洞穴蜘蛛/蠹虫/末影螨/蜜蜂等)造成
+        // 双倍燃烧伤害(8 点)。沿用 vanilla 虫灾附魔(Bane of Arthropods)的同款 tag 判定。
         if (!target.level().isClientSide()) {
+            boolean arthropod = target.getType().is(EntityTypeTags.ARTHROPOD);
+            float damage = arthropod ? FIRE_DAMAGE * 2.0F : FIRE_DAMAGE;
             // 致命一击判定:Minecraft 掉生肉/熟肉取决于实体 isOnFire() 状态(由 setSecondsOnFire
-            // 设置),而非伤害类型。普通攻击已扣血,此时 getHealth() <= FIRE_DAMAGE 说明加上
-            // 4 点燃烧会致死 -- 仅在这种情况下提前点火 1 秒,让 die() -> dropAllDeathLoot 检测到
+            // 设置),而非伤害类型。普通攻击已扣血,此时 getHealth() <= damage 说明加上
+            // 本次燃烧伤害会致死 -- 仅在这种情况下提前点火 1 秒,让 die() -> dropAllDeathLoot 检测到
             // isOnFire=true 从而走 furnace_smelt 掉熟肉。非致命攻击不点火,避免日常攻击污染视觉。
-            if (target.getHealth() <= FIRE_DAMAGE) {
+            if (target.getHealth() <= damage) {
                 target.igniteForSeconds(1);
             }
-            target.hurt(target.damageSources().onFire(), FIRE_DAMAGE);
+            target.hurt(target.damageSources().onFire(), damage);
             // 在生物身上播放火花粒子(原版火把同款 FLAME 粒子),3-6 个围绕身体中心随机散布。
             // sendParticles 的 xOffset/yOffset/zOffset 是位置散布范围,speed=0 让粒子原地生成后
             // 靠 FLAME 粒子自身 tick 缓慢上浮消散,视觉上像火花从生物身上冒出。仅服务端发送,
