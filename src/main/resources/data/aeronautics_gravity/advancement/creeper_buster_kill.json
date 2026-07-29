@@ -14,6 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
+  "parent": "aeronautics_gravity:root",
   "criteria": {
     "kill_creeper": {
       "trigger": "aeronautics_gravity:creeper_buster_kill",

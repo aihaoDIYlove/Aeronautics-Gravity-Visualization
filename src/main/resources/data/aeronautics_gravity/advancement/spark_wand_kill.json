@@ -14,6 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
+  "parent": "aeronautics_gravity:root",
   "criteria": {
     "kill_arthropod": {
       "trigger": "aeronautics_gravity:spark_wand_kill",

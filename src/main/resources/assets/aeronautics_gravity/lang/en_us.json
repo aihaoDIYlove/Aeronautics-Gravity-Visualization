@@ -8,6 +8,8 @@
   "advancements.aeronautics_gravity.spark_wand_kill.description": "Kill an arthropod with the Spark Wand",
   "advancements.aeronautics_gravity.creeper_buster_kill.title": "Don't Touch My Machine!",
   "advancements.aeronautics_gravity.creeper_buster_kill.description": "One-shot a Creeper with the Spark Wand",
+  "advancements.aeronautics_gravity.root.title": "Aeronautics Gravity",
+  "advancements.aeronautics_gravity.root.description": "Spark Wand and gravity tools",
   "enchantment.aeronautics_gravity.creeper_buster": "Creeper Buster",
   "itemGroup.aeronautics_gravity.main": "Aeronautics Gravity",
   "block.aeronautics_gravity.convenient_analog_transmission": "Convenient Analog Transmission",

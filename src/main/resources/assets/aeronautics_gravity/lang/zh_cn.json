@@ -8,6 +8,8 @@
   "advancements.aeronautics_gravity.spark_wand_kill.description": "使用火花魔杖击杀一只爬虫",
   "advancements.aeronautics_gravity.creeper_buster_kill.title": "别碰我的机器！",
   "advancements.aeronautics_gravity.creeper_buster_kill.description": "使用火花魔杖秒杀一只苦力怕",
+  "advancements.aeronautics_gravity.root.title": "航空学：重力",
+  "advancements.aeronautics_gravity.root.description": "火花魔杖与重力工具",
   "enchantment.aeronautics_gravity.creeper_buster": "苦力怕克星",
   "itemGroup.aeronautics_gravity.main": "航空学：重力可视化",
   "block.aeronautics_gravity.convenient_analog_transmission": "更方便的模拟传动器",
