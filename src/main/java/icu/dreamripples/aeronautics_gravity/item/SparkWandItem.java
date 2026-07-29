@@ -3,6 +3,7 @@ package icu.dreamripples.aeronautics_gravity.item;
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
+import icu.dreamripples.aeronautics_gravity.advancement.ModTriggers;
 import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
 import icu.dreamripples.aeronautics_gravity.client.MassVisualizer;
 import icu.dreamripples.aeronautics_gravity.enchantment.ModEnchantments;
@@ -12,8 +13,10 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -118,6 +121,21 @@ public class SparkWandItem extends Item {
                 serverLevel.sendParticles(ParticleTypes.FLAME,
                         target.getX(), target.getY() + target.getBbHeight() * 0.5, target.getZ(),
                         count, 0.3, 0.4, 0.3, 0.0);
+            }
+            // 击杀判定:普攻与附加火伤都已结算,hurtEnemy 由 Player.attack 在普攻 hurt 之后调用,
+            // 火伤在本方法内造成 -- 两条致死路径在此处汇合,isDeadOrDying() 都能命中。火伤走 onFire()
+            // 且 causing entity 为 null,无法被 vanilla player_killed_entity 匹配,故用自定义触发器兜底。
+            if (target.isDeadOrDying() && attacker instanceof ServerPlayer serverPlayer) {
+                // 点燃爬虫:用火花魔杖击杀节肢生物
+                if (arthropod) {
+                    ModTriggers.SPARK_WAND_KILL.get().trigger(serverPlayer);
+                }
+                // 别碰我的机器!:附魔苦力怕克星秒杀苦力怕(creeper_buster 对苦力怕 +100 伤害,满血 20 必杀,
+                // 故"持有该附魔 + 击杀苦力怕"即等价秒杀)。
+                if (target.getType() == EntityType.CREEPER
+                        && stack.getEnchantmentLevel(target.level().holderOrThrow(ModEnchantments.CREEPER_BUSTER)) > 0) {
+                    ModTriggers.CREEPER_BUSTER_KILL.get().trigger(serverPlayer);
+                }
             }
         }
         // 左键攻击消耗 1 点耐久。1.21.1 的 hurtAndBreak 用 EquipmentSlot 重载

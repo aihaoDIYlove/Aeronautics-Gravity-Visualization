@@ -1,0 +1,24 @@
+{
+  "display": {
+    "icon": {
+      "id": "aeronautics_gravity:spark_wand"
+    },
+    "title": {
+      "translate": "advancements.aeronautics_gravity.spark_wand_kill.title"
+    },
+    "description": {
+      "translate": "advancements.aeronautics_gravity.spark_wand_kill.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "kill_arthropod": {
+      "trigger": "aeronautics_gravity:spark_wand_kill",
+      "conditions": {}
+    }
+  },
+  "sends_telemetry_event": false
+}

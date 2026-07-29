@@ -1,6 +1,7 @@
 package icu.dreamripples.aeronautics_gravity;
 
 import com.mojang.logging.LogUtils;
+import icu.dreamripples.aeronautics_gravity.advancement.ModTriggers;
 import icu.dreamripples.aeronautics_gravity.block.ModBlocks;
 import icu.dreamripples.aeronautics_gravity.item.ModCreativeTabs;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
@@ -18,6 +19,7 @@ public class AeronauticsGravityVisualization {
         ModBlocks.BLOCKS.register(modEventBus);
         ModBlocks.BLOCK_ENTITIES.register(modEventBus);
         ModCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
+        ModTriggers.TRIGGERS.register(modEventBus);
         LOGGER.info("Aeronautics Gravity Visualization loaded!");
     }
 }
