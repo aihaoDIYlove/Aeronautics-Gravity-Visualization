@@ -6,7 +6,9 @@
     "AnalogTransmissionBlockEntityAccessor",
     "RotationPropagatorMixin"
   ],
-  "client": [],
+  "client": [
+    "GoggleOverlayRendererMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

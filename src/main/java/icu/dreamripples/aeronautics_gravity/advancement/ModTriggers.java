@@ -29,4 +29,7 @@ public class ModTriggers {
     // CriteriaTrigger 实例 per-ID 维护 listener map,同 new 两个实例注册两个 ID 完全独立。
     public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> CREEPER_BUSTER_KILL =
             TRIGGERS.register("creeper_buster_kill", SparkWandKillTrigger::new);
+
+    public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> GOGGLE_OBSERVE =
+            TRIGGERS.register("goggle_observe", SparkWandKillTrigger::new);
 }

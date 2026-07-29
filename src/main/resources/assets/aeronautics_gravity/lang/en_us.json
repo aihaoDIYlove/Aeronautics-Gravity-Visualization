@@ -10,6 +10,8 @@
   "advancements.aeronautics_gravity.creeper_buster_kill.description": "One-shot a Creeper with the Spark Wand",
   "advancements.aeronautics_gravity.root.title": "Aeronautics Gravity",
   "advancements.aeronautics_gravity.root.description": "Spark Wand and gravity tools",
+  "advancements.aeronautics_gravity.goggle_observe.title": "Who Needs Goggles?",
+  "advancements.aeronautics_gravity.goggle_observe.description": "Observe a machine using the Spark Wand",
   "enchantment.aeronautics_gravity.creeper_buster": "Creeper Buster",
   "itemGroup.aeronautics_gravity.main": "Aeronautics Gravity",
   "block.aeronautics_gravity.convenient_analog_transmission": "Convenient Analog Transmission",
