@@ -2,11 +2,15 @@
   <img src=".github/banner.webp" alt="Aeronautics Gravity" width="640"/>
 </p>
 
-<h1 align="center">Aeronautics Gravity</h1>
+<h1 align="center">Aeronautics: Gravity Visualization</h1>
 
 <p align="center">
   A <b>Create Aeronautics</b> add-on for Minecraft 1.21.1 / NeoForge.<br/>
   Tools and blocks for tuning Sable physics on contraptions — mass visualization, configurable counterweights, lightweight glass, a self-stabilizing block, and more.
+</p>
+
+<p align="center">
+  English | <a href="README.zh_CN.md">简体中文</a>
 </p>
 
 ---
@@ -26,10 +30,10 @@ Tune Sable physics properties per-block, in two families:
 
 | Family | How to adjust | Blocks | Range |
 |---|---|---|---|
-| **Manual** | Scroll-value board (right-click empty-handed) | counterweight, counterweight_light (+ skins) | mass 1–20, lift 1–36 |
+| **Manual** | Scroll-value board (right-click empty-handed) | counterweight, counterweight_light (+ skins) | mass 1–20, buoyancy 1–36 |
 | **Redstone** | Neighbor redstone signal 0–15 | counterweight_redstone, counterweight_light_redstone (+ skins) | tier 1–16 |
 
-The redstone family has no value board — its lamp band tints by signal so you can read the tier at a glance (red = down force, cyan = lift). Goggles also show the current tier.
+The redstone family has no value board — its lamp band tints by signal so you can read the tier at a glance (red = down force, cyan = buoyancy). Goggles also show the current tier.
 
 ### Lightweight / Ultralight Glass
 Low-mass glass for shedding weight off contraptions, with connected textures (panes merge visually).
@@ -40,7 +44,7 @@ Low-mass glass for shedding weight off contraptions, with connected textures (pa
 A self-stabilizing block that keeps a contraption **level without interfering with yaw steering**.
 - PD controller with gain scheduling on tilt speed: gentle response on slow tilt, early response on fast tilt (beats the 45° physics-failure limit).
 - Auto-switches between **mass mode** (high end, down force) and **lift mode** (low end, up force) based on position relative to the center of mass.
-- Adjustable deadband (0–30°, per side face) and redstone-controllable (top/bottom faces: active when off / on).
+- Adjustable deadband (0–30°, per side face) and redstone-controllable (top/bottom faces: active when unpowered / powered).
 
 ### Spark Wand
 The mass visualizer trigger — and a combat item:
