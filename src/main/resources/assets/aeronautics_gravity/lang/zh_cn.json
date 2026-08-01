@@ -44,5 +44,10 @@
   "aeronautics_gravity.unit.deadband_deg": "度",
   "tooltip.aeronautics_gravity.stabilizer.redstone_mode": "红石模式",
   "tooltip.aeronautics_gravity.stabilizer.redstone_mode.active_when_off": "无红石时开启",
-  "tooltip.aeronautics_gravity.stabilizer.redstone_mode.active_when_on": "有红石时开启"
+  "tooltip.aeronautics_gravity.stabilizer.redstone_mode.active_when_on": "有红石时开启",
+  "fluid.aeronautics_gravity.starlight": "星空液体",
+  "item.aeronautics_gravity.starlight_bucket": "星空液体桶",
+  "item.aeronautics_gravity.starlight_bottle": "瓶装星空液体",
+  "block.aeronautics_gravity.void_hose_pulley": "虚空软管滑轮",
+  "tooltip.aeronautics_gravity.hose_bottom": "最底端高度"
 }

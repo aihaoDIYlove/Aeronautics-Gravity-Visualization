@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import icu.dreamripples.aeronautics_gravity.advancement.ModTriggers;
 import icu.dreamripples.aeronautics_gravity.network.ModPayloads;
 import icu.dreamripples.aeronautics_gravity.block.ModBlocks;
+import icu.dreamripples.aeronautics_gravity.fluid.ModFluids;
 import icu.dreamripples.aeronautics_gravity.item.ModCreativeTabs;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
 import net.neoforged.bus.api.IEventBus;
@@ -19,6 +20,8 @@ public class AeronauticsGravityVisualization {
         ModItems.ITEMS.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModBlocks.BLOCK_ENTITIES.register(modEventBus);
+        ModFluids.FLUID_TYPES.register(modEventBus);
+        ModFluids.FLUIDS.register(modEventBus);
         ModCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
         ModTriggers.TRIGGERS.register(modEventBus);
         ModPayloads.register(modEventBus);

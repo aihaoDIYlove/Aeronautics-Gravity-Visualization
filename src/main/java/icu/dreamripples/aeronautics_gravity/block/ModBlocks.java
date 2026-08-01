@@ -1,12 +1,15 @@
 package icu.dreamripples.aeronautics_gravity.block;
 
 import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
+import icu.dreamripples.aeronautics_gravity.fluid.ModFluids;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -248,6 +251,13 @@ public class ModBlocks {
             ModItems.ITEMS.register("ultralight_glass",
                     () -> new BlockItem(ULTRALIGHT_GLASS_BLOCK.get(), new Item.Properties()));
 
+    // 星空液体方块: source 流体不蔓延(见 StarlightFluid.tick), 贴图复用 aeronautics:levitite_blend.
+    // 不注册 BlockItem -- 流体方块用桶拾取, 不作为物品.
+    public static final DeferredHolder<Block, LiquidBlock> STARLIGHT_BLOCK =
+            BLOCKS.register("starlight", () -> new LiquidBlock(
+                    ModFluids.STARLIGHT.get(),
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()));
+
     // 自稳定方块:PD 混合 + 倾斜速度自适应增益调度,互斥调节 MASS_TIER(1..16)/LIFT_TIER(1..16)维持载具水平。
     // 红石仅使能(signal=0 停用);右键 ScrollValueBehaviour 调死区 0..30°(默认 3°)。详见 StabilizerBlockEntity Javadoc。
     public static final DeferredHolder<Block, StabilizerBlock> STABILIZER_BLOCK =
@@ -270,6 +280,29 @@ public class ModBlocks {
     public static final DeferredHolder<Item, BlockItem> STABILIZER_ITEM =
             ModItems.ITEMS.register("stabilizer",
                     () -> new BlockItem(STABILIZER_BLOCK.get(), new Item.Properties()));
+
+    // 虚空软管滑轮: 继承 Create HosePulleyBlock, BE 换成 VoidHosePulleyBlockEntity(自带无限星空液体 handler)。
+    // 外观/动画复用 Create 的 hose_pulley model + HosePulleyRenderer。在末地之海区域(末端 y<=startY)时
+    // 经 capability 暴露的 VoidHosePulleyFluidHandler.drain 返回无限 STARLIGHT(见 ModCapabilities)。
+    public static final DeferredHolder<Block, VoidHosePulleyBlock> VOID_HOSE_PULLEY_BLOCK =
+            BLOCKS.register("void_hose_pulley",
+                    () -> new VoidHosePulleyBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<VoidHosePulleyBlockEntity>> VOID_HOSE_PULLEY_BE =
+            BLOCK_ENTITIES.register("void_hose_pulley",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createVoidHosePulleyBlockEntity, VOID_HOSE_PULLEY_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> VOID_HOSE_PULLEY_ITEM =
+            ModItems.ITEMS.register("void_hose_pulley",
+                    () -> new BlockItem(VOID_HOSE_PULLEY_BLOCK.get(), new Item.Properties()));
 
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);
@@ -311,5 +344,9 @@ public class ModBlocks {
 
     private static StabilizerBlockEntity createStabilizerBlockEntity(BlockPos pos, BlockState state) {
         return new StabilizerBlockEntity(STABILIZER_BE.get(), pos, state);
+    }
+
+    private static VoidHosePulleyBlockEntity createVoidHosePulleyBlockEntity(BlockPos pos, BlockState state) {
+        return new VoidHosePulleyBlockEntity(VOID_HOSE_PULLEY_BE.get(), pos, state);
     }
 }

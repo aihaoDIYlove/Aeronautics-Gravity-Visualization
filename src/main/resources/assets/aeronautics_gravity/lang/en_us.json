@@ -44,5 +44,10 @@
   "aeronautics_gravity.unit.deadband_deg": "deg",
   "tooltip.aeronautics_gravity.stabilizer.redstone_mode": "Redstone Mode",
   "tooltip.aeronautics_gravity.stabilizer.redstone_mode.active_when_off": "Active when unpowered",
-  "tooltip.aeronautics_gravity.stabilizer.redstone_mode.active_when_on": "Active when powered"
+  "tooltip.aeronautics_gravity.stabilizer.redstone_mode.active_when_on": "Active when powered",
+  "fluid.aeronautics_gravity.starlight": "Starlight",
+  "item.aeronautics_gravity.starlight_bucket": "Starlight Bucket",
+  "item.aeronautics_gravity.starlight_bottle": "Starlight Bottle",
+  "block.aeronautics_gravity.void_hose_pulley": "Void Hose Pulley",
+  "tooltip.aeronautics_gravity.hose_bottom": "Hose Bottom"
 }

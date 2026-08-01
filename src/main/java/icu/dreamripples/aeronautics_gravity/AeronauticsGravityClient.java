@@ -1,6 +1,7 @@
 package icu.dreamripples.aeronautics_gravity;
 
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
+import com.simibubi.create.content.contraptions.pulley.HosePulleyVisual;
 import com.simibubi.create.foundation.block.connected.AllCTTypes;
 import com.simibubi.create.foundation.block.connected.CTModel;
 import com.simibubi.create.foundation.block.connected.CTSpriteShifter;
@@ -57,6 +58,11 @@ public class AeronauticsGravityClient {
                     .factory(RedstoneCounterweightVisual::new).apply();
             SimpleBlockEntityVisualizer.builder(ModBlocks.REDSTONE_COUNTERWEIGHT_LIGHT_BE.get())
                     .factory(RedstoneCounterweightLightVisual::new).apply();
+            // 虚空软管滑轮: 复用 Create 的 HosePulleyVisual(Flywheel Visualizer). BER(AbstractPulleyRenderer)
+            // 在 Flywheel 环境下 renderSafe 首行 if(supportsVisualization) return 直接跳过, 软管/线圈/磁铁
+            // 全由 Visualizer 渲染 -- 所以必须注册 Visualizer, 不能只注册 BER(只注册 BER = 只剩 blockstate 外壳).
+            SimpleBlockEntityVisualizer.builder(ModBlocks.VOID_HOSE_PULLEY_BE.get())
+                    .factory(HosePulleyVisual::new).apply();
             // 手持火花魔杖时获得护目镜视野: Create 的 GogglesItem 用一组 Predicate<Player> 判定
             // "是否佩戴护目镜",默认只查 HEAD 槽。addIsWearingPredicate 是官方为"手持替代品"预留的
             // 扩展点(GogglesItem Javadoc 原文)。注册后 3 处调用点同时生效: 准星瞄准方块的 overlay
