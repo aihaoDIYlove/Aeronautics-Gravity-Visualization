@@ -49,5 +49,6 @@
   "item.aeronautics_gravity.starlight_bucket": "Starlight Bucket",
   "item.aeronautics_gravity.starlight_bottle": "Starlight Bottle",
   "block.aeronautics_gravity.void_hose_pulley": "Void Hose Pulley",
-  "tooltip.aeronautics_gravity.hose_bottom": "Hose Bottom"
+  "tooltip.aeronautics_gravity.hose_bottom": "Current Hose Bottom:",
+  "tooltip.aeronautics_gravity.hose_too_high": "Extraction requires hose Y: %d or below"
 }

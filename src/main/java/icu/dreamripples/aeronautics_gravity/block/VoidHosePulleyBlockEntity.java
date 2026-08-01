@@ -56,6 +56,15 @@ public class VoidHosePulleyBlockEntity extends HosePulleyBlockEntity {
         return getBlockPos().getY() - (int) Math.ceil(getInterpolatedOffset(0));
     }
 
+    /** 末地之海抽取所需的最低 Y(力场顶部 startY - 2, 对齐渲染位置)。维度无 EndSeaPhysics 时返回 Integer.MIN_VALUE。 */
+    public int getRequiredY() {
+        Level level = getLevel();
+        if (level == null) return Integer.MIN_VALUE;
+        EndSeaPhysics physics = EndSeaPhysicsData.of(level);
+        if (physics == null) return Integer.MIN_VALUE;
+        return (int) Math.floor(physics.startY() - 2);
+    }
+
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         // 照搬 Create 软管滑轮: super 显示 kinetic 应力(stress=0 时不加 -- 虚空软管是新 BE type,
@@ -65,8 +74,16 @@ public class VoidHosePulleyBlockEntity extends HosePulleyBlockEntity {
         // drainer/filler 在虚空空转为 false, 手动补 infinite hint(复用 Create 的 hint.hose_pulley lang).
         if (isEndSeaActive()) {
             TooltipHelper.addHint(tooltip, "hint.hose_pulley");
+        } else {
+            // 不 active: 提示抽取所需的最低 Y(末地之海渲染顶部 = startY - 2)
+            CreateLang.builder()
+                    .add(Component.translatable("tooltip.aeronautics_gravity.hose_too_high", getRequiredY())
+                            .withStyle(ChatFormatting.GRAY))
+                    .forGoggles(tooltip);
         }
-        // 新增: 软管最底端高度(总是显示, 玩家需知道末端是否进入末地之海)
+        // 空行分隔提示与高度读数
+        tooltip.add(Component.empty());
+        // 当前软管最底端高度(总是显示, 玩家需知道末端是否进入末地之海)
         CreateLang.builder()
                 .add(Component.translatable("tooltip.aeronautics_gravity.hose_bottom")
                         .withStyle(ChatFormatting.GRAY))
