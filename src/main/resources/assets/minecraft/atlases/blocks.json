@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "aeronautics_gravity:fluid/starlight_still"
+    },
+    {
+      "type": "single",
+      "resource": "aeronautics_gravity:fluid/starlight_flow"
+    }
+  ]
+}

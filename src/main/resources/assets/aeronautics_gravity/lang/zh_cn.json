@@ -49,5 +49,5 @@
   "item.aeronautics_gravity.starlight_bucket": "星空液体桶",
   "item.aeronautics_gravity.starlight_bottle": "瓶装星空液体",
   "block.aeronautics_gravity.void_hose_pulley": "虚空软管滑轮",
-  "tooltip.aeronautics_gravity.hose_bottom": "最底端高度"
+  "tooltip.aeronautics_gravity.hose_bottom": "软管最底端高度："
 }

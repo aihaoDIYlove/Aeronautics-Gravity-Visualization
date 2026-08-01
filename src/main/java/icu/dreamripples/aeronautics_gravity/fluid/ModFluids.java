@@ -23,7 +23,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
  * （不是 {@code Registries.FLUID_TYPE}）；LiquidBlock/BucketItem 构造接直接 Fluid 而非 Supplier；
  * BucketItem/LiquidBlock 的 fluid capability 由 NeoForge 默认提供，无需手写。
  * <p>
- * 贴图复用 aeronautics 的 levitite_blend（视觉一致），lang key = {@code fluid.aeronautics_gravity.starlight}。
+ * 贴图为本 mod 自制的 starlight_still/flow (末地之海色调星海动画, tools/gen_starlight.py 生成), lang key = {@code fluid.aeronautics_gravity.starlight}。
  */
 public class ModFluids {
     public static final DeferredRegister<FluidType> FLUID_TYPES =
@@ -32,9 +32,9 @@ public class ModFluids {
             DeferredRegister.create(Registries.FLUID, AeronauticsGravityVisualization.MOD_ID);
 
     private static final ResourceLocation STILL_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("aeronautics", "fluid/levitite_blend_still");
+            ResourceLocation.fromNamespaceAndPath(AeronauticsGravityVisualization.MOD_ID, "fluid/starlight_still");
     private static final ResourceLocation FLOWING_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("aeronautics", "fluid/levitite_blend_flow");
+            ResourceLocation.fromNamespaceAndPath(AeronauticsGravityVisualization.MOD_ID, "fluid/starlight_flow");
 
     public static final DeferredHolder<FluidType, StarlightFluidType> STARLIGHT_FLUID_TYPE =
             FLUID_TYPES.register("starlight", () -> new StarlightFluidType(

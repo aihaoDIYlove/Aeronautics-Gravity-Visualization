@@ -251,7 +251,7 @@ public class ModBlocks {
             ModItems.ITEMS.register("ultralight_glass",
                     () -> new BlockItem(ULTRALIGHT_GLASS_BLOCK.get(), new Item.Properties()));
 
-    // 星空液体方块: source 流体不蔓延(见 StarlightFluid.tick), 贴图复用 aeronautics:levitite_blend.
+    // 星空液体方块: source 流体不蔓延(见 StarlightFluid.tick), 贴图为自制 starlight_still/flow (tools/gen_starlight.py).
     // 不注册 BlockItem -- 流体方块用桶拾取, 不作为物品.
     public static final DeferredHolder<Block, LiquidBlock> STARLIGHT_BLOCK =
             BLOCKS.register("starlight", () -> new LiquidBlock(

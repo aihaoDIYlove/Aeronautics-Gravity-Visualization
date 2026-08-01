@@ -9,11 +9,14 @@ import java.util.function.Consumer;
 /**
  * 星空液体的 FluidType。
  * <p>
- * 贴图复用 Aeronautics 的 levitite_blend（{@code aeronautics:fluid/levitite_blend_still} / {@code _flow}），
- * 视觉上与 levitite_blend 一致；雾色/着色走 {@link IClientFluidTypeExtensions} 默认实现。
+ * 贴图为本 mod 自制的 {@code aeronautics_gravity:fluid/starlight_still} / {@code starlight_flow}
+ * (末地之海色调星海动画, 由 tools/gen_starlight.py 生成); 雾色/着色走 {@link IClientFluidTypeExtensions} 默认实现。
  * <p>
- * NeoForge 1.21.1：{@link FluidType} 直接 implements {@link IClientFluidTypeExtensions} 即会被客户端自动注册
- * （参考 Aeronautics 的 {@code AeroFluidType}，同样不 override {@code initializeClient}）。
+ * NeoForge 1.21.1：{@link FluidType} 默认 {@code initializeClient} 是空实现, 直接 implements
+ * {@link IClientFluidTypeExtensions} 并不会自动注册 -- 必须 override {@code initializeClient} 并
+ * {@code consumer.accept(this)}, 否则 {@code ClientExtensionsManager.FLUID_TYPE_EXTENSIONS} 映射到
+ * DEFAULT(空实现) -> {@code getStillTexture} 返回 null -> 渲染流体方块时 {@code FluidSpriteCache}
+ * {@code MapN.getOrDefault(null, ...)} NPE 崩溃(且报错不指向 fluid, 极难排查). 见下方 {@link #initializeClient}.
  */
 public class StarlightFluidType extends FluidType implements IClientFluidTypeExtensions {
     private final ResourceLocation stillTexture;

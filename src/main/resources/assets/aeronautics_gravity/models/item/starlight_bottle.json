@@ -1,3 +1,6 @@
 {
-  "parent": "minecraft:item/glass_bottle"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "aeronautics_gravity:item/starlight_bottle"
+  }
 }

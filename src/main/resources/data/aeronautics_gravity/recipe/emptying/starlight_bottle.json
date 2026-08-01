@@ -1,0 +1,17 @@
+{
+  "type": "create:emptying",
+  "ingredients": [
+    {
+      "item": "aeronautics_gravity:starlight_bottle"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:glass_bottle"
+    },
+    {
+      "amount": 250,
+      "id": "aeronautics_gravity:starlight"
+    }
+  ]
+}
