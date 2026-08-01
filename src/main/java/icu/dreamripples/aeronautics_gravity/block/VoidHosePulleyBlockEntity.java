@@ -39,14 +39,16 @@ public class VoidHosePulleyBlockEntity extends HosePulleyBlockEntity {
         return voidHandler;
     }
 
-    /** 末端是否进入末地之海区域(末端 y &lt;= startY)。active 时 handler 返回无限 STARLIGHT。 */
+    /** 末端是否进入末地之海区域。active 时 handler 返回无限 STARLIGHT。 */
     public boolean isEndSeaActive() {
         Level level = getLevel();
         if (level == null) return false;
         EndSeaPhysics physics = EndSeaPhysicsData.of(level);
         if (physics == null) return false;
         double endY = getBlockPos().getY() - getInterpolatedOffset(0);
-        return endY <= physics.startY();
+        // startY 是力场顶部(默认 -40), 但末地海渲染顶部在 startY - 2(实测 -42)。
+        // 对齐渲染位置: 末端 y <= startY - 2 才算真正进入末地海(载具悬浮在 startY - 1 = -41)。
+        return endY <= physics.startY() - 2;
     }
 
     /** 软管最底端格子的 y 坐标(滑轮 y - ceil(offset), 与 Create rootPosGetter 一致)。 */
