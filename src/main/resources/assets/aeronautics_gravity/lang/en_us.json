@@ -34,6 +34,7 @@
   "block.aeronautics_gravity.lightweight_glass": "Lightweight Glass",
   "block.aeronautics_gravity.ultralight_glass": "Ultralight Glass",
   "block.aeronautics_gravity.stabilizer": "Stabilizer",
+  "item.aeronautics_gravity.incomplete_stabilizer": "Incomplete Stabilizer",
   "block.aeronautics_gravity.stabilizer.deadband": "Deadband",
   "tooltip.aeronautics_gravity.stabilizer.mode": "Mode",
   "tooltip.aeronautics_gravity.stabilizer.mass_mode": "Mass (Down-force)",

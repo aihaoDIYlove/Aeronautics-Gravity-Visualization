@@ -26,4 +26,9 @@ public class ModItems {
     // 取液交互见 StarlightBottleHandler. 也作合成/酿造材料.
     public static final Supplier<Item> STARLIGHT_BOTTLE =
             ITEMS.register("starlight_bottle", () -> new Item(new Item.Properties().stacksTo(64)));
+
+    // 自稳定方块(半成品框架): 纯物品(不可放置), sequenced_assembly 中间产物(transitional_item).
+    // crafting 合成后, 经 Spout 6 次注液(星空液体) -> stabilizer(50%)/废品(50%). 参考 precision_mechanism.
+    public static final Supplier<Item> INCOMPLETE_STABILIZER =
+            ITEMS.register("incomplete_stabilizer", () -> new Item(new Item.Properties().stacksTo(64)));
 }
