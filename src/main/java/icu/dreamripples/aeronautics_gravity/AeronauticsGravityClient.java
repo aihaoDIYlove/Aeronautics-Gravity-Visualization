@@ -1,5 +1,8 @@
 package icu.dreamripples.aeronautics_gravity;
 
+import com.simibubi.create.CreateClient;
+import com.simibubi.create.content.decoration.encasing.EncasedCTBehaviour;
+import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.content.contraptions.pulley.HosePulleyVisual;
 import com.simibubi.create.foundation.block.connected.AllCTTypes;
@@ -81,6 +84,8 @@ public class AeronauticsGravityClient {
     public static void onModifyBaking(ModelEvent.ModifyBakingResult event) {
         registerGlassCT(event, "lightweight_glass");
         registerGlassCT(event, "ultralight_glass");
+        registerCasingCT(event, "starlight_casing");
+        registerEncasedPipeCT(event, "starlight_encased_fluid_pipe");
     }
 
     private static void registerGlassCT(ModelEvent.ModifyBakingResult event, String name) {
@@ -92,6 +97,50 @@ public class AeronauticsGravityClient {
                 ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/" + name),
                 ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/" + name + "_connected"));
         ConnectedTextureBehaviour behaviour = new SimpleCTBehaviour(shift);
+        for (BlockState state : block.getStateDefinition().getPossibleStates()) {
+            ModelResourceLocation mrl = BlockModelShaper.stateToModelLocation(blockId, state);
+            BakedModel original = event.getModels().get(mrl);
+            if (original != null) {
+                event.getModels().put(mrl, new CTModel(original, behaviour));
+            }
+        }
+    }
+
+    // 机壳 CT + CasingConnectivity: EncasedCTBehaviour.connectsTo 依赖 CasingConnectivity.get(state) 查找相邻
+    // 同机壳 entry, 所以 CT 包装和 CasingConnectivity 注册必须用同一 CTSpriteShiftEntry. 等价 Create 的
+    // BuilderTransformers.casing(connectedTextures(EncasedCTBehaviour) + casingConnectivity(makeCasing)).
+    private static void registerCasingCT(ModelEvent.ModifyBakingResult event, String name) {
+        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", name);
+        Block block = BuiltInRegistries.BLOCK.get(blockId);
+        if (block == Blocks.AIR) return;
+        CTSpriteShiftEntry shift = CTSpriteShifter.getCT(
+                AllCTTypes.OMNIDIRECTIONAL,
+                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/" + name),
+                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/" + name + "_connected"));
+        CreateClient.CASING_CONNECTIVITY.makeCasing(block, shift);
+        ConnectedTextureBehaviour behaviour = new EncasedCTBehaviour(shift);
+        for (BlockState state : block.getStateDefinition().getPossibleStates()) {
+            ModelResourceLocation mrl = BlockModelShaper.stateToModelLocation(blockId, state);
+            BakedModel original = event.getModels().get(mrl);
+            if (original != null) {
+                event.getModels().put(mrl, new CTModel(original, behaviour));
+            }
+        }
+    }
+
+    // 套壳管道 CT + CasingConnectivity: 用 starlight_casing 的 shift(机壳面连接), 只在非管道连接方向
+    // 显示机壳连接(仿 Create encased_fluid_pipe 的 predicate: !getValue(FACING_TO_PROPERTY_MAP)).
+    private static void registerEncasedPipeCT(ModelEvent.ModifyBakingResult event, String name) {
+        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", name);
+        Block block = BuiltInRegistries.BLOCK.get(blockId);
+        if (block == Blocks.AIR) return;
+        CTSpriteShiftEntry shift = CTSpriteShifter.getCT(
+                AllCTTypes.OMNIDIRECTIONAL,
+                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/starlight_casing"),
+                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/starlight_casing_connected"));
+        CreateClient.CASING_CONNECTIVITY.make(block, shift,
+                (s, f) -> !s.getValue(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(f)));
+        ConnectedTextureBehaviour behaviour = new EncasedCTBehaviour(shift);
         for (BlockState state : block.getStateDefinition().getPossibleStates()) {
             ModelResourceLocation mrl = BlockModelShaper.stateToModelLocation(blockId, state);
             BakedModel original = event.getModels().get(mrl);

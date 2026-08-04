@@ -1,0 +1,16 @@
+{
+  "type": "create:item_application",
+  "ingredients": [
+    {
+      "item": "create:copper_casing"
+    },
+    {
+      "item": "aeronautics_gravity:starlight_bottle"
+    }
+  ],
+  "results": [
+    {
+      "id": "aeronautics_gravity:starlight_casing"
+    }
+  ]
+}

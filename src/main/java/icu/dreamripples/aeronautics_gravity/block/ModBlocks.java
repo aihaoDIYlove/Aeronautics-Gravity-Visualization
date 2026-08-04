@@ -1,5 +1,7 @@
 package icu.dreamripples.aeronautics_gravity.block;
 
+import com.simibubi.create.content.decoration.encasing.CasingBlock;
+import com.simibubi.create.content.fluids.pipes.FluidPipeBlockEntity;
 import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
 import icu.dreamripples.aeronautics_gravity.fluid.ModFluids;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
@@ -243,6 +245,42 @@ public class ModBlocks {
             ModItems.ITEMS.register("void_hose_pulley",
                     () -> new BlockItem(VOID_HOSE_PULLEY_BLOCK.get(), new Item.Properties()));
 
+    // 星空机壳: 继承 Create CasingBlock(铜机壳改色), 有 CT 连接纹理 + 可套管道(见 StarlightEncasedPipeBlock).
+    // 合成: 手持星空液体瓶右键铜机壳 / 机械手 / 注液器 250mb starlight 注液. 详见 Feature 9.
+    public static final DeferredHolder<Block, CasingBlock> STARLIGHT_CASING_BLOCK =
+            BLOCKS.register("starlight_casing",
+                    () -> new CasingBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<Item, BlockItem> STARLIGHT_CASING_ITEM =
+            ModItems.ITEMS.register("starlight_casing",
+                    () -> new BlockItem(STARLIGHT_CASING_BLOCK.get(), new Item.Properties()));
+
+    // 星空套壳管道: 继承 EncasedPipeBlock(见 StarlightEncasedPipeBlock), 覆盖 getBlockEntityType 指向自注册 BE.
+    // starlight_casing 右键 fluid_pipe -> 此方块; 扳手拆除还原 fluid_pipe(继承 onWrenched). 无 BlockItem(不可直接放置).
+    public static final DeferredHolder<Block, StarlightEncasedPipeBlock> STARLIGHT_ENCASED_FLUID_PIPE_BLOCK =
+            BLOCKS.register("starlight_encased_fluid_pipe",
+                    () -> new StarlightEncasedPipeBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops(),
+                            STARLIGHT_CASING_BLOCK::get));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FluidPipeBlockEntity>> STARLIGHT_ENCASED_FLUID_PIPE_BE =
+            BLOCK_ENTITIES.register("starlight_encased_fluid_pipe",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createStarlightEncasedFluidPipeBlockEntity,
+                                    STARLIGHT_ENCASED_FLUID_PIPE_BLOCK.get())
+                            .build(null));
+
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);
     }
@@ -285,5 +323,11 @@ public class ModBlocks {
 
     private static VoidHosePulleyBlockEntity createVoidHosePulleyBlockEntity(BlockPos pos, BlockState state) {
         return new VoidHosePulleyBlockEntity(VOID_HOSE_PULLEY_BE.get(), pos, state);
+    }
+
+    // FluidPipeBlockEntity 构造是 3 参数(type,pos,state), 而 BlockEntityType.Builder.of 需要
+    // 2 参数 BlockEntitySupplier(pos,state), 不能直接 method ref -> 工厂方法补上 BE type.
+    private static FluidPipeBlockEntity createStarlightEncasedFluidPipeBlockEntity(BlockPos pos, BlockState state) {
+        return new FluidPipeBlockEntity(STARLIGHT_ENCASED_FLUID_PIPE_BE.get(), pos, state);
     }
 }

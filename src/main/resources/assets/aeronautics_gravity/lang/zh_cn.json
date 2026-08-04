@@ -47,5 +47,6 @@
   "item.aeronautics_gravity.starlight_bottle": "瓶装星空液体",
   "block.aeronautics_gravity.void_hose_pulley": "虚空软管滑轮",
   "tooltip.aeronautics_gravity.hose_bottom": "当前软管最底端高度：",
-  "tooltip.aeronautics_gravity.hose_too_high": "抽取需软管到达Y：%d及以下"
+  "tooltip.aeronautics_gravity.hose_too_high": "抽取需软管到达Y：%d及以下",
+  "block.aeronautics_gravity.starlight_casing": "星空机壳"
 }
