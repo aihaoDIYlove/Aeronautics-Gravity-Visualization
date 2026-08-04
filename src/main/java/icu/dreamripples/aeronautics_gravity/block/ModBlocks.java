@@ -56,49 +56,18 @@ public class ModBlocks {
                                     .noOcclusion()
                                     .requiresCorrectToolForDrops()));
 
-    public static final DeferredHolder<Block, CounterweightBlock> COUNTERWEIGHT_COAL_BLOCK =
-            BLOCKS.register("counterweight_coal",
-                    () -> new CounterweightBlock(
-                            BlockBehaviour.Properties.of()
-                                    .mapColor(MapColor.METAL)
-                                    .sound(SoundType.COPPER)
-                                    .strength(3.5f)
-                                    .noOcclusion()
-                                    .requiresCorrectToolForDrops()));
-
-    public static final DeferredHolder<Block, CounterweightBlock> COUNTERWEIGHT_GOLD_BLOCK =
-            BLOCKS.register("counterweight_gold",
-                    () -> new CounterweightBlock(
-                            BlockBehaviour.Properties.of()
-                                    .mapColor(MapColor.METAL)
-                                    .sound(SoundType.COPPER)
-                                    .strength(3.5f)
-                                    .noOcclusion()
-                                    .requiresCorrectToolForDrops()));
-
-    // 三种配重块共用一个 BE 类型(同 CounterweightBlockEntity + MASS_TIER),省去重复注册
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CounterweightBlockEntity>> COUNTERWEIGHT_BE =
             BLOCK_ENTITIES.register("counterweight",
                     () -> BlockEntityType.Builder
                             .of(ModBlocks::createCounterweightBlockEntity,
-                                    COUNTERWEIGHT_BLOCK.get(),
-                                    COUNTERWEIGHT_COAL_BLOCK.get(),
-                                    COUNTERWEIGHT_GOLD_BLOCK.get())
+                                    COUNTERWEIGHT_BLOCK.get())
                             .build(null));
 
     public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_ITEM =
             ModItems.ITEMS.register("counterweight",
                     () -> new BlockItem(COUNTERWEIGHT_BLOCK.get(), new Item.Properties()));
 
-    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_COAL_ITEM =
-            ModItems.ITEMS.register("counterweight_coal",
-                    () -> new BlockItem(COUNTERWEIGHT_COAL_BLOCK.get(), new Item.Properties()));
-
-    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_GOLD_ITEM =
-            ModItems.ITEMS.register("counterweight_gold",
-                    () -> new BlockItem(COUNTERWEIGHT_GOLD_BLOCK.get(), new Item.Properties()));
-
-    // 红石配重块系列:铁/煤/金三种皮,共用 RedstoneCounterweightBlock(MASS_TIER 1..16),红stone信号驱动。
+    // 红石配重块:共用 RedstoneCounterweightBlock(MASS_TIER 1..16),红石信号驱动。
     // 轻量 BE(无 tick 无 NBT)仅为挂载灯带染色 Flywheel visual。
     public static final DeferredHolder<Block, RedstoneCounterweightBlock> COUNTERWEIGHT_REDSTONE_BLOCK =
             BLOCKS.register("counterweight_redstone",
@@ -111,39 +80,9 @@ public class ModBlocks {
                                     .isRedstoneConductor((state, level, pos) -> false)
                                     .requiresCorrectToolForDrops()));
 
-    public static final DeferredHolder<Block, RedstoneCounterweightBlock> COUNTERWEIGHT_COAL_REDSTONE_BLOCK =
-            BLOCKS.register("counterweight_coal_redstone",
-                    () -> new RedstoneCounterweightBlock(
-                            BlockBehaviour.Properties.of()
-                                    .mapColor(MapColor.METAL)
-                                    .sound(SoundType.COPPER)
-                                    .strength(3.5f)
-                                    .noOcclusion()
-                                    .isRedstoneConductor((state, level, pos) -> false)
-                                    .requiresCorrectToolForDrops()));
-
-    public static final DeferredHolder<Block, RedstoneCounterweightBlock> COUNTERWEIGHT_GOLD_REDSTONE_BLOCK =
-            BLOCKS.register("counterweight_gold_redstone",
-                    () -> new RedstoneCounterweightBlock(
-                            BlockBehaviour.Properties.of()
-                                    .mapColor(MapColor.METAL)
-                                    .sound(SoundType.COPPER)
-                                    .strength(3.5f)
-                                    .noOcclusion()
-                                    .isRedstoneConductor((state, level, pos) -> false)
-                                    .requiresCorrectToolForDrops()));
-
     public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_REDSTONE_ITEM =
             ModItems.ITEMS.register("counterweight_redstone",
                     () -> new BlockItem(COUNTERWEIGHT_REDSTONE_BLOCK.get(), new Item.Properties()));
-
-    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_COAL_REDSTONE_ITEM =
-            ModItems.ITEMS.register("counterweight_coal_redstone",
-                    () -> new BlockItem(COUNTERWEIGHT_COAL_REDSTONE_BLOCK.get(), new Item.Properties()));
-
-    public static final DeferredHolder<Item, BlockItem> COUNTERWEIGHT_GOLD_REDSTONE_ITEM =
-            ModItems.ITEMS.register("counterweight_gold_redstone",
-                    () -> new BlockItem(COUNTERWEIGHT_GOLD_REDSTONE_BLOCK.get(), new Item.Properties()));
 
     public static final DeferredHolder<Block, CounterweightLightBlock> COUNTERWEIGHT_LIGHT_BLOCK =
             BLOCKS.register("counterweight_light",
@@ -321,9 +260,7 @@ public class ModBlocks {
             BLOCK_ENTITIES.register("redstone_counterweight",
                     () -> BlockEntityType.Builder
                             .of(ModBlocks::createRedstoneCounterweightBlockEntity,
-                                    COUNTERWEIGHT_REDSTONE_BLOCK.get(),
-                                    COUNTERWEIGHT_COAL_REDSTONE_BLOCK.get(),
-                                    COUNTERWEIGHT_GOLD_REDSTONE_BLOCK.get())
+                                    COUNTERWEIGHT_REDSTONE_BLOCK.get())
                             .build(null));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RedstoneCounterweightLightBlockEntity>> REDSTONE_COUNTERWEIGHT_LIGHT_BE =

@@ -1,7 +1,5 @@
 {
   "values": [
-    "aeronautics_gravity:counterweight_redstone",
-    "aeronautics_gravity:counterweight_coal_redstone",
-    "aeronautics_gravity:counterweight_gold_redstone"
+    "aeronautics_gravity:counterweight_redstone"
   ]
 }

@@ -1,7 +1,5 @@
 {
   "values": [
-    "aeronautics_gravity:counterweight",
-    "aeronautics_gravity:counterweight_coal",
-    "aeronautics_gravity:counterweight_gold"
+    "aeronautics_gravity:counterweight"
   ]
 }

@@ -3,13 +3,13 @@
   "category": "misc",
   "pattern": [
     "IBI",
-    "LTL",
+    "HTH",
     "IBI"
   ],
   "key": {
-    "I": { "item": "minecraft:iron_block" },
-    "B": { "item": "create:brass_casing" },
-    "L": { "item": "aeronautics:levitite_blend_bucket" },
+    "I": { "item": "create:industrial_iron_block" },
+    "B": { "item": "create:andesite_casing" },
+    "H": { "item": "minecraft:heavy_core" },
     "T": { "item": "simulated:throttle_lever" }
   },
   "result": {
