@@ -46,9 +46,10 @@ public class StabilizerRenderer extends SafeBlockEntityRenderer<StabilizerBlockE
     protected void renderSafe(StabilizerBlockEntity be, float partialTicks, PoseStack ms,
                               MultiBufferSource buffer, int light, int overlay) {
         // 1. 灯带染色(SuperByteBuffer + cutout)
+        // 换皮成不透明 cube_all 后改用 REDSTONE_INDICATOR(72 突出版);换皮前用 ANCHOR_INDICATOR(32 内嵌,框住星空)
         BlockState state = be.getBlockState();
         int color = computeColor(state);
-        SuperByteBuffer indicator = CachedBuffers.partial(ModPartialModels.REDSTONE_INDICATOR, state);
+        SuperByteBuffer indicator = CachedBuffers.partial(ModPartialModels.ANCHOR_INDICATOR, state);
         indicator.color((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, (color >> 24) & 0xFF)
                 .light(light)
                 .renderInto(ms, buffer.getBuffer(RenderType.cutout()));
