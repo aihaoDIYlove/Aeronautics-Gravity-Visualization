@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "aeronautics_gravity:lightweight_glass"
+  },
+  "result": {
+    "id": "aeronautics_gravity:ultralight_glass",
+    "count": 2
+  }
+}
