@@ -6,8 +6,8 @@
 		64
 	],
 	"textures": {
-		"0": "aeronautics_gravity:block/stabilizer",
-		"particle": "aeronautics_gravity:block/stabilizer"
+		"0": "aeronautics_gravity:block/world_anchor",
+		"particle": "aeronautics_gravity:block/world_anchor"
 	},
 	"elements": [
 		{
