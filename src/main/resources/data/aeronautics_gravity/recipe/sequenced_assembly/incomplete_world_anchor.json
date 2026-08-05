@@ -1,0 +1,48 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "aeronautics_gravity:lightweight_glass"
+  },
+  "loops": 1,
+  "transitional_item": {
+    "id": "aeronautics_gravity:incomplete_world_anchor"
+  },
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "aeronautics_gravity:incomplete_world_anchor" },
+        { "item": "aeronautics_gravity:stabilizer" }
+      ],
+      "results": [
+        { "id": "aeronautics_gravity:incomplete_world_anchor" }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "aeronautics_gravity:incomplete_world_anchor" },
+        { "item": "create:packager" }
+      ],
+      "results": [
+        { "id": "aeronautics_gravity:incomplete_world_anchor" }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "aeronautics_gravity:incomplete_world_anchor" },
+        { "item": "create:fluid_tank" }
+      ],
+      "results": [
+        { "id": "aeronautics_gravity:incomplete_world_anchor" }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "chance": 100.0,
+      "id": "aeronautics_gravity:incomplete_world_anchor"
+    }
+  ]
+}
