@@ -53,5 +53,6 @@
   "block.aeronautics_gravity.void_hose_pulley": "虚空软管滑轮",
   "tooltip.aeronautics_gravity.hose_bottom": "当前软管最底端高度：",
   "tooltip.aeronautics_gravity.hose_too_high": "抽取需软管到达Y：%d及以下",
-  "block.aeronautics_gravity.starlight_casing": "星空机壳"
+  "block.aeronautics_gravity.starlight_casing": "星空机壳",
+  "item.aeronautics_gravity.zinc_lump": "小堆锌粒"
 }

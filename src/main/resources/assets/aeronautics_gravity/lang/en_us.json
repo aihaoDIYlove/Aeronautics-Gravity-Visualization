@@ -53,5 +53,6 @@
   "block.aeronautics_gravity.void_hose_pulley": "Void Hose Pulley",
   "tooltip.aeronautics_gravity.hose_bottom": "Current Hose Bottom:",
   "tooltip.aeronautics_gravity.hose_too_high": "Extraction requires hose Y: %d or below",
-  "block.aeronautics_gravity.starlight_casing": "Starlight Casing"
+  "block.aeronautics_gravity.starlight_casing": "Starlight Casing",
+  "item.aeronautics_gravity.zinc_lump": "Zinc Lump"
 }

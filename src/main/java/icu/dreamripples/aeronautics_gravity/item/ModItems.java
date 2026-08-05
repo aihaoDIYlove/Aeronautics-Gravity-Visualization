@@ -36,4 +36,8 @@ public class ModItems {
     // starlight_casing + 3 步机械手安装(红石配重/姿态传感器/红石配轻) -> stabilizer(100%).
     public static final Supplier<Item> INCOMPLETE_STABILIZER =
             ITEMS.register("incomplete_stabilizer", () -> new Item(new Item.Properties().stacksTo(64)));
+
+    // 小堆锌粒: 3 锌粒无序合成, 注液 1000mb 星空液体 -> 海晶沙砾.
+    public static final Supplier<Item> ZINC_LUMP =
+            ITEMS.register("zinc_lump", () -> new Item(new Item.Properties().stacksTo(64)));
 }

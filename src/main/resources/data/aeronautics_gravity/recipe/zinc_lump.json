@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "create:zinc_nugget" },
+    { "item": "create:zinc_nugget" },
+    { "item": "create:zinc_nugget" }
+  ],
+  "result": {
+    "id": "aeronautics_gravity:zinc_lump",
+    "count": 1
+  }
+}

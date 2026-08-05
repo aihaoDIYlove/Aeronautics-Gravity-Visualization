@@ -35,6 +35,7 @@ public class ModCreativeTabs {
                         output.accept(ModItems.STARLIGHT_BOTTLE.get());
                         output.accept(ModBlocks.VOID_HOSE_PULLEY_ITEM.get());
                         output.accept(ModBlocks.STARLIGHT_CASING_ITEM.get());
+                        output.accept(ModItems.ZINC_LUMP.get());
                     })
                     .build());
 }
