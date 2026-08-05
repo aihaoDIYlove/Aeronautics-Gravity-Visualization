@@ -9,6 +9,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIc
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.item.SmartInventory;
+import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
 import icu.dreamripples.aeronautics_gravity.logistics.WorldAnchorNetwork;
 import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.math.VecHelper;
@@ -19,6 +20,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
@@ -39,8 +41,10 @@ import java.util.Objects;
  *         失败(无接收端/冲突/满) -> failedLastExport=true(黄灯)。
  * - RECEIVE:告示牌配置 addressFilter -> 注册到 WorldAnchorNetwork -> 接收端插入物品栏(被动)。
  *           漏斗/溜槽导出(不自动吐)。地址冲突(同 filter 多接收端) -> conflicted=true(白灯)。
+ *           本地多告示牌(贴了 2+ 个非空告示牌) -> signConflict=true(白灯,不注册,不接受包裹)。
  *
  * **告示牌配置**:照搬 Packager 的 updateSignAddress/getSign(去 ComputerCraft)。6 面任一告示牌,4 行拼接。
+ *   贴多个非空告示牌视为配置冲突(白灯),避免按朝向顺序隐式取一个造成困惑。
  *
  * **强加载**:onLoad 调 ServerLevel.setChunkForced(true) 强加载自身区块,接收端永远在线。
  *
@@ -61,7 +65,8 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
     public String signBasedAddress = "";
 
     // 服务端算, sync 到客户端供 BER 染色
-    private boolean conflicted;
+    private boolean conflicted;        // 跨维度:同 addressFilter 多接收端
+    private boolean signConflict;      // 本地:贴了 2+ 个非空告示牌
     private boolean failedLastExport;
 
     // 网络注册跟踪(避免重复注册/注销)
@@ -142,6 +147,11 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
     }
 
     private void registerToNetwork() {
+        if (signConflict) {
+            // 本地多告示牌冲突,不注册(发送端找不到此端,NO_RECEIVER,不接受包裹)
+            deregisterFromNetwork();
+            return;
+        }
         if (registered && Objects.equals(registeredAddress, signBasedAddress)) return;
         deregisterFromNetwork();
         if (!signBasedAddress.isBlank()) {
@@ -159,14 +169,26 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
         registeredAddress = null;
     }
 
-    /** 告示牌配置地址(照搬 Packager, 去 ComputerCraft) */
+    /**
+     * 告示牌配置地址(照搬 Packager, 去 ComputerCraft)。
+     * 6 面扫非空告示牌:0 个 -> 空地址;1 个 -> 该地址;2+ 个 -> signConflict=true(白灯,不注册)。
+     * 变化时 sendData() 同步给客户端 BER。
+     */
     public void updateSignAddress() {
-        signBasedAddress = "";
+        String first = null;
+        int count = 0;
         for (Direction side : Iterate.directions) {
             String address = getSign(side);
             if (address == null || address.isBlank()) continue;
-            signBasedAddress = address;
+            if (first == null) first = address;
+            count++;
         }
+        String newAddress = (first != null) ? first : "";
+        boolean newConflict = count > 1;
+        boolean changed = !Objects.equals(signBasedAddress, newAddress) || (signConflict != newConflict);
+        signBasedAddress = newAddress;
+        signConflict = newConflict;
+        if (changed) sendData();
     }
 
     protected String getSign(Direction side) {
@@ -188,8 +210,18 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
     public void onLoad() {
         super.onLoad();
         if (level instanceof ServerLevel sl && !level.isClientSide) {
+            // 载具(SubLevel)上的世界锚点:BlockEntity.level 是父 ServerLevel,worldPosition 是
+            // SubLevel 内坐标(即父维度的 plot chunk 坐标)。对父维度强加载该 plot chunk 既无意义
+            // (SubLevel 由 Sable 管理生命周期),又会导致退出存档时 ChunkMap.processUnloads 卡死。
+            if (isInsideSubLevel(sl)) return;
             sl.setChunkForced(worldPosition.getX() >> 4, worldPosition.getZ() >> 4, true);
         }
+    }
+
+    /** 判断本 BE 是否位于物理载具(SubLevel)内 -- 此时 level 是父 ServerLevel,worldPosition 落在 plot chunk 上 */
+    private boolean isInsideSubLevel(ServerLevel sl) {
+        SubLevelContainer container = SubLevelContainer.getContainer(sl);
+        return container != null && container.getPlot(new ChunkPos(worldPosition)) != null;
     }
 
     @Override
@@ -202,6 +234,7 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
     public void destroy() {
         super.destroy();
         if (level instanceof ServerLevel sl && !level.isClientSide) {
+            if (isInsideSubLevel(sl)) return;
             sl.setChunkForced(worldPosition.getX() >> 4, worldPosition.getZ() >> 4, false);
         }
     }
@@ -211,7 +244,7 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
         if (getMode() == AnchorMode.SEND) {
             return failedLastExport ? COLOR_SEND_STUCK : COLOR_SEND_IDLE;
         } else {
-            if (conflicted) return COLOR_CONFLICT;
+            if (signConflict || conflicted) return COLOR_CONFLICT; // 本地多告示牌 / 跨维度同 filter 冲突
             if (isBackedUp()) return COLOR_RECV_BUFFERED;
             return COLOR_RECV_IDLE;
         }
@@ -229,6 +262,7 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
         super.write(tag, registries, clientPacket);
         tag.putString("SignAddress", signBasedAddress);
         tag.putBoolean("Conflicted", conflicted);
+        tag.putBoolean("SignConflict", signConflict);
         tag.putBoolean("FailedLastExport", failedLastExport);
     }
 
@@ -237,6 +271,7 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
         super.read(tag, registries, clientPacket);
         signBasedAddress = tag.getString("SignAddress");
         conflicted = tag.getBoolean("Conflicted");
+        signConflict = tag.getBoolean("SignConflict");
         failedLastExport = tag.getBoolean("FailedLastExport");
     }
 
