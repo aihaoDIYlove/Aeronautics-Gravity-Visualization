@@ -1,7 +1,6 @@
 package icu.dreamripples.aeronautics_gravity.block;
 
 import com.simibubi.create.content.logistics.box.PackageItem;
-import com.simibubi.create.content.logistics.packagePort.PackagePortAutomationInventoryWrapper;
 import com.simibubi.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -73,7 +72,10 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
         super(type, pos, state);
         // 覆盖父类 18 格 inventory 为 1 格(仅接受包裹)
         inventory = new SmartInventory(1, this, (slot, stack) -> PackageItem.isPackage(stack));
-        itemHandler = new PackagePortAutomationInventoryWrapper(inventory, this);
+        // 直通 inventory 作为 handler,不用 PackagePortAutomationInventoryWrapper:后者的 insert/extract
+        // 绑定蛙港 addressFilter 语义(提取要求包裹匹配 filter,插入拒绝匹配包裹),世界锚点用告示牌地址
+        // 体系,addressFilter 恒空 -> 提取永远被拒(漏斗抽不出,实测 bug)。SmartInventory 自身已做 isPackage 验证。
+        itemHandler = inventory;
     }
 
     @Override

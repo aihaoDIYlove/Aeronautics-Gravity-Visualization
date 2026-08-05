@@ -28,7 +28,12 @@ public class ModItems {
             ITEMS.register("starlight_bottle", () -> new Item(
                     new Item.Properties().stacksTo(64).craftRemainder(Items.GLASS_BOTTLE)));
 
-    // 世界锚点框架: 纯物品(不可放置), 计划作为世界锚点的序列装配中间产物. 配方下阶段实现.
+    // 世界锚点框架: 纯物品(不可放置), 世界锚点的序列装配中间产物. 配方下阶段实现.
     public static final Supplier<Item> INCOMPLETE_WORLD_ANCHOR =
             ITEMS.register("incomplete_world_anchor", () -> new Item(new Item.Properties().stacksTo(64)));
+
+    // 自稳定方块(半成品): 序列装配中间产物, 贴图复用 block/stabilizer.png.
+    // starlight_casing + 3 步机械手安装(红石配重/姿态传感器/红石配轻) -> stabilizer(100%).
+    public static final Supplier<Item> INCOMPLETE_STABILIZER =
+            ITEMS.register("incomplete_stabilizer", () -> new Item(new Item.Properties().stacksTo(64)));
 }

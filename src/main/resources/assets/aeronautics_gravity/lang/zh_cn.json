@@ -29,6 +29,7 @@
   "tooltip.aeronautics_gravity.current_lift": "当前浮力",
   "block.aeronautics_gravity.lightweight_glass": "轻质玻璃",
   "block.aeronautics_gravity.ultralight_glass": "超轻玻璃",
+  "item.aeronautics_gravity.incomplete_stabilizer": "自稳定方块（半成品）",
   "block.aeronautics_gravity.stabilizer": "自稳定方块",
   "item.aeronautics_gravity.incomplete_world_anchor": "世界锚点框架",
   "block.aeronautics_gravity.world_anchor": "世界锚点",
