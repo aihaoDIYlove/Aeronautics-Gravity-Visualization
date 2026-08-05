@@ -1,0 +1,5 @@
+{
+  "multipart": [
+    { "apply": { "model": "aeronautics_gravity:block/lightweight_glass" } }
+  ]
+}

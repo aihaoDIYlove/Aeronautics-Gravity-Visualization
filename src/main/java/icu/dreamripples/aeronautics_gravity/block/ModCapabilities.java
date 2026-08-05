@@ -30,5 +30,7 @@ public class ModCapabilities {
                         return be.getVoidHandler();
                     return null;
                 });
+        // 世界锚点:暴露 ItemHandler(双向,漏斗/溜槽导入导出包裹)
+        WorldAnchorBlockEntity.registerCapabilities(event);
     }
 }

@@ -20,6 +20,7 @@ import icu.dreamripples.aeronautics_gravity.client.ModPartialModels;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightVisual;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightLightVisual;
 import icu.dreamripples.aeronautics_gravity.client.StabilizerRenderer;
+import icu.dreamripples.aeronautics_gravity.client.WorldAnchorRenderer;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.resources.model.BakedModel;
@@ -48,10 +49,12 @@ public class AeronauticsGravityClient {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        // StabilizerRenderer 同时画灯带(染色)和 portal 星空。不用 Flywheel Visual:
-        // Flywheel 的 SectionCompilerMixin 对有 Visualizer 的 BE cancel renderable,BER.render 不被调。
-        // BER 注册同步调用(不 enqueueWork),确保在 BlockEntityRenderDispatcher 构造前注册到 BY_TYPE map。
+        // StabilizerRenderer 画灯带(染色,换皮后用 72 突出 REDSTONE_INDICATOR)。不用 Flywheel Visual:
+        // Flywheel SectionCompilerMixin 对有 Visualizer 的 BE cancel renderable,BER.render 不被调。
+        // BER 同步注册(不 enqueueWork),确保在 BlockEntityRenderDispatcher 构造前注册到 BY_TYPE map。
+        // WorldAnchorRenderer 画灯带(ANCHOR_INDICATOR 染色) + portal 星空(从 stabilizer 迁移)。
         BlockEntityRenderers.register(ModBlocks.STABILIZER_BE.get(), StabilizerRenderer::new);
+        BlockEntityRenderers.register(ModBlocks.WORLD_ANCHOR_BE.get(), WorldAnchorRenderer::new);
         event.enqueueWork(() -> {
             ModPartialModels.init();
             SimpleBlockEntityVisualizer.builder(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_BE.get())

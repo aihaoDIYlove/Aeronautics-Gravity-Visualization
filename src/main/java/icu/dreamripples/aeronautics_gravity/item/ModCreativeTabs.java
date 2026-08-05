@@ -28,7 +28,8 @@ public class ModCreativeTabs {
                         output.accept(ModBlocks.LIGHTWEIGHT_GLASS_ITEM.get());
                         output.accept(ModBlocks.ULTRALIGHT_GLASS_ITEM.get());
                         output.accept(ModBlocks.STABILIZER_ITEM.get());
-                        output.accept(ModItems.INCOMPLETE_STABILIZER.get());
+                        output.accept(ModBlocks.WORLD_ANCHOR_ITEM.get());
+                        output.accept(ModItems.INCOMPLETE_WORLD_ANCHOR.get());
                         output.accept(ModItems.STARLIGHT_BUCKET.get());
                         output.accept(ModItems.STARLIGHT_BOTTLE.get());
                         output.accept(ModBlocks.VOID_HOSE_PULLEY_ITEM.get());

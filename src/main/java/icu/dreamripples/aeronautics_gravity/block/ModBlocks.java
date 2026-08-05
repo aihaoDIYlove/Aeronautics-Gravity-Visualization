@@ -222,6 +222,30 @@ public class ModBlocks {
             ModItems.ITEMS.register("stabilizer",
                     () -> new BlockItem(STABILIZER_BLOCK.get(), new Item.Properties()));
 
+    // 世界锚点:跨维度物流核心。继承 PackagePortBlockEntity,6 面弹板切发送/接收(ScrollOptionBehaviour),
+    // 告示牌配地址(照搬 Packager),强加载自身区块。灯带 ANCHOR_INDICATOR(32 内嵌框住星空) + portal 星空。
+    // 详见 WorldAnchorBlockEntity Javadoc。
+    public static final DeferredHolder<Block, WorldAnchorBlock> WORLD_ANCHOR_BLOCK =
+            BLOCKS.register("world_anchor",
+                    () -> new WorldAnchorBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .isRedstoneConductor((state, level, pos) -> false)
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WorldAnchorBlockEntity>> WORLD_ANCHOR_BE =
+            BLOCK_ENTITIES.register("world_anchor",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createWorldAnchorBlockEntity, WORLD_ANCHOR_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> WORLD_ANCHOR_ITEM =
+            ModItems.ITEMS.register("world_anchor",
+                    () -> new BlockItem(WORLD_ANCHOR_BLOCK.get(), new Item.Properties()));
+
     // 虚空软管滑轮: 继承 Create HosePulleyBlock, BE 换成 VoidHosePulleyBlockEntity(自带无限星空液体 handler)。
     // 外观/动画复用 Create 的 hose_pulley model + HosePulleyRenderer。在末地之海区域(末端 y<=startY)时
     // 经 capability 暴露的 VoidHosePulleyFluidHandler.drain 返回无限 STARLIGHT(见 ModCapabilities)。
@@ -319,6 +343,10 @@ public class ModBlocks {
 
     private static StabilizerBlockEntity createStabilizerBlockEntity(BlockPos pos, BlockState state) {
         return new StabilizerBlockEntity(STABILIZER_BE.get(), pos, state);
+    }
+
+    private static WorldAnchorBlockEntity createWorldAnchorBlockEntity(BlockPos pos, BlockState state) {
+        return new WorldAnchorBlockEntity(WORLD_ANCHOR_BE.get(), pos, state);
     }
 
     private static VoidHosePulleyBlockEntity createVoidHosePulleyBlockEntity(BlockPos pos, BlockState state) {

@@ -6,8 +6,8 @@
 		64
 	],
 	"textures": {
-		"0": "aeronautics_gravity:block/incomplete_stabilizer",
-		"particle": "aeronautics_gravity:block/incomplete_stabilizer"
+		"0": "aeronautics_gravity:block/incomplete_world_anchor",
+		"particle": "aeronautics_gravity:block/incomplete_world_anchor"
 	},
 	"elements": [
 		{
