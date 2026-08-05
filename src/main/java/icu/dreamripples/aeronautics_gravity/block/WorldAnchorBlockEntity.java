@@ -119,6 +119,10 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
                 } else {
                     if (!failedLastExport) { failedLastExport = true; sendData(); }
                 }
+            } else if (failedLastExport) {
+                // 物品已被漏斗/玩家移除,卡住状态无意义,清除
+                failedLastExport = false;
+                sendData();
             }
         } else {
             registerToNetwork();
