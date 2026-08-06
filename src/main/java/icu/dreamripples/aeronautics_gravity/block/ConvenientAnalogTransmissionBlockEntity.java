@@ -1,14 +1,19 @@
 package icu.dreamripples.aeronautics_gravity.block;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
+import com.simibubi.create.foundation.utility.CreateLang;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlock;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlockEntity;
 import dev.simulated_team.simulated.mixin_interface.extra_kinetics.KineticBlockEntityExtension;
 import icu.dreamripples.aeronautics_gravity.mixin.AnalogTransmissionBlockEntityAccessor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
 
 /**
  * 更方便的模拟传动器 - 查表输出固定 RPM，无视输入转速。
@@ -42,6 +47,30 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
         int signal = (level != null) ? level.getBestNeighborSignal(getBlockPos()) : 0;
         signal = Math.max(0, Math.min(15, signal));
         return RPM_TABLE[signal];
+    }
+
+    /**
+     * 护目镜信息: 仅显示当前输出转速(查表 RPM, 由红石信号决定)。
+     * 不调 super: KineticBlockEntity.addToGoggleTooltip 在 calculateStressApplied()==0 时返回 false
+     * 且不加内容(本 BE 无 Create stress 配置), 调了也是空操作。
+     */
+    @Override
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        CreateLang.builder()
+                .add(Component.translatable("block.aeronautics_gravity.convenient_analog_transmission")
+                        .withStyle(ChatFormatting.WHITE))
+                .forGoggles(tooltip);
+
+        CreateLang.builder()
+                .add(Component.translatable("tooltip.aeronautics_gravity.current_output_speed")
+                        .withStyle(ChatFormatting.GRAY))
+                .forGoggles(tooltip, 1);
+        CreateLang.number(getTargetSpeed())
+                .translate("generic.unit.rpm")
+                .style(ChatFormatting.GOLD)
+                .forGoggles(tooltip, 2);
+
+        return true;
     }
 
     @Override
