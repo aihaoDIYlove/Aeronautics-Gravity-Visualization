@@ -32,6 +32,8 @@
   "block.aeronautics_gravity.stabilizer": "Stabilizer",
   "item.aeronautics_gravity.incomplete_world_anchor": "World Anchor Frame",
   "item.aeronautics_gravity.incomplete_stabilizer": "Incomplete Stabilizer",
+  "item.aeronautics_gravity.incomplete_counterweight": "Incomplete Counterweight",
+  "item.aeronautics_gravity.incomplete_counterweight_light": "Incomplete Buoyant Counterweight",
   "block.aeronautics_gravity.world_anchor": "World Anchor",
   "tooltip.aeronautics_gravity.world_anchor.mode": "Mode",
   "tooltip.aeronautics_gravity.world_anchor.mode.send": "Send",

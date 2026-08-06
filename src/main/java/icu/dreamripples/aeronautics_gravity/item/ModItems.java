@@ -37,6 +37,16 @@ public class ModItems {
     public static final Supplier<Item> INCOMPLETE_STABILIZER =
             ITEMS.register("incomplete_stabilizer", () -> new Item(new Item.Properties().stacksTo(64)));
 
+    // 配重块(半成品): 序列装配中间产物, 贴图复用 block/counterweight.png.
+    // 安山机壳 + 2 轮机械手安装(工业铁块/油门拉杆) -> 配重块(100%).
+    public static final Supplier<Item> INCOMPLETE_COUNTERWEIGHT =
+            ITEMS.register("incomplete_counterweight", () -> new Item(new Item.Properties().stacksTo(64)));
+
+    // 配"轻"块(半成品): 序列装配中间产物, 贴图复用 block/counterweight_light.png.
+    // 配重块 + 4 轮注液 1000mb 浮空混合物 -> 配"轻"块(100%).
+    public static final Supplier<Item> INCOMPLETE_COUNTERWEIGHT_LIGHT =
+            ITEMS.register("incomplete_counterweight_light", () -> new Item(new Item.Properties().stacksTo(64)));
+
     // 小堆锌粒: 3 锌粒无序合成, 注液 1000mb 星空液体 -> 海晶沙砾.
     public static final Supplier<Item> ZINC_LUMP =
             ITEMS.register("zinc_lump", () -> new Item(new Item.Properties().stacksTo(64)));
