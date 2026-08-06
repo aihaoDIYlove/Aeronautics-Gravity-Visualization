@@ -1,0 +1,9 @@
+{
+  "type": "create:haunting",
+  "ingredients": [
+    { "item": "aeronautics:levitite" }
+  ],
+  "results": [
+    { "id": "aeronautics:pearlescent_levitite" }
+  ]
+}

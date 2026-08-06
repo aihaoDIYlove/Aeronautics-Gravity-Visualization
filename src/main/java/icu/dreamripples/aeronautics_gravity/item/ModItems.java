@@ -47,6 +47,11 @@ public class ModItems {
     public static final Supplier<Item> INCOMPLETE_COUNTERWEIGHT_LIGHT =
             ITEMS.register("incomplete_counterweight_light", () -> new Item(new Item.Properties().stacksTo(64)));
 
+    // 浮空水晶(半成品): 序列装配中间产物, 贴图复用 aeronautics:block/levitite.
+    // 超轻玻璃 + 注液 500mb 浮空混合物 + 注液 500mb 星空液体 -> 浮空水晶(100%).
+    public static final Supplier<Item> INCOMPLETE_LEVITITE =
+            ITEMS.register("incomplete_levitite", () -> new Item(new Item.Properties().stacksTo(64)));
+
     // 小堆锌粒: 3 锌粒无序合成, 注液 1000mb 星空液体 -> 海晶沙砾.
     public static final Supplier<Item> ZINC_LUMP =
             ITEMS.register("zinc_lump", () -> new Item(new Item.Properties().stacksTo(64)));
