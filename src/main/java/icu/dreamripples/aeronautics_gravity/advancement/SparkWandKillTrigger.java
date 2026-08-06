@@ -28,7 +28,7 @@ public class SparkWandKillTrigger extends SimpleCriterionTrigger<SparkWandKillTr
         this.trigger(player, TriggerInstance::matches);
     }
 
-    public record TriggerInstance(Optional<ContextAwarePredicate> player) implements SimpleInstance {
+    public record TriggerInstance(Optional<ContextAwarePredicate> player) implements SimpleCriterionTrigger.SimpleInstance {
         public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(
                 instance -> instance.group(
                         ContextAwarePredicate.CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player)
