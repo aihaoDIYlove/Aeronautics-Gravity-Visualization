@@ -1,5 +1,6 @@
 package icu.dreamripples.aeronautics_gravity.block;
 
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.content.logistics.box.PackageItem;
 import com.simibubi.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
@@ -9,10 +10,12 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIc
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.item.SmartInventory;
+import com.simibubi.create.foundation.utility.CreateLang;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
 import icu.dreamripples.aeronautics_gravity.logistics.WorldAnchorNetwork;
 import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.math.VecHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -52,7 +55,7 @@ import java.util.Objects;
  *   SEND 空闲=红 / SEND 卡住=黄 / RECEIVE 空闲=青 / RECEIVE 缓存满=绿 / RECEIVE 地址冲突=白。
  *   conflicted/failedLastExport 服务端算,NBT sync 到客户端。
  */
-public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
+public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IHaveGoggleInformation {
 
     // 灯带颜色(ARGB)
     private static final int COLOR_SEND_IDLE    = 0xFFCD0000; // 红
@@ -248,6 +251,98 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity {
             if (isBackedUp()) return COLOR_RECV_BUFFERED;
             return COLOR_RECV_IDLE;
         }
+    }
+
+    /**
+     * 护目镜信息: 标题 / 模式 / 内容物(包裹地址或"空") / (RECEIVE) 地址或"未配置地址"。
+     * 状态提示色对齐灯带: SEND 卡住=黄("存在待发送包裹") / RECEIVE 缓存满=绿("存在待导出包裹") /
+     * RECEIVE 地址冲突=白("地址冲突", 跟在地址值下)。
+     * 必须返回 true: GoggleOverlayRenderer 第 138 行 hasGoggleInfo && !goggleAddedInfo 会跳过显示。
+     */
+    @Override
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        AnchorMode mode = getMode();
+
+        CreateLang.builder()
+                .add(Component.translatable("block.aeronautics_gravity.world_anchor")
+                        .withStyle(ChatFormatting.WHITE))
+                .forGoggles(tooltip);
+
+        // 模式(SEND=红 / RECEIVE=青, 对齐灯带色)
+        ChatFormatting modeColor = (mode == AnchorMode.SEND) ? ChatFormatting.RED : ChatFormatting.AQUA;
+        CreateLang.builder()
+                .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.mode")
+                        .withStyle(ChatFormatting.GRAY))
+                .add(Component.literal(": ")
+                        .withStyle(ChatFormatting.DARK_GRAY))
+                .add(Component.translatable(mode.getTranslationKey())
+                        .withStyle(modeColor))
+                .forGoggles(tooltip, 1);
+
+        // 内容物(1 格包裹; 显示包裹地址, 空槽显示"空")
+        ItemStack box = inventory.getStackInSlot(0);
+        CreateLang.builder()
+                .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.contents")
+                        .withStyle(ChatFormatting.GRAY))
+                .add(Component.literal(": ")
+                        .withStyle(ChatFormatting.DARK_GRAY))
+                .forGoggles(tooltip, 1);
+        if (box.isEmpty()) {
+            CreateLang.builder()
+                    .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.empty")
+                            .withStyle(ChatFormatting.GRAY))
+                    .forGoggles(tooltip, 2);
+        } else {
+            CreateLang.builder()
+                    .add(Component.literal(PackageItem.getAddress(box))
+                            .withStyle(ChatFormatting.GOLD))
+                    .forGoggles(tooltip, 2);
+        }
+
+        if (mode == AnchorMode.SEND) {
+            // 卡住: 上次导出失败(无接收端/冲突/满), 黄色提示
+            if (failedLastExport) {
+                CreateLang.builder()
+                        .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.pending_send")
+                                .withStyle(ChatFormatting.YELLOW))
+                        .forGoggles(tooltip, 1);
+            }
+        } else {
+            // RECEIVE: 地址行(告示牌配置的 addressFilter)
+            CreateLang.builder()
+                    .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.address")
+                            .withStyle(ChatFormatting.GRAY))
+                    .add(Component.literal(": ")
+                            .withStyle(ChatFormatting.DARK_GRAY))
+                    .forGoggles(tooltip, 1);
+            if (signBasedAddress.isBlank()) {
+                CreateLang.builder()
+                        .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.no_address")
+                                .withStyle(ChatFormatting.GRAY))
+                        .forGoggles(tooltip, 2);
+            } else {
+                CreateLang.builder()
+                        .add(Component.literal(signBasedAddress)
+                                .withStyle(ChatFormatting.GOLD))
+                        .forGoggles(tooltip, 2);
+            }
+            // 地址冲突(本地多告示牌 / 跨维度同 filter), 白色, 跟在地址值下
+            if (signConflict || conflicted) {
+                CreateLang.builder()
+                        .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.address_conflict")
+                                .withStyle(ChatFormatting.WHITE))
+                        .forGoggles(tooltip, 2);
+            }
+            // 缓存满(待导出), 绿色提示
+            if (isBackedUp()) {
+                CreateLang.builder()
+                        .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.pending_export")
+                                .withStyle(ChatFormatting.GREEN))
+                        .forGoggles(tooltip, 1);
+            }
+        }
+
+        return true;
     }
 
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
