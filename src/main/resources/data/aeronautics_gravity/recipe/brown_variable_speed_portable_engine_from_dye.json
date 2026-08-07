@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "aeronautics_gravity:red_variable_speed_portable_engine" },
+    { "item": "minecraft:brown_dye" }
+  ],
+  "result": {
+    "id": "aeronautics_gravity:brown_variable_speed_portable_engine",
+    "count": 1
+  }
+}

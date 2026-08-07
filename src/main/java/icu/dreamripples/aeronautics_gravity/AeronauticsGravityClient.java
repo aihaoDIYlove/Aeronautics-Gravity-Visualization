@@ -13,6 +13,7 @@ import com.simibubi.create.foundation.block.connected.ConnectedTextureBehaviour;
 import com.simibubi.create.foundation.block.connected.SimpleCTBehaviour;
 import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionVisual;
+import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineRenderer;
 import icu.dreamripples.aeronautics_gravity.block.ModBlocks;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
 import icu.dreamripples.aeronautics_gravity.client.MassVisualizer;
@@ -55,6 +56,8 @@ public class AeronauticsGravityClient {
         // WorldAnchorRenderer 画灯带(ANCHOR_INDICATOR 染色) + portal 星空(从 stabilizer 迁移)。
         BlockEntityRenderers.register(ModBlocks.STABILIZER_BE.get(), StabilizerRenderer::new);
         BlockEntityRenderers.register(ModBlocks.WORLD_ANCHOR_BE.get(), WorldAnchorRenderer::new);
+        // 变速式便携引擎:复用 Simulated 的 PortableEngineRenderer(BE 继承 PortableEngineBlockEntity,多态成立)
+        BlockEntityRenderers.register(ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINE_BE.get(), PortableEngineRenderer::new);
         event.enqueueWork(() -> {
             ModPartialModels.init();
             SimpleBlockEntityVisualizer.builder(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_BE.get())

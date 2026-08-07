@@ -5,9 +5,11 @@ import com.simibubi.create.content.fluids.pipes.FluidPipeBlockEntity;
 import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
 import icu.dreamripples.aeronautics_gravity.fluid.ModFluids;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
+import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -19,6 +21,9 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.block.SoundType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS =
@@ -305,6 +310,40 @@ public class ModBlocks {
                                     STARLIGHT_ENCASED_FLUID_PIPE_BLOCK.get())
                             .build(null));
 
+    // 变速式便携引擎:继承 Simulated 便携引擎,弹板调转速(32-256,15档),超热只翻倍应力。
+    // 16 色变种(同原版 DyedBlockList 配色),染色交互指向本 mod 色表(见 VariableSpeedPortableEngineBlock.useItemOn)。
+    // 创造页只放红色(同 Aeronautics 风格),其余靠染色获得。
+    public static final Map<DyeColor, DeferredHolder<Block, VariableSpeedPortableEngineBlock>> VARIABLE_SPEED_PORTABLE_ENGINES =
+            new EnumMap<>(DyeColor.class);
+    public static final Map<DyeColor, DeferredHolder<Item, BlockItem>> VARIABLE_SPEED_PORTABLE_ENGINE_ITEMS =
+            new EnumMap<>(DyeColor.class);
+
+    static {
+        for (DyeColor color : DyeColor.values()) {
+            String name = color.getSerializedName() + "_variable_speed_portable_engine";
+            DeferredHolder<Block, VariableSpeedPortableEngineBlock> blockHolder = BLOCKS.register(name,
+                    () -> new VariableSpeedPortableEngineBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.NETHERITE_BLOCK)
+                                    .lightLevel(state -> PortableEngineBlock.isLitState(state) ? 6 : 0)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops(), color));
+            VARIABLE_SPEED_PORTABLE_ENGINES.put(color, blockHolder);
+            VARIABLE_SPEED_PORTABLE_ENGINE_ITEMS.put(color,
+                    ModItems.ITEMS.register(name, () -> new BlockItem(blockHolder.get(), new Item.Properties())));
+        }
+    }
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<VariableSpeedPortableEngineBlockEntity>> VARIABLE_SPEED_PORTABLE_ENGINE_BE =
+            BLOCK_ENTITIES.register("variable_speed_portable_engine", () -> {
+                Block[] blocks = VARIABLE_SPEED_PORTABLE_ENGINES.values().stream()
+                        .map(h -> h.get())
+                        .toArray(Block[]::new);
+                return BlockEntityType.Builder.of(ModBlocks::createVariableSpeedEngineBlockEntity, blocks).build(null);
+            });
+
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);
     }
@@ -357,5 +396,9 @@ public class ModBlocks {
     // 2 参数 BlockEntitySupplier(pos,state), 不能直接 method ref -> 工厂方法补上 BE type.
     private static FluidPipeBlockEntity createStarlightEncasedFluidPipeBlockEntity(BlockPos pos, BlockState state) {
         return new FluidPipeBlockEntity(STARLIGHT_ENCASED_FLUID_PIPE_BE.get(), pos, state);
+    }
+
+    private static VariableSpeedPortableEngineBlockEntity createVariableSpeedEngineBlockEntity(BlockPos pos, BlockState state) {
+        return new VariableSpeedPortableEngineBlockEntity(VARIABLE_SPEED_PORTABLE_ENGINE_BE.get(), pos, state);
     }
 }

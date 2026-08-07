@@ -5,6 +5,7 @@ import icu.dreamripples.aeronautics_gravity.block.ModBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DyeColor;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -33,6 +34,7 @@ public class ModCreativeTabs {
                         output.accept(ModItems.STARLIGHT_BOTTLE.get());
                         output.accept(ModBlocks.VOID_HOSE_PULLEY_ITEM.get());
                         output.accept(ModBlocks.STARLIGHT_CASING_ITEM.get());
+                        output.accept(ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINE_ITEMS.get(DyeColor.RED).get());
                         output.accept(ModItems.ZINC_LUMP.get());
                     })
                     .build());

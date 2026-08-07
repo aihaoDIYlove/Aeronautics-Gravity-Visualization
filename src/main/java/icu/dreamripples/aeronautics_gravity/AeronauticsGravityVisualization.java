@@ -1,6 +1,7 @@
 package icu.dreamripples.aeronautics_gravity;
 
 import com.mojang.logging.LogUtils;
+import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
 import icu.dreamripples.aeronautics_gravity.advancement.ModTriggers;
@@ -44,6 +45,10 @@ public class AeronauticsGravityVisualization {
             FluidPipeBlock pipe = (FluidPipeBlock) BuiltInRegistries.BLOCK.get(
                     ResourceLocation.fromNamespaceAndPath("create", "fluid_pipe"));
             EncasingRegistry.addVariant(pipe, ModBlocks.STARLIGHT_ENCASED_FLUID_PIPE_BLOCK.get());
+            // 变速式便携引擎:注册应力容量(超热 ×2 由 BE.calculateAddedStressCapacity 覆盖)
+            for (var holder : ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINES.values()) {
+                BlockStressValues.CAPACITIES.register(holder.get(), () -> 64.0);
+            }
         });
     }
 }
