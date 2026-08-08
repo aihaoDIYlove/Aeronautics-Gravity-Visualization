@@ -215,7 +215,8 @@ public class ModBlocks {
                                     .strength(3.5f)
                                     .noOcclusion()
                                     .isRedstoneConductor((state, level, pos) -> false)
-                                    .requiresCorrectToolForDrops()));
+                                    .requiresCorrectToolForDrops()
+                                    .emissiveRendering((s, level, pos) -> true)));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<StabilizerBlockEntity>> STABILIZER_BE =
             BLOCK_ENTITIES.register("stabilizer",
@@ -262,7 +263,8 @@ public class ModBlocks {
                                     .sound(SoundType.COPPER)
                                     .strength(3.5f)
                                     .noOcclusion()
-                                    .requiresCorrectToolForDrops()));
+                                    .requiresCorrectToolForDrops()
+                                    .emissiveRendering((s, level, pos) -> true)));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<VoidHosePulleyBlockEntity>> VOID_HOSE_PULLEY_BE =
             BLOCK_ENTITIES.register("void_hose_pulley",
@@ -284,7 +286,8 @@ public class ModBlocks {
                                     .sound(SoundType.COPPER)
                                     .strength(3.5f)
                                     .noOcclusion()
-                                    .requiresCorrectToolForDrops()));
+                                    .requiresCorrectToolForDrops()
+                                    .emissiveRendering((s, level, pos) -> true)));
 
     public static final DeferredHolder<Item, BlockItem> STARLIGHT_CASING_ITEM =
             ModItems.ITEMS.register("starlight_casing",
