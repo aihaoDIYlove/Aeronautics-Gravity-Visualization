@@ -240,7 +240,8 @@ public class ModBlocks {
                                     .strength(3.5f)
                                     .noOcclusion()
                                     .isRedstoneConductor((state, level, pos) -> false)
-                                    .requiresCorrectToolForDrops()));
+                                    .requiresCorrectToolForDrops()
+                                    .emissiveRendering((s, level, pos) -> true)));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<WorldAnchorBlockEntity>> WORLD_ANCHOR_BE =
             BLOCK_ENTITIES.register("world_anchor",

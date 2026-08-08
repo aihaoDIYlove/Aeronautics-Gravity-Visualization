@@ -1,0 +1,4 @@
+{
+  "parent": "aeronautics_gravity:block/lightweight_glass",
+  "ambientocclusion": false
+}
