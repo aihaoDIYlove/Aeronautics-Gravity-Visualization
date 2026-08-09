@@ -66,6 +66,8 @@
   "tooltip.aeronautics_gravity.hose_too_high": "Extraction requires hose Y: %d or below",
   "block.aeronautics_gravity.starlight_casing": "Starlight Casing",
   "item.aeronautics_gravity.zinc_lump": "Zinc Lump",
+  "item.aeronautics_gravity.portable_diagram": "Portable Contraption Diagram",
+  "tooltip.aeronautics_gravity.portable_diagram": "Right-click a contraption: open its diagram view (camera set by the clicked face)",
   "block.aeronautics_gravity.white_variable_speed_portable_engine": "White Variable-Speed Portable Engine",
   "block.aeronautics_gravity.orange_variable_speed_portable_engine": "Orange Variable-Speed Portable Engine",
   "block.aeronautics_gravity.magenta_variable_speed_portable_engine": "Magenta Variable-Speed Portable Engine",

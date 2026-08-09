@@ -66,6 +66,8 @@
   "tooltip.aeronautics_gravity.hose_too_high": "抽取需软管到达Y：%d及以下",
   "block.aeronautics_gravity.starlight_casing": "星空机壳",
   "item.aeronautics_gravity.zinc_lump": "小堆锌粒",
+  "item.aeronautics_gravity.portable_diagram": "便携图解",
+  "tooltip.aeronautics_gravity.portable_diagram": "右键载具：打开其图纸视图（视角由命中的方块面决定）",
   "block.aeronautics_gravity.white_variable_speed_portable_engine": "白色变速式便携引擎",
   "block.aeronautics_gravity.orange_variable_speed_portable_engine": "橙色变速式便携引擎",
   "block.aeronautics_gravity.magenta_variable_speed_portable_engine": "品红色变速式便携引擎",

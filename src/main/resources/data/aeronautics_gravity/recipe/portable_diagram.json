@@ -1,0 +1,11 @@
+{
+  "type": "crafting_shapeless",
+  "ingredients": [
+    { "item": "simulated:contraption_diagram" },
+    { "item": "aeronautics_gravity:spark_wand" }
+  ],
+  "result": {
+    "id": "aeronautics_gravity:portable_diagram",
+    "count": 1
+  }
+}

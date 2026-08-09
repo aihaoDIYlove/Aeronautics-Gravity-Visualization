@@ -19,7 +19,9 @@ public class ModCreativeTabs {
                     .icon(() -> ModItems.SPARK_WAND.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.SPARK_WAND.get());
+                        output.accept(ModItems.PORTABLE_DIAGRAM.get());
                         output.accept(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_ITEM.get());
+                        output.accept(ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINE_ITEMS.get(DyeColor.RED).get());
                         output.accept(ModBlocks.COUNTERWEIGHT_ITEM.get());
                         output.accept(ModBlocks.COUNTERWEIGHT_LIGHT_ITEM.get());
                         output.accept(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_ITEM.get());
@@ -34,7 +36,6 @@ public class ModCreativeTabs {
                         output.accept(ModItems.STARLIGHT_BOTTLE.get());
                         output.accept(ModBlocks.VOID_HOSE_PULLEY_ITEM.get());
                         output.accept(ModBlocks.STARLIGHT_CASING_ITEM.get());
-                        output.accept(ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINE_ITEMS.get(DyeColor.RED).get());
                         output.accept(ModItems.ZINC_LUMP.get());
                     })
                     .build());

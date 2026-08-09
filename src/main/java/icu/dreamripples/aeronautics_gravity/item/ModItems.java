@@ -16,6 +16,11 @@ public class ModItems {
     public static final Supplier<Item> SPARK_WAND =
             ITEMS.register("spark_wand", SparkWandItem::new);
 
+    // 便携图解: 右键载具直接打开 Simulated 机器图纸页面, 免去放置 contraption_diagram 实体到墙面.
+    // 初始视角由命中的方块面决定(复用 Simulated face->yRot/xRot 转换). 贴图暂复用 simulated:contraption_diagram.
+    public static final Supplier<Item> PORTABLE_DIAGRAM =
+            ITEMS.register("portable_diagram", PortableDiagramItem::new);
+
     // 星空液体桶: 倒出后不蔓延(见 StarlightFluid), 只有一格 source.
     public static final Supplier<Item> STARLIGHT_BUCKET =
             ITEMS.register("starlight_bucket", () -> new BucketItem(
