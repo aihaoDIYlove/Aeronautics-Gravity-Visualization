@@ -186,7 +186,7 @@ public class ModBlocks {
                             BlockBehaviour.Properties.of()
                                     .mapColor(MapColor.NONE)
                                     .sound(SoundType.GLASS)
-                                    .strength(0.3f)
+                                    .strength(0.0f)
                                     .noOcclusion()
                                     .isValidSpawn((state, level, pos, entity) -> false)
                                     .isRedstoneConductor((state, level, pos) -> false)
