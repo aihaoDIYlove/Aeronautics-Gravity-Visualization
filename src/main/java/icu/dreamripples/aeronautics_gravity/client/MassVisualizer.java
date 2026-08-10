@@ -401,13 +401,12 @@ private static final float MARKER_SCALE = 0.04f;          // 箭头字号(世界
 
         Font font = Minecraft.getInstance().font;
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
-        Quaternionf billboard = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         int light = LightTexture.FULL_BRIGHT;
         PoseStack poseStack = event.getPoseStack();
 
         // 重心:红 ⬇ 朝下(屏幕空间恒定,billboard 随玩家视角转)。门控:任何模式都画。
         if (drawCOM) {
-            renderGlyphMarker(poseStack, buffer, font, billboard, camera, position, COM_GLYPH, COM_COLOR, light);
+            renderGlyphMarker(poseStack, buffer, font, camera, position, COM_GLYPH, COM_COLOR, light);
         }
 
         // 浮心:天蓝 ⬆ 朝上。门控:仅重块模式且有浮力块时画。
@@ -415,30 +414,38 @@ private static final float MARKER_SCALE = 0.04f;          // 箭头字号(世界
             Vector3d worldBuoy = new Vector3d(viz.buoyancyCenterLocal).sub(rotationPoint);
             orientation.transform(worldBuoy);
             worldBuoy.add(position);
-            renderGlyphMarker(poseStack, buffer, font, billboard, camera, worldBuoy, BUOYANCY_GLYPH, BUOYANCY_COLOR, light);
+            renderGlyphMarker(poseStack, buffer, font, camera, worldBuoy, BUOYANCY_GLYPH, BUOYANCY_COLOR, light);
         }
         // 不主动 endBatch:文字顶点随 vanilla final endBatch(走 fixed textSeeThrough RenderType),
         // 与质量数字同一 buffer/同一 flush 时机,无自定义 RT 状态机问题。
     }
 
     /**
-     * 在世界坐标 {@code worldPos} 画一个 Unicode 字符(公告板 billboard,面朝玩家,SEE_THROUGH 穿墙)。
-     * 复用 renderMassNumbers 同一套 Font.drawInBatch + cameraOrientation billboard + SEE_THROUGH 语义,
-     * 走 vanilla 文字 buffer(在 fixedBuffers 中),无自定义 RenderType,无 getBuffer 副作用崩盘风险。
-     * 字号恒定(MARKER_SCALE),不随距离缩放——与质量数字(NUMBER_SCALE 恒定)视觉语言一致。
+     * 在世界坐标 {@code worldPos} 画一个 Unicode 箭头字符,圆柱 billboard(只绕世界 Y 轴旋转),
+     * 字面始终竖直、正面对玩家的水平朝向。SEE_THROUGH 穿墙。走 vanilla 文字 buffer(在 fixedBuffers 中),
+     * 无自定义 RenderType,无 getBuffer 副作用崩盘风险。字号恒定(MARKER_SCALE),与质量数字视觉语言一致。
+     *
+     * 为何用圆柱 billboard 而非全轴 cameraOrientation():箭头字符的"上下"语义必须保持世界 Y 对齐
+     * (重力/浮力方向恒世界上/下)。全轴 billboard 俯视时字面倾倒成水平,投影成"指向左右"易误读;
+     * 圆柱 billboard 字面恒竖直,侧看时箭头方向在屏幕上恒正确指向 上/下,俯视/仰视是一条水平线
+     * (字面平贴的固有厚度≈0 限制,任何非 3D 几何方案都有)。
      */
     private static void renderGlyphMarker(PoseStack poseStack, MultiBufferSource.BufferSource buffer,
-                                          Font font, Quaternionf billboard, Vec3 camera,
+                                          Font font, Vec3 camera,
                                           Vector3dc worldPos, String glyph, int color, int light) {
         float glyphWidth = font.width(glyph);
         float x = -glyphWidth / 2f; // 水平居中
+        // 圆柱 billboard:只在水平面绕 Y 转到正对玩家方位角,pitch/roll 丢弃,字面恒竖直。
+        // atan2(dx, dz) 给相机在标记水平面的方位角;字面法线转到该方位,字面 Y 仍对齐世界 Y。
+        double dx = camera.x - worldPos.x();
+        double dz = camera.z - worldPos.z();
+        double yawRad = Math.atan2(dx, dz);
         poseStack.pushPose();
         poseStack.translate(worldPos.x() - camera.x, worldPos.y() - camera.y, worldPos.z() - camera.z);
-        poseStack.mulPose(billboard);
-        // scale Y 取负翻转(同 renderMassNumbers),让文字正立而非上下颠倒。
+        // 绕世界 Y 轴旋转 yaw:字面法线指向水平面上的相机方位,字面 Y 仍对齐世界 Y。
+        poseStack.mulPose(new Quaternionf().rotationYXZ((float) yawRad, 0f, 0f));
         poseStack.scale(MARKER_SCALE, -MARKER_SCALE, MARKER_SCALE);
         Matrix4f matrix = poseStack.last().pose();
-        // y=-glyphHeight/2 让字垂直居中(字符基线在 fontHeight,drawInBatch y 是基线偏移,取负上移半个字高近似居中)。
         font.drawInBatch(glyph, x, 0f, color, false, matrix, buffer, Font.DisplayMode.SEE_THROUGH, 0, light);
         poseStack.popPose();
     }
