@@ -54,6 +54,8 @@ public class MassVisualizer {
         final Map<BlockState, Double> typeMasses = new IdentityHashMap<>();
         final Map<BlockState, Double> typeLifts = new IdentityHashMap<>(); // 单块标称浮力 = liftStrength * floatingScale;同类型同值,首次遇到时算一次
         double totalMass;
+        double totalLift;                       // Σ liftᵢ;浮力门控
+        final Vector3d buoyancyCenterLocal = new Vector3d(); // 标称浮心本地坐标 = Σ(liftᵢ·posᵢ)/Σ(liftᵢ);与 rotationPoint 同坐标系
         long expiresAt;
         SubLevelBlockGetter blockGetter; // rescan 时建,渲染时查裸露面邻居
         boolean heavy; // true=重块模式(只 >=2 或有浮力,不剔除,穿透找重块/浮力块配平); false=全量模式(朝向玩家剔除,只画质量)
@@ -74,7 +76,18 @@ public class MassVisualizer {
     private static final float COM_ARM_HALF_FAR = 0.1f;      // 距离>=COM_DIST_FAR 时的臂半粗
     private static final double COM_DIST_NEAR = 4.0;          // 近端距离(格)
     private static final double COM_DIST_FAR = 64.0;          // 远端距离(格)
-    private static final int COM_COLOR = 0xE000BFFF;         // 亮蓝,穿透方块显示
+    private static final int COM_COLOR = 0xE0FF3030;          // 红=重力/重心,朝下箭头,穿透方块显示
+    private static final int BUOYANCY_COLOR = 0xE087CEEB;     // 天蓝=浮力/浮心,朝上箭头,与 liftToColor 同色系
+    // 箭头几何尺寸(绝对世界格,不乘 scale——旧十字就是这么做的,固定半粗保可见性)。
+    // 粗细独立于臂长做近/远线性插值:近处细短、远处粗长,屏幕视大小大致恒定。
+    // 不用"粗细=scale·小常数",那会在近处退化成像素线(第一版 bug)。
+    private static final float SHAFT_HALF_NEAR = 0.04f;       // 近端杆半粗(砍半,0.08 格宽)
+    private static final float SHAFT_HALF_FAR  = 0.125f;      // 远端杆半粗(砍半)
+    private static final float HEAD_HALF_NEAR  = 0.12f;       // 近端锥底半边(杆粗 ~3 倍,锥才像箭头)
+    private static final float HEAD_HALF_FAR   = 0.4f;        // 远端锥底半边
+    private static final float HEAD_TO_SHAFT = 2.25f;         // 头部半边 = 杆半粗 × 此值(头比杆粗,成箭头)
+    private static final float HEAD_LEN_RATIO = 2.0f;         // 头部 Y 高度 = 头部半边 × 此值(方块偏长)
+    private static final float TIP_GAP_RATIO = 0.15f;         // 杆顶到头底间隙 = 头部半边 × 此值
 
     // 质量数字:公告板,画在方块中心,只画表面方块(任一面接触空气),只画玩家半径内的方块。
     private static final double NUMBER_RADIUS = 16.0;        // 玩家半径(格),超出不画
@@ -159,10 +172,15 @@ public class MassVisualizer {
         viz.typeGroups.clear();
         viz.typeMasses.clear();
         viz.typeLifts.clear();
+        viz.totalLift = 0;
+        viz.buoyancyCenterLocal.zero();
 
         Map<BlockState, Double> typeMassSums = new IdentityHashMap<>();
         Map<BlockState, Integer> typeCounts = new IdentityHashMap<>();
         double totalM = 0;
+        // 浮心累加器:Σ(lift·pos) 与 Σlift,rescan 末尾相除得标称浮心。
+        Vector3d sumLiftPos = new Vector3d();
+        double sumLift = 0;
         BlockPos.MutableBlockPos holdingPos = new BlockPos.MutableBlockPos();
 
         // 子级方块存储在 plot 的独立 chunk 中,不会注册到父级 ClientLevel 的 chunk map。
@@ -208,9 +226,19 @@ public class MassVisualizer {
                             // 浮力:同 BlockState 同值(来自 floating_material override),首次遇到算一次。
                             // 标称浮力 = liftStrength * floatingScale。getFloatingMaterial/getFloatingScale 只读
                             // state 属性,不涉及 isSolid,所以不依赖 bg(与 getMass 不同)。
-                            if (!viz.typeLifts.containsKey(state)) {
+                            double lift;
+                            Double cached = viz.typeLifts.get(state);
+                            if (cached != null) {
+                                lift = cached;
+                            } else {
                                 FloatingBlockMaterial mat = PhysicsBlockPropertyHelper.getFloatingMaterial(state);
-                                viz.typeLifts.put(state, mat == null ? 0.0 : mat.liftStrength() * PhysicsBlockPropertyHelper.getFloatingScale(state));
+                                lift = mat == null ? 0.0 : mat.liftStrength() * PhysicsBlockPropertyHelper.getFloatingScale(state);
+                                viz.typeLifts.put(state, lift);
+                            }
+                            // 浮心累加:标称 lift 加权方块中心。与 COM 同坐标系(本地/rotationPoint)。
+                            if (lift > 0) {
+                                sumLiftPos.fma(lift, new Vector3d(x + 0.5, y + 0.5, z + 0.5));
+                                sumLift += lift;
                             }
                         }
                     }
@@ -222,6 +250,12 @@ public class MassVisualizer {
             viz.typeMasses.put(entry.getKey(), entry.getValue() / typeCounts.get(entry.getKey()));
         }
         viz.totalMass = totalM;
+        viz.totalLift = sumLift;
+        if (sumLift > 0) {
+            viz.buoyancyCenterLocal.set(sumLiftPos).div(sumLift);
+        } else {
+            viz.buoyancyCenterLocal.zero();
+        }
     }
 
     private static void renderMassNumbers(Visualization viz, RenderLevelStageEvent event, float partialTick) {
@@ -364,52 +398,76 @@ public class MassVisualizer {
     }
 
     private static void renderCenterOfMass(Visualization viz, RenderLevelStageEvent event, float partialTick) {
-        if (viz.totalMass <= 0) return;
+        boolean drawCOM = viz.totalMass > 0;
+        boolean drawBuoy = viz.heavy && viz.totalLift > 0;
+        if (!drawCOM && !drawBuoy) return;
         Pose3dc pose = viz.subLevel.renderPose(partialTick);
         if (pose == null) return;
 
-        // Sable 的物理 pipeline 保证 rotationPoint = centerOfMass,
-        // 所以重心世界坐标 = pose.position()。
+        // Sable 的物理 pipeline 保证 rotationPoint = centerOfMass,所以重心世界坐标 = pose.position()。
+        // 浮心本地坐标(rescan 已算)需经与数字同公式变换到世界:worldBuoy = R*(localBuoy - rotationPoint) + position。
         Vector3dc position = pose.position();
         Quaterniondc orientation = pose.orientation();
+        Vector3dc rotationPoint = pose.rotationPoint();
         Vec3 camera = event.getCamera().getPosition();
 
-        // 用自定义 RenderType（NO_DEPTH_TEST）画重心标记,使其穿透方块显示不被遮挡。
-        // Outliner.showAABB 走 Catnip 默认 RenderType（有深度测试）,OutlineParams 无法禁用深度。
-        // 先 flush 所有 pending(含 AFTER_TRANSLUCENT_BLOCKS 写入的 textSeeThrough 数字顶点):
-        // 让数字在 AFTER_PARTICLES 画(在半透明地形/particles 之后,穿墙可见),再画 COM,
-        // 使 COM 盖在数字之上。否则 text 拖到 vanilla final endBatch 才画,会盖住先画的 COM,
-        // 导致 COM 看似不穿墙。NO_DEPTH_TEST 内容之间,画图顺序决定谁盖谁--COM 必须最后画。
+        // flush vanilla 全局 bufferSource(含 AFTER_TRANSLUCENT 写入的 textSeeThrough 数字),
+        // 让数字先上屏,COM/浮心箭头盖在数字之上(NO_DEPTH_TEST 内容后画者盖先画者)。
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
-        PoseStack poseStack = event.getPoseStack();
-        poseStack.pushPose();
-        poseStack.translate(position.x() - camera.x, position.y() - camera.y, position.z() - camera.z);
-        // 跟船本地轴旋转:准星随子级 orientation 转,顺带当朝向指示器。位置用 pose.position()
-        // (世界 COM),旋转用 orientation,完全不依赖未同步的 rotationPoint。
-        poseStack.mulPose(new Quaternionf(orientation));
-
-        // 臂长与臂粗都按相机到 COM 的世界距离缩放:position 和 camera 都是世界坐标,
-        // 直接欧氏距离即可,不涉及子级/本地坐标转换。近端小远端大,屏幕视大小大致恒定。
-        double dist = Math.sqrt(position.distanceSquared(camera.x, camera.y, camera.z));
-        double t = (dist - COM_DIST_NEAR) / (COM_DIST_FAR - COM_DIST_NEAR);
-        float l = (float) Mth.clampedLerp(COM_ARM_LENGTH_NEAR, COM_ARM_LENGTH_FAR, t);
-        float h = (float) Mth.clampedLerp(COM_ARM_HALF_NEAR, COM_ARM_HALF_FAR, t);
-
         VertexConsumer buffer = Minecraft.getInstance().renderBuffers().bufferSource()
                 .getBuffer(MassRenderTypes.centerOfMass());
-        // 3 轴十字:三段细方体沿 X/Y/Z 过原点,交点即 COM。
-        box(buffer, poseStack.last(), -l, -h, -h, l, h, h, COM_COLOR); // X
-        box(buffer, poseStack.last(), -h, -l, -h, h, l, h, COM_COLOR); // Y
-        box(buffer, poseStack.last(), -h, -h, -l, h, h, l, COM_COLOR); // Z
+        PoseStack poseStack = event.getPoseStack();
 
-        // 不主动 endBatch(centerOfMass):让 COM 顶点随 vanilla final endBatch 最晚画,
-        // 使 COM 成为最后画的世界空间内容(NO_DEPTH_TEST 内容最晚画才不被后续覆盖/遮挡)。
-        // 顶点 Matrix4f 是 AFTER_PARTICLES poseStack 的快照(含相机世界变换),
-        // final endBatch 时 modelview 已 popPose 为 identity,projection*poseMatrix 仍正确。
+        // 重心:红箭头朝下(重力方向)。沿世界 Y 轴,不跟 orientation——重力是世界向下。
+        if (drawCOM) {
+            renderWorldArrow(poseStack, buffer, camera, position, COM_COLOR, true);
+        }
+
+        // 浮心:天蓝箭头朝上(浮力方向)。门控:仅重块模式且有浮力块时画。
+        if (drawBuoy) {
+            Vector3d worldBuoy = new Vector3d(viz.buoyancyCenterLocal).sub(rotationPoint);
+            orientation.transform(worldBuoy);
+            worldBuoy.add(position);
+            renderWorldArrow(poseStack, buffer, camera, worldBuoy, BUOYANCY_COLOR, false);
+        }
+
+        // 不主动 endBatch(centerOfMass):顶点随 vanilla final endBatch 最晚画。
+        // 顶点 Matrix4f 是 AFTER_PARTICLES poseStack 的快照(含相机世界变换),final endBatch 时
+        // modelview 已 popPose 为 identity,projection*poseMatrix 仍正确。
+    }
+
+    /**
+     * 画一个沿世界 Y 轴的 blocky 箭头(杆 + 头部方块),朝向由 {@code downward} 决定。
+     * 中心位于 {@code worldPos};臂长随相机距离缩放(近小远大,屏幕视大小大致恒定)。
+     * 用世界轴(不 mulPose orientation):重力/浮力方向是世界上下,与载具朝向无关。
+     */
+    private static void renderWorldArrow(PoseStack poseStack, VertexConsumer buffer, Vec3 camera,
+                                         Vector3dc worldPos, int color, boolean downward) {
+        double dist = Math.sqrt(worldPos.distanceSquared(camera.x, camera.y, camera.z));
+        double t = (dist - COM_DIST_NEAR) / (COM_DIST_FAR - COM_DIST_NEAR);
+        float l = (float) Mth.clampedLerp(COM_ARM_LENGTH_NEAR, COM_ARM_LENGTH_FAR, t);
+        float half = (float) Mth.clampedLerp(SHAFT_HALF_NEAR, SHAFT_HALF_FAR, t);
+        float headHalf = (float) Mth.clampedLerp(HEAD_HALF_NEAR, HEAD_HALF_FAR, t);
+        float headH = headHalf * HEAD_LEN_RATIO;
+        float tipGap = headHalf * TIP_GAP_RATIO;
+
+        poseStack.pushPose();
+        poseStack.translate(worldPos.x() - camera.x, worldPos.y() - camera.y, worldPos.z() - camera.z);
+        var p = poseStack.last();
+
+        // 杆:沿 Y 从中心指向箭头端。downward 时杆在 [−l, 0];upward 时杆在 [0, +l]。
+        float shaftY0 = downward ? -l : 0;
+        float shaftY1 = downward ? 0 : l;
+        box(buffer, p, -half, shaftY0, -half, half, shaftY1, half, color); // 杆
+
+        // 头部方块:紧接杆的箭头端,留 tipGap 间隙避免重叠闪烁。
+        float headY0 = downward ? shaftY0 - tipGap - headH : shaftY1 + tipGap;
+        float headY1 = downward ? shaftY0 - tipGap : shaftY1 + tipGap + headH;
+        box(buffer, p, -headHalf, headY0, -headHalf, headHalf, headY1, headHalf, color); // 头部方块
         poseStack.popPose();
     }
 
-    /** 画一个轴对齐方体(6 面,NO_CULL 下正反面都可见)。用于构成十字准星的三段臂。 */
+    /** 画一个轴对齐方体(6 面,NO_CULL 下正反面都可见)。用于构成箭头的杆与头部方块。 */
     private static void box(VertexConsumer vc, PoseStack.Pose pose,
                             float x0, float y0, float z0,
                             float x1, float y1, float z1, int color) {
