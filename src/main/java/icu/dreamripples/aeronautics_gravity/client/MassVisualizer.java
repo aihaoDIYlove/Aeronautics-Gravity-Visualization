@@ -9,7 +9,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
@@ -30,7 +29,6 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,27 +65,17 @@ public class MassVisualizer {
         }
     }
 
-    // 重心标记:3 轴十字准星,跟船本地轴旋转,NO_DEPTH_TEST 穿墙可见。
-    // 臂长与臂粗都随相机距离缩放:<=近端用小值(近处精),>=远端用大值(远处仍可见),
-    // 之间线性插值,让屏幕上的视大小大致恒定。
-    private static final float COM_ARM_LENGTH_NEAR = 0.125f; // 距离<=COM_DIST_NEAR 时的单臂半长
-    private static final float COM_ARM_LENGTH_FAR = 2.0f;    // 距离>=COM_DIST_FAR 时的单臂半长
-    private static final float COM_ARM_HALF_NEAR = 0.0125f; // 距离<=COM_DIST_NEAR 时的臂半粗
-    private static final float COM_ARM_HALF_FAR = 0.1f;      // 距离>=COM_DIST_FAR 时的臂半粗
-    private static final double COM_DIST_NEAR = 4.0;          // 近端距离(格)
-    private static final double COM_DIST_FAR = 64.0;          // 远端距离(格)
-    private static final int COM_COLOR = 0xE0FF3030;          // 红=重力/重心,朝下箭头,穿透方块显示
-    private static final int BUOYANCY_COLOR = 0xE087CEEB;     // 天蓝=浮力/浮心,朝上箭头,与 liftToColor 同色系
-    // 箭头几何尺寸(绝对世界格,不乘 scale——旧十字就是这么做的,固定半粗保可见性)。
-    // 粗细独立于臂长做近/远线性插值:近处细短、远处粗长,屏幕视大小大致恒定。
-    // 不用"粗细=scale·小常数",那会在近处退化成像素线(第一版 bug)。
-    private static final float SHAFT_HALF_NEAR = 0.04f;       // 近端杆半粗(砍半,0.08 格宽)
-    private static final float SHAFT_HALF_FAR  = 0.125f;      // 远端杆半粗(砍半)
-    private static final float HEAD_HALF_NEAR  = 0.12f;       // 近端锥底半边(杆粗 ~3 倍,锥才像箭头)
-    private static final float HEAD_HALF_FAR   = 0.4f;        // 远端锥底半边
-    private static final float HEAD_TO_SHAFT = 2.25f;         // 头部半边 = 杆半粗 × 此值(头比杆粗,成箭头)
-    private static final float HEAD_LEN_RATIO = 2.0f;         // 头部 Y 高度 = 头部半边 × 此值(方块偏长)
-    private static final float TIP_GAP_RATIO = 0.15f;         // 杆顶到头底间隙 = 头部半边 × 此值
+    // 重心/浮心标记:Unicode 粗箭头字符(⬇/⬆),公告板 billboard,面朝玩家,SEE_THROUGH 穿墙。
+// 复用 Font.drawInBatch 走 vanilla 文字 buffer(已在 fixedBuffers 中),无自定义 RenderType,
+// 避开"同帧 getBuffer 多个自定义 RT"导致的 "Not building!" 崩溃(曾用 box/quad/vertex + 自定义
+// RenderType 画儿何箭头,崩;根因是 MultiBufferSource.getBuffer 对非 fixedBuffers 自定义 RT
+// 会副作用 endBatch 掉正在 building 的另一个自定义 RT)。
+// 与质量数字同一套渲染路径(同 stage/同 buffer/同 scale 语义),视觉语言统一。
+private static final int COM_COLOR = 0xE0FF3030;          // 红=重心,⬇ 朝下(屏幕恒定,玩家转头跟着转)
+private static final int BUOYANCY_COLOR = 0xE087CEEB;     // 天蓝=浮心,⬆ 朝上,与 liftToColor 同色系
+private static final String COM_GLYPH = "\u2B07";          // ⬇ U+2B07 DOWNWARDS BLACK ARROW(BMP 内,vanilla Font 有字形)
+private static final String BUOYANCY_GLYPH = "\u2B06";    // ⬆ U+2B06 UPWARDS BLACK ARROW
+private static final float MARKER_SCALE = 0.04f;          // 箭头字号(世界格);比数字 NUMBER_SCALE 0.02 大一倍,醒目但不喧宾夺主
 
     // 质量数字:公告板,画在方块中心,只画表面方块(任一面接触空气),只画玩家半径内的方块。
     private static final double NUMBER_RADIUS = 16.0;        // 玩家半径(格),超出不画
@@ -404,101 +392,55 @@ public class MassVisualizer {
         Pose3dc pose = viz.subLevel.renderPose(partialTick);
         if (pose == null) return;
 
-        // Sable 的物理 pipeline 保证 rotationPoint = centerOfMass,所以重心世界坐标 = pose.position()。
+        // Sable 物理 pipeline 保证 rotationPoint = centerOfMass,所以重心世界坐标 = pose.position()。
         // 浮心本地坐标(rescan 已算)需经与数字同公式变换到世界:worldBuoy = R*(localBuoy - rotationPoint) + position。
         Vector3dc position = pose.position();
         Quaterniondc orientation = pose.orientation();
         Vector3dc rotationPoint = pose.rotationPoint();
         Vec3 camera = event.getCamera().getPosition();
 
-        // flush vanilla 全局 bufferSource(含 AFTER_TRANSLUCENT 写入的 textSeeThrough 数字),
-        // 让数字先上屏,COM/浮心箭头盖在数字之上(NO_DEPTH_TEST 内容后画者盖先画者)。
-        Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
-        VertexConsumer buffer = Minecraft.getInstance().renderBuffers().bufferSource()
-                .getBuffer(MassRenderTypes.centerOfMass());
+        Font font = Minecraft.getInstance().font;
+        MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
+        Quaternionf billboard = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        int light = LightTexture.FULL_BRIGHT;
         PoseStack poseStack = event.getPoseStack();
 
-        // 重心:红箭头朝下(重力方向)。沿世界 Y 轴,不跟 orientation——重力是世界向下。
+        // 重心:红 ⬇ 朝下(屏幕空间恒定,billboard 随玩家视角转)。门控:任何模式都画。
         if (drawCOM) {
-            renderWorldArrow(poseStack, buffer, camera, position, COM_COLOR, true);
+            renderGlyphMarker(poseStack, buffer, font, billboard, camera, position, COM_GLYPH, COM_COLOR, light);
         }
 
-        // 浮心:天蓝箭头朝上(浮力方向)。门控:仅重块模式且有浮力块时画。
+        // 浮心:天蓝 ⬆ 朝上。门控:仅重块模式且有浮力块时画。
         if (drawBuoy) {
             Vector3d worldBuoy = new Vector3d(viz.buoyancyCenterLocal).sub(rotationPoint);
             orientation.transform(worldBuoy);
             worldBuoy.add(position);
-            renderWorldArrow(poseStack, buffer, camera, worldBuoy, BUOYANCY_COLOR, false);
+            renderGlyphMarker(poseStack, buffer, font, billboard, camera, worldBuoy, BUOYANCY_GLYPH, BUOYANCY_COLOR, light);
         }
-
-        // 不主动 endBatch(centerOfMass):顶点随 vanilla final endBatch 最晚画。
-        // 顶点 Matrix4f 是 AFTER_PARTICLES poseStack 的快照(含相机世界变换),final endBatch 时
-        // modelview 已 popPose 为 identity,projection*poseMatrix 仍正确。
+        // 不主动 endBatch:文字顶点随 vanilla final endBatch(走 fixed textSeeThrough RenderType),
+        // 与质量数字同一 buffer/同一 flush 时机,无自定义 RT 状态机问题。
     }
 
     /**
-     * 画一个沿世界 Y 轴的 blocky 箭头(杆 + 头部方块),朝向由 {@code downward} 决定。
-     * 中心位于 {@code worldPos};臂长随相机距离缩放(近小远大,屏幕视大小大致恒定)。
-     * 用世界轴(不 mulPose orientation):重力/浮力方向是世界上下,与载具朝向无关。
+     * 在世界坐标 {@code worldPos} 画一个 Unicode 字符(公告板 billboard,面朝玩家,SEE_THROUGH 穿墙)。
+     * 复用 renderMassNumbers 同一套 Font.drawInBatch + cameraOrientation billboard + SEE_THROUGH 语义,
+     * 走 vanilla 文字 buffer(在 fixedBuffers 中),无自定义 RenderType,无 getBuffer 副作用崩盘风险。
+     * 字号恒定(MARKER_SCALE),不随距离缩放——与质量数字(NUMBER_SCALE 恒定)视觉语言一致。
      */
-    private static void renderWorldArrow(PoseStack poseStack, VertexConsumer buffer, Vec3 camera,
-                                         Vector3dc worldPos, int color, boolean downward) {
-        double dist = Math.sqrt(worldPos.distanceSquared(camera.x, camera.y, camera.z));
-        double t = (dist - COM_DIST_NEAR) / (COM_DIST_FAR - COM_DIST_NEAR);
-        float l = (float) Mth.clampedLerp(COM_ARM_LENGTH_NEAR, COM_ARM_LENGTH_FAR, t);
-        float half = (float) Mth.clampedLerp(SHAFT_HALF_NEAR, SHAFT_HALF_FAR, t);
-        float headHalf = (float) Mth.clampedLerp(HEAD_HALF_NEAR, HEAD_HALF_FAR, t);
-        float headH = headHalf * HEAD_LEN_RATIO;
-        float tipGap = headHalf * TIP_GAP_RATIO;
-
+    private static void renderGlyphMarker(PoseStack poseStack, MultiBufferSource.BufferSource buffer,
+                                          Font font, Quaternionf billboard, Vec3 camera,
+                                          Vector3dc worldPos, String glyph, int color, int light) {
+        float glyphWidth = font.width(glyph);
+        float x = -glyphWidth / 2f; // 水平居中
         poseStack.pushPose();
         poseStack.translate(worldPos.x() - camera.x, worldPos.y() - camera.y, worldPos.z() - camera.z);
-        var p = poseStack.last();
-
-        // 杆:沿 Y 从中心指向箭头端。downward 时杆在 [−l, 0];upward 时杆在 [0, +l]。
-        float shaftY0 = downward ? -l : 0;
-        float shaftY1 = downward ? 0 : l;
-        box(buffer, p, -half, shaftY0, -half, half, shaftY1, half, color); // 杆
-
-        // 头部方块:紧接杆的箭头端,留 tipGap 间隙避免重叠闪烁。
-        float headY0 = downward ? shaftY0 - tipGap - headH : shaftY1 + tipGap;
-        float headY1 = downward ? shaftY0 - tipGap : shaftY1 + tipGap + headH;
-        box(buffer, p, -headHalf, headY0, -headHalf, headHalf, headY1, headHalf, color); // 头部方块
+        poseStack.mulPose(billboard);
+        // scale Y 取负翻转(同 renderMassNumbers),让文字正立而非上下颠倒。
+        poseStack.scale(MARKER_SCALE, -MARKER_SCALE, MARKER_SCALE);
+        Matrix4f matrix = poseStack.last().pose();
+        // y=-glyphHeight/2 让字垂直居中(字符基线在 fontHeight,drawInBatch y 是基线偏移,取负上移半个字高近似居中)。
+        font.drawInBatch(glyph, x, 0f, color, false, matrix, buffer, Font.DisplayMode.SEE_THROUGH, 0, light);
         poseStack.popPose();
-    }
-
-    /** 画一个轴对齐方体(6 面,NO_CULL 下正反面都可见)。用于构成箭头的杆与头部方块。 */
-    private static void box(VertexConsumer vc, PoseStack.Pose pose,
-                            float x0, float y0, float z0,
-                            float x1, float y1, float z1, int color) {
-        quad(vc, pose, color,
-                x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1); // 下 (y0)
-        quad(vc, pose, color,
-                x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0); // 上 (y1)
-        quad(vc, pose, color,
-                x0, y0, z0, x0, y1, z0, x1, y1, z0, x1, y0, z0); // -Z (z0)
-        quad(vc, pose, color,
-                x1, y0, z1, x1, y1, z1, x0, y1, z1, x0, y0, z1); // +Z (z1)
-        quad(vc, pose, color,
-                x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0); // -X (x0)
-        quad(vc, pose, color,
-                x1, y0, z0, x1, y1, z0, x1, y1, z1, x1, y0, z1); // +X (x1)
-    }
-
-    private static void quad(VertexConsumer vc, PoseStack.Pose pose, int color,
-                             float x0, float y0, float z0,
-                             float x1, float y1, float z1,
-                             float x2, float y2, float z2,
-                             float x3, float y3, float z3) {
-        vertex(vc, pose, x0, y0, z0, color);
-        vertex(vc, pose, x1, y1, z1, color);
-        vertex(vc, pose, x2, y2, z2, color);
-        vertex(vc, pose, x3, y3, z3, color);
-    }
-
-    private static void vertex(VertexConsumer vc, PoseStack.Pose pose,
-                               float x, float y, float z, int color) {
-        vc.addVertex(pose, x, y, z).setColor(color);
     }
 
     private static int massToColor(double mass) {
