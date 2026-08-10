@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
@@ -65,17 +66,23 @@ public class MassVisualizer {
         }
     }
 
-    // 重心/浮心标记:Unicode 粗箭头字符(⬇/⬆),公告板 billboard,面朝玩家,SEE_THROUGH 穿墙。
+    // 重心/浮心标记:Unicode 粗箭头字符(⬇/⬆),圆柱 billboard + 三层堆叠加厚度,SEE_THROUGH 穿墙。
 // 复用 Font.drawInBatch 走 vanilla 文字 buffer(已在 fixedBuffers 中),无自定义 RenderType,
 // 避开"同帧 getBuffer 多个自定义 RT"导致的 "Not building!" 崩溃(曾用 box/quad/vertex + 自定义
-// RenderType 画儿何箭头,崩;根因是 MultiBufferSource.getBuffer 对非 fixedBuffers 自定义 RT
+// RenderType 画几何箭头,崩;根因是 MultiBufferSource.getBuffer 对非 fixedBuffers 自定义 RT
 // 会副作用 endBatch 掉正在 building 的另一个自定义 RT)。
-// 与质量数字同一套渲染路径(同 stage/同 buffer/同 scale 语义),视觉语言统一。
 private static final int COM_COLOR = 0xE0FF3030;          // 红=重心,⬇ 朝下(屏幕恒定,玩家转头跟着转)
 private static final int BUOYANCY_COLOR = 0xE087CEEB;     // 天蓝=浮心,⬆ 朝上,与 liftToColor 同色系
 private static final String COM_GLYPH = "\u2B07";          // ⬇ U+2B07 DOWNWARDS BLACK ARROW(BMP 内,vanilla Font 有字形)
 private static final String BUOYANCY_GLYPH = "\u2B06";    // ⬆ U+2B06 UPWARDS BLACK ARROW
-private static final float MARKER_SCALE = 0.04f;          // 箭头字号(世界格);比数字 NUMBER_SCALE 0.02 大一倍,醒目但不喧宾夺主
+// 近小远大:字号与厚度偏移都按相机距离线性插值,屏幕视大小近似恒定(远处有最小可读阈值)。
+// 复用旧 3 轴十字的距离常数语义:NEAR<=4格 用小值,FAR>=64格 用大值。
+private static final double MARKER_DIST_NEAR = 4.0;        // 近端距离(格)
+private static final double MARKER_DIST_FAR = 64.0;        // 远端距离(格)
+private static final float MARKER_SCALE_NEAR = 0.03f;      // 近端字号(世界格/像素)
+private static final float MARKER_SCALE_FAR = 0.24f;       // 远端字号;FAR/NEAR=16 倍缓透视压缩,屏幕视大小近似恒定
+private static final float THICKNESS_NEAR = 0.1f;           // 近端三层 Y 偏移 ε(世界格)
+private static final float THICKNESS_FAR = 0.6f;            // 远端三层 Y 偏移 ε;远箭头大,厚度也大保持比例
 
     // 质量数字:公告板,画在方块中心,只画表面方块(任一面接触空气),只画玩家半径内的方块。
     private static final double NUMBER_RADIUS = 16.0;        // 玩家半径(格),超出不画
@@ -421,33 +428,41 @@ private static final float MARKER_SCALE = 0.04f;          // 箭头字号(世界
     }
 
     /**
-     * 在世界坐标 {@code worldPos} 画一个 Unicode 箭头字符,圆柱 billboard(只绕世界 Y 轴旋转),
-     * 字面始终竖直、正面对玩家的水平朝向。SEE_THROUGH 穿墙。走 vanilla 文字 buffer(在 fixedBuffers 中),
-     * 无自定义 RenderType,无 getBuffer 副作用崩盘风险。字号恒定(MARKER_SCALE),与质量数字视觉语言一致。
+     * 在世界坐标 {@code worldPos} 附近画一个 Unicode 箭头字符:圆柱 billboard(只绕世界 Y 转,字面恒竖直)
+     * + 三层堆叠加厚度(worldPos.y + 0/±ε 各画一次,缓解字面平贴、俯视看不清的问题)。
+     * SEE_THROUGH 穿墙;走 vanilla 文字 buffer(在 fixedBuffers 中),无 getBuffer 副作用崩盘风险。
+     * 字号与 ε 都按相机距离 lerp(近小远大,屏幕视大小近似恒定,远处大载具也显眼)。
      *
      * 为何用圆柱 billboard 而非全轴 cameraOrientation():箭头字符的"上下"语义必须保持世界 Y 对齐
      * (重力/浮力方向恒世界上/下)。全轴 billboard 俯视时字面倾倒成水平,投影成"指向左右"易误读;
-     * 圆柱 billboard 字面恒竖直,侧看时箭头方向在屏幕上恒正确指向 上/下,俯视/仰视是一条水平线
-     * (字面平贴的固有厚度≈0 限制,任何非 3D 几何方案都有)。
+     * 圆柱 billboard 字面恒竖直,侧看时屏幕上箭头恒指 上/下,俯视/仰视因厚度三层至少不是单条线。
      */
     private static void renderGlyphMarker(PoseStack poseStack, MultiBufferSource.BufferSource buffer,
                                           Font font, Vec3 camera,
                                           Vector3dc worldPos, String glyph, int color, int light) {
         float glyphWidth = font.width(glyph);
         float x = -glyphWidth / 2f; // 水平居中
+        double dist = Math.sqrt(worldPos.distanceSquared(camera.x, camera.y, camera.z));
+        double t = (dist - MARKER_DIST_NEAR) / (MARKER_DIST_FAR - MARKER_DIST_NEAR);
+        float scale = (float) Mth.clampedLerp(MARKER_SCALE_NEAR, MARKER_SCALE_FAR, t);
+        float thickness = (float) Mth.clampedLerp(THICKNESS_NEAR, THICKNESS_FAR, t);
         // 圆柱 billboard:只在水平面绕 Y 转到正对玩家方位角,pitch/roll 丢弃,字面恒竖直。
-        // atan2(dx, dz) 给相机在标记水平面的方位角;字面法线转到该方位,字面 Y 仍对齐世界 Y。
-        double dx = camera.x - worldPos.x();
-        double dz = camera.z - worldPos.z();
-        double yawRad = Math.atan2(dx, dz);
-        poseStack.pushPose();
-        poseStack.translate(worldPos.x() - camera.x, worldPos.y() - camera.y, worldPos.z() - camera.z);
-        // 绕世界 Y 轴旋转 yaw:字面法线指向水平面上的相机方位,字面 Y 仍对齐世界 Y。
-        poseStack.mulPose(new Quaternionf().rotationYXZ((float) yawRad, 0f, 0f));
-        poseStack.scale(MARKER_SCALE, -MARKER_SCALE, MARKER_SCALE);
-        Matrix4f matrix = poseStack.last().pose();
-        font.drawInBatch(glyph, x, 0f, color, false, matrix, buffer, Font.DisplayMode.SEE_THROUGH, 0, light);
-        poseStack.popPose();
+        double yawRad = Math.atan2(camera.x - worldPos.x(), camera.z - worldPos.z());
+        Quaternionf yaw = new Quaternionf().rotationYXZ((float) yawRad, 0f, 0f);
+
+        // 三层堆叠:Y 偏移 -ε / 0 / +ε 在世界平移阶段加,然后整体 yaw billboard + scale。
+        // 三层平面平行、同 yaw,俯视时沿 Y 错开成三条线显厚,侧看时沿 视线方向叠合成一个箭头。
+        float[] offsets = { -thickness, 0f, +thickness };
+        for (float yOff : offsets) {
+            poseStack.pushPose();
+            poseStack.translate(worldPos.x() - camera.x, worldPos.y() - camera.y + yOff, worldPos.z() - camera.z);
+            poseStack.mulPose(yaw);
+            // scale Y 取负翻转(同 renderMassNumbers),让文字正立而非上下颠倒;thickness 不受 scale 影响(已在世界平移应用)。
+            poseStack.scale(scale, -scale, scale);
+            Matrix4f matrix = poseStack.last().pose();
+            font.drawInBatch(glyph, x, 0f, color, false, matrix, buffer, Font.DisplayMode.SEE_THROUGH, 0, light);
+            poseStack.popPose();
+        }
     }
 
     private static int massToColor(double mass) {
