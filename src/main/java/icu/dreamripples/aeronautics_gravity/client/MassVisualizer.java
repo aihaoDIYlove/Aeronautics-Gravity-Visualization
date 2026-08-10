@@ -81,8 +81,6 @@ private static final double MARKER_DIST_NEAR = 4.0;        // 近端距离(格)
 private static final double MARKER_DIST_FAR = 64.0;        // 远端距离(格)
 private static final float MARKER_SCALE_NEAR = 0.03f;      // 近端字号(世界格/像素)
 private static final float MARKER_SCALE_FAR = 0.24f;       // 远端字号;FAR/NEAR=16 倍缓透视压缩,屏幕视大小近似恒定
-private static final float THICKNESS_NEAR = 0.1f;           // 近端三层 Y 偏移 ε(世界格)
-private static final float THICKNESS_FAR = 0.6f;            // 远端三层 Y 偏移 ε;远箭头大,厚度也大保持比例
 
     // 质量数字:公告板,画在方块中心,只画表面方块(任一面接触空气),只画玩家半径内的方块。
     private static final double NUMBER_RADIUS = 16.0;        // 玩家半径(格),超出不画
@@ -428,14 +426,14 @@ private static final float THICKNESS_FAR = 0.6f;            // 远端三层 Y �
     }
 
     /**
-     * 在世界坐标 {@code worldPos} 附近画一个 Unicode 箭头字符:圆柱 billboard(只绕世界 Y 转,字面恒竖直)
-     * + 三层堆叠加厚度(worldPos.y + 0/±ε 各画一次,缓解字面平贴、俯视看不清的问题)。
+     * 在世界坐标 {@code worldPos} 画一个 Unicode 箭头字符:圆柱 billboard(只绕世界 Y 转,字面恒竖直)。
      * SEE_THROUGH 穿墙;走 vanilla 文字 buffer(在 fixedBuffers 中),无 getBuffer 副作用崩盘风险。
-     * 字号与 ε 都按相机距离 lerp(近小远大,屏幕视大小近似恒定,远处大载具也显眼)。
+     * 字号按相机距离 lerp(近小远大,屏幕视大小近似恒定,远处大载具也显眼)。
      *
      * 为何用圆柱 billboard 而非全轴 cameraOrientation():箭头字符的"上下"语义必须保持世界 Y 对齐
      * (重力/浮力方向恒世界上/下)。全轴 billboard 俯视时字面倾倒成水平,投影成"指向左右"易误读;
-     * 圆柱 billboard 字面恒竖直,侧看时屏幕上箭头恒指 上/下,俯视/仰视因厚度三层至少不是单条线。
+     * 圆柱 billboard 字面恒竖直,侧看时屏幕上箭头恒指 上/下,俯视/仰视是单层贴片(平面固有限制,
+     * 玩家稍偏一点视角就能看到箭头,接受此限制)。
      */
     private static void renderGlyphMarker(PoseStack poseStack, MultiBufferSource.BufferSource buffer,
                                           Font font, Vec3 camera,
@@ -445,24 +443,17 @@ private static final float THICKNESS_FAR = 0.6f;            // 远端三层 Y �
         double dist = Math.sqrt(worldPos.distanceSquared(camera.x, camera.y, camera.z));
         double t = (dist - MARKER_DIST_NEAR) / (MARKER_DIST_FAR - MARKER_DIST_NEAR);
         float scale = (float) Mth.clampedLerp(MARKER_SCALE_NEAR, MARKER_SCALE_FAR, t);
-        float thickness = (float) Mth.clampedLerp(THICKNESS_NEAR, THICKNESS_FAR, t);
         // 圆柱 billboard:只在水平面绕 Y 转到正对玩家方位角,pitch/roll 丢弃,字面恒竖直。
         double yawRad = Math.atan2(camera.x - worldPos.x(), camera.z - worldPos.z());
-        Quaternionf yaw = new Quaternionf().rotationYXZ((float) yawRad, 0f, 0f);
 
-        // 三层堆叠:Y 偏移 -ε / 0 / +ε 在世界平移阶段加,然后整体 yaw billboard + scale。
-        // 三层平面平行、同 yaw,俯视时沿 Y 错开成三条线显厚,侧看时沿 视线方向叠合成一个箭头。
-        float[] offsets = { -thickness, 0f, +thickness };
-        for (float yOff : offsets) {
-            poseStack.pushPose();
-            poseStack.translate(worldPos.x() - camera.x, worldPos.y() - camera.y + yOff, worldPos.z() - camera.z);
-            poseStack.mulPose(yaw);
-            // scale Y 取负翻转(同 renderMassNumbers),让文字正立而非上下颠倒;thickness 不受 scale 影响(已在世界平移应用)。
-            poseStack.scale(scale, -scale, scale);
-            Matrix4f matrix = poseStack.last().pose();
-            font.drawInBatch(glyph, x, 0f, color, false, matrix, buffer, Font.DisplayMode.SEE_THROUGH, 0, light);
-            poseStack.popPose();
-        }
+        poseStack.pushPose();
+        poseStack.translate(worldPos.x() - camera.x, worldPos.y() - camera.y, worldPos.z() - camera.z);
+        poseStack.mulPose(new Quaternionf().rotationYXZ((float) yawRad, 0f, 0f));
+        // scale Y 取负翻转(同 renderMassNumbers),让文字正立而非上下颠倒。
+        poseStack.scale(scale, -scale, scale);
+        Matrix4f matrix = poseStack.last().pose();
+        font.drawInBatch(glyph, x, 0f, color, false, matrix, buffer, Font.DisplayMode.SEE_THROUGH, 0, light);
+        poseStack.popPose();
     }
 
     private static int massToColor(double mass) {
