@@ -9,7 +9,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class MassRenderTypes {
 
-    /** 重心十字准星：无深度测试（穿墙可见） */
+    /** 重心/浮心标记：无深度测试（穿墙可见），QUADS 模式画 blocky 杆 + 方块头。 */
     public static final RenderType CENTER_OF_MASS = RenderType.create(
             "aeronautics_gravity:center_of_mass",
             DefaultVertexFormat.POSITION_COLOR,

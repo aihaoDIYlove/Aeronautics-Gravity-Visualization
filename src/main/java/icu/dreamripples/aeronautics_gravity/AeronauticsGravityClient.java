@@ -2,6 +2,7 @@ package icu.dreamripples.aeronautics_gravity;
 
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.decoration.encasing.EncasedCTBehaviour;
+import com.simibubi.create.content.fluids.PipeAttachmentModel;
 import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
 import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.content.contraptions.pulley.HosePulleyVisual;
@@ -151,7 +152,13 @@ public class AeronauticsGravityClient {
             ModelResourceLocation mrl = BlockModelShaper.stateToModelLocation(blockId, state);
             BakedModel original = event.getModels().get(mrl);
             if (original != null) {
-                event.getModels().put(mrl, new CTModel(original, behaviour));
+                // 套壳管道必须再包一层 PipeAttachmentModel: 法兰连接件(RIM_CONNECTOR/DRAIN/RIM)是
+                // 由它在 gatherModelData 读 FluidTransportBehaviour.getRenderedRimAttachment 后, 在
+                // addQuads 从 AllPartialModels.PIPE_ATTACHMENTS 拼装的 3D 部件, 不是贴图/blockstate 画的.
+                // CT 管静态六面板机壳纹理, PipeAttachmentModel 管动态法兰几何, 互不干扰.
+                // 包装顺序: PipeAttachmentModel(CTModel(original)) — super.getQuads 先走 CT 再拼 partials.
+                BakedModel wrapped = new CTModel(original, behaviour);
+                event.getModels().put(mrl, PipeAttachmentModel.withAO(wrapped));
             }
         }
     }
