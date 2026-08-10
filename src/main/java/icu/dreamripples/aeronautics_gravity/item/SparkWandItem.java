@@ -39,7 +39,7 @@ public class SparkWandItem extends Item {
     @SuppressWarnings("deprecation")
     @Override
     public int getEnchantmentValue() {
-        // 让火花魔杖可在附魔台附魔(默认 0 = 不可附魔)。14 ≈ 铁剑。
+        // 让火花魔杖可在附魔台附魔(默认 0 = 不可附魔)。返回 36。
         // 1.21.1 此方法被 @Deprecated(附魔系统 data-driven 重构),但尚无 Item.Properties 替代方法
         // (.enchantable 是更高版本才引入),只能重写 + @SuppressWarnings。参考 PlungerLauncherItem:181。
         return 36;

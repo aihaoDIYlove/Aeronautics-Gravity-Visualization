@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 /**
  * Flywheel PartialModel 注册 - 灯带几何。
  * REDSTONE_INDICATOR: 72 小方块突出表面版,配重/配轻块 + 换皮后 stabilizer 用(不透明方块须突出才可见)。
- * ANCHOR_INDICATOR: 32 小方块内嵌版,框住星空,世界锚点用(stabilizer 换皮前临时共用)。
+ * ANCHOR_INDICATOR: 32 小方块内嵌版,框住星空,世界锚点专用。
  * 必须在 ModelEvent.RegisterAdditional 之前触发类加载,在 FMLClientSetupEvent 调用 init() 即可。
  */
 public class ModPartialModels {

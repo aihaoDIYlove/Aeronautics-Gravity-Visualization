@@ -24,7 +24,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
  *   <li>{@link #onRightClickBlock}: 命中方块(载具地板/平台等)时取消 -- 玩家在末地海里能遮挡射线的只有
  *       载具本身, 对方块右键说明不是对着虚空, 不该装瓶. {@code cancellationResult=SUCCESS} 同时阻止
  *       方块 use 和后续 {@code RightClickItem}(物品 use), 从而阻止装瓶.</li>
- *   <li>{@link #onRightClickItem}: 未命中方块(对着虚空)时, 若视角朝下({@code pitch>0})才装瓶 --
+ *   <li>{@link #onRightClickItem}: 未命中方块(对着虚空)时, 若视角朝下({@code pitch>45})才装瓶 --
  *       抬头朝天空不算对着虚空(下方).</li>
  * </ul>
  * <p>

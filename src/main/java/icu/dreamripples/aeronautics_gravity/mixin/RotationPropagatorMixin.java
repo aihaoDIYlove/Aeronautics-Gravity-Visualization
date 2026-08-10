@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  *       （=邻居速度×getRotationSpeedModifier，含齿轮箱反转修饰符）</li>
  *   <li>主BE -> 源（generator）-> 返回源当前速度（不注入 targetSpeed、不返回 0）。
  *       让 propagateNewSource 看到 |newSpeed - speedOfNeighbour|≈0 而跳过 setSource(主BE)，
- *       避免源 hasSource=主BE 后调整方向时 applyNewSpeed 第147行自毁，也避免拆除源后主BE不停。</li>
+ *       避免源 hasSource=主BE 后调整方向时 applyNewSpeed(GeneratingKineticBlockEntity)自毁，也避免拆除源后主BE不停。</li>
  *   <li>主BE -> source（驱动主BE的邻居，反向传播）-> 返回 source 当前速度，
  *       避免循环检测因 targetSpeed > source 速度且同网络而破坏主BE。</li>
  *   <li>源 -> 主BE 且主BE当前速度方向与源新方向冲突 -> 返回主BE当前方向，
