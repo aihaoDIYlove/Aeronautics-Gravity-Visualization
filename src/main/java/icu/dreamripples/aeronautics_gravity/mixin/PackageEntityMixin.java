@@ -58,7 +58,7 @@ public abstract class PackageEntityMixin {
     /** 静止判定: 相邻 tick 位置差平方阈值, < 1e-6 (≈0.001 块位移) 视为静止. 实测传送带上位置差≈0.006. */
     private static final double AG_STILL_POS_DELTA_SQR = 1.0E-6D;
     /** 诊断: 控制台每 N tick 才打一次状态, 避免日志爆炸. -1=关闭. */
-    private static final int AG_DEBUG_INTERVAL = 20;
+    private static final int AG_DEBUG_INTERVAL = -1;
     private static final Logger AG_LOG = AeronauticsGravityVisualization.LOGGER;
 
     @Unique
@@ -142,7 +142,7 @@ public abstract class PackageEntityMixin {
         // ========= 触发破裂 =========
         ag$stillTicks = 0;
         ItemStack pearlStack = contents.getStackInSlot(slot);
-        UUID owner = ActivatedEnderPearlItem.getOwner(pearlStack);
+        UUID owner = ActivatedEnderPearlItem.getOwnerUuid(pearlStack);
         if (owner == null) return; // 非法激活珍珠(无 UUID), 放弃
 
         ServerPlayer player = level.getServer().getPlayerList().getPlayer(owner);

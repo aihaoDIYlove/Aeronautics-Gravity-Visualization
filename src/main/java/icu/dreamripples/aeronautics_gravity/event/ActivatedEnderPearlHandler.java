@@ -1,6 +1,7 @@
 package icu.dreamripples.aeronautics_gravity.event;
 
 import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
+import icu.dreamripples.aeronautics_gravity.component.PearlOwner;
 import icu.dreamripples.aeronautics_gravity.item.ActivatedEnderPearlItem;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
 import net.minecraft.world.InteractionHand;
@@ -44,7 +45,8 @@ public class ActivatedEnderPearlHandler {
 
         // 服务端: 产出激活珍珠, 消耗两物, 优先放回主手(若该格已空) 否则入背包或丢出
         ItemStack activated = new ItemStack(ModItems.ACTIVATED_ENDER_PEARL.get());
-        ActivatedEnderPearlItem.setOwner(activated, player.getUUID());
+        ActivatedEnderPearlItem.setOwner(activated,
+                    new PearlOwner(player.getUUID(), player.getName().getString()));
         main.shrink(1);     // 消耗主手末影珍珠
         offHand.shrink(1);  // 消耗副手回响碎片
         if (main.isEmpty()) {

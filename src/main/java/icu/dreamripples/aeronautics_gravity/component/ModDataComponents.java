@@ -1,13 +1,10 @@
 package icu.dreamripples.aeronautics_gravity.component;
 
-import com.mojang.serialization.Codec;
 import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
@@ -21,17 +18,19 @@ public class ModDataComponents {
             DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, AeronauticsGravityVisualization.MOD_ID);
 
     /**
-     * 激活的末影珍珠:记录拥有者玩家 UUID. 玩家主手 ender_pearl + 副手 echo_shard 右键时由
-     * {@code ActivatedEnderPearlHandler} 写入;读取发生在 {@code PackageEntityMixin} 中检测
-     * 包裹静止 3 秒后破裂传送.
+     * 激活的末影珍珠:记录拥有者玩家 UUID + 玩家名. 玩家主手 ender_pearl + 副手 echo_shard
+     * 右键时由 {@code ActivatedEnderPearlHandler} 写入;读取发生在 {@code PackageEntityMixin}
+     * 中检测包裹静止 3 秒后破裂传送.
      * <p>
-     * persistent ({@link UUIDUtil#CODEC}) 使其写入 ItemStack NBT 持久化;networkSynchronized
-     * ({@link UUIDUtil#STREAM_CODEC}) 让客户端 ItemStack (tooltip/lore) 也能拿到 UUID.
+     * 使用 {@link PearlOwner} record 而非裸 UUID 的目的: 客户端 tooltip 可直接展示 name,
+     * 不需要通过 UUID 反查玩家列表(客户端反查只在当前维度有效, 且离线玩家无记录).
+     * <p>
+     * persistent / networkSynchronized 使用 {@link PearlOwner#CODEC} / {@link PearlOwner#STREAM_CODEC}.
      */
-    public static final Supplier<DataComponentType<UUID>> ACTIVATED_PEARL_OWNER =
+    public static final Supplier<DataComponentType<PearlOwner>> ACTIVATED_PEARL_OWNER =
             DATA_COMPONENTS.register("activated_pearl_owner",
-                    () -> DataComponentType.<UUID>builder()
-                            .persistent(UUIDUtil.CODEC)
-                            .networkSynchronized(UUIDUtil.STREAM_CODEC)
+                    () -> DataComponentType.<PearlOwner>builder()
+                            .persistent(PearlOwner.CODEC)
+                            .networkSynchronized(PearlOwner.STREAM_CODEC)
                             .build());
 }
