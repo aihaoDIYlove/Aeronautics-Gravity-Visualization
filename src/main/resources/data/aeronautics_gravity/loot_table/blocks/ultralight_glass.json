@@ -5,30 +5,25 @@
       "rolls": 1,
       "entries": [
         {
-          "type": "minecraft:alternatives",
-          "children": [
-            {
-              "type": "minecraft:item",
-              "name": "aeronautics_gravity:ultralight_glass",
-              "conditions": [
+          "type": "minecraft:item",
+          "name": "aeronautics_gravity:ultralight_glass"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:match_tool",
+          "predicate": {
+            "predicates": {
+              "minecraft:enchantments": [
                 {
-                  "condition": "minecraft:match_tool",
-                  "predicate": {
-                    "enchantments": [
-                      {
-                        "enchantment": "minecraft:silk_touch",
-                        "levels": { "min": 1 }
-                      }
-                    ]
-                  }
+                  "enchantments": "minecraft:silk_touch",
+                  "levels": { "min": 1 }
                 }
               ]
-            },
-            {
-              "type": "minecraft:empty"
             }
-          ]
-        }
+          }
+        },
+        { "condition": "minecraft:survives_explosion" }
       ]
     }
   ]
