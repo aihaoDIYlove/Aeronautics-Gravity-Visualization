@@ -468,13 +468,10 @@ private static final float MARKER_SCALE_FAR = 0.24f;       // 远端字号;FAR/N
     }
 
     private static int liftToColor(double lift) {
-        // 青色系 = "升力"语义,与 RedstoneCounterweightLightVisual 配轻灯带同色系(暗青->亮青)。
-        // 范围:手调配轻 1..36, 红石配轻/stabilizer lift 1..16。分级让强度差异可读。
-        if (lift <= 0) return 0x40013A3A;
-        if (lift <= 8) return 0xFF013A3A;   // 暗青
-        if (lift <= 16) return 0xFF008B8B;  // 中青
-        if (lift <= 24) return 0xFF00CDCD;  // 亮青
-        return 0xFF00FFFF;                  // 极亮青
+        // 青色系 = "升力"语义,与 RedstoneCounterweightLightVisual 配轻灯带同色系。
+        // 统一用中青(原 lift=16 档):浮力值大小已由数字本身表达,颜色不再分级,避免低浮力暗青看不清。
+        if (lift <= 0) return 0x40008B8B;   // 无浮力(实际不会画到,drawLift 门控 lift>0)
+        return 0xFF008B8B;                  // 中青,统一所有浮力块
     }
 
     /**
