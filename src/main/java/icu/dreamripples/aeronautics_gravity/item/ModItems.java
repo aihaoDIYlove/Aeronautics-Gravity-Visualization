@@ -60,4 +60,12 @@ public class ModItems {
     // 小堆锌粒: 3 锌粒无序合成, 注液 1000mb 星空液体 -> 海晶沙砾.
     public static final Supplier<Item> ZINC_LUMP =
             ITEMS.register("zinc_lump", () -> new Item(new Item.Properties().stacksTo(64)));
+
+    // 被激活的末影珍珠: 玩家主手 ender_pearl + 副手 echo_shard 右键合成(见 ActivatedEnderPearlHandler),
+    // 携带玩家 UUID(见 ModDataComponents.ACTIVATED_PEARL_OWNER). 装入 Create Package 待物流派送,
+    // 包裹作为实体静止 3 秒后破裂 -> 生成一颗末影珍珠实体 -> 落地传送玩家到落点(跨维度由 vanilla
+    // ThrownEnderpearl.onHit 自带). stacksTo(16) 与 vanilla ender_pearl 一致.
+    public static final Supplier<Item> ACTIVATED_ENDER_PEARL =
+            ITEMS.register("activated_ender_pearl",
+                    () -> new ActivatedEnderPearlItem(new Item.Properties().stacksTo(16)));
 }

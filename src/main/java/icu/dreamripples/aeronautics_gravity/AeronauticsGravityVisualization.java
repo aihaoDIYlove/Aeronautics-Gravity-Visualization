@@ -6,6 +6,7 @@ import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
 import icu.dreamripples.aeronautics_gravity.advancement.ModTriggers;
 import icu.dreamripples.aeronautics_gravity.network.ModPayloads;
+import icu.dreamripples.aeronautics_gravity.component.ModDataComponents;
 import icu.dreamripples.aeronautics_gravity.block.ModBlocks;
 import icu.dreamripples.aeronautics_gravity.fluid.ModFluids;
 import icu.dreamripples.aeronautics_gravity.item.ModCreativeTabs;
@@ -23,6 +24,7 @@ public class AeronauticsGravityVisualization {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public AeronauticsGravityVisualization(IEventBus modEventBus) {
+        ModDataComponents.DATA_COMPONENTS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModBlocks.BLOCK_ENTITIES.register(modEventBus);

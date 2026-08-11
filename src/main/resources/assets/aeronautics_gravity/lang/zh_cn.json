@@ -85,5 +85,9 @@
   "block.aeronautics_gravity.red_variable_speed_portable_engine": "红色变速式便携引擎",
   "block.aeronautics_gravity.black_variable_speed_portable_engine": "黑色变速式便携引擎",
   "block.aeronautics_gravity.variable_speed_portable_engine.speed": "转速",
-  "tooltip.aeronautics_gravity.superheated_stress_boost": "超级加热：应力翻倍"
+  "tooltip.aeronautics_gravity.superheated_stress_boost": "超级加热：应力翻倍",
+  "item.aeronautics_gravity.activated_ender_pearl": "激活的末影珍珠",
+  "tooltip.aeronautics_gravity.activated_ender_pearl": "装入包裹派送至远方，包裹静置 3 秒后将你传送到落点",
+  "tooltip.aeronautics_gravity.activated_ender_pearl.bound": "已绑定：右键使用即可",
+  "tooltip.aeronautics_gravity.activated_ender_pearl.unbound": "未绑定：右键绑定当前玩家"
 }

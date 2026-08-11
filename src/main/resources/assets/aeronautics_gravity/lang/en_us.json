@@ -85,5 +85,9 @@
   "block.aeronautics_gravity.red_variable_speed_portable_engine": "Red Variable-Speed Portable Engine",
   "block.aeronautics_gravity.black_variable_speed_portable_engine": "Black Variable-Speed Portable Engine",
   "block.aeronautics_gravity.variable_speed_portable_engine.speed": "Rotation Speed",
-  "tooltip.aeronautics_gravity.superheated_stress_boost": "Superheated: Stress x2"
+  "tooltip.aeronautics_gravity.superheated_stress_boost": "Superheated: Stress x2",
+  "item.aeronautics_gravity.activated_ender_pearl": "Activated Ender Pearl",
+  "tooltip.aeronautics_gravity.activated_ender_pearl": "Mail in a package; after the package settles for 3 seconds, teleports you to its rupture point",
+  "tooltip.aeronautics_gravity.activated_ender_pearl.bound": "Bound: ready to mail",
+  "tooltip.aeronautics_gravity.activated_ender_pearl.unbound": "Unbound: right-click to bind to yourself"
 }

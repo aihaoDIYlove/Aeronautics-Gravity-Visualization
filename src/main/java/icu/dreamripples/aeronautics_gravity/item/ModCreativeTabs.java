@@ -34,6 +34,7 @@ public class ModCreativeTabs {
                         output.accept(ModBlocks.WORLD_ANCHOR_ITEM.get());
                         output.accept(ModItems.STARLIGHT_BUCKET.get());
                         output.accept(ModItems.STARLIGHT_BOTTLE.get());
+                        output.accept(ModItems.ACTIVATED_ENDER_PEARL.get());
                         output.accept(ModBlocks.VOID_HOSE_PULLEY_ITEM.get());
                         output.accept(ModBlocks.STARLIGHT_CASING_ITEM.get());
                         // zinc_lump 改放在 Create 的 base 创造页(zinc_nugget 旁),
