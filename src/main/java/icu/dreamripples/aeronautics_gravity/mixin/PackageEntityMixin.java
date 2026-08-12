@@ -4,7 +4,6 @@ import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.content.logistics.box.PackageEntity;
 import com.simibubi.create.content.logistics.box.PackageItem;
 import com.simibubi.create.foundation.item.ItemHelper;
-import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
 import icu.dreamripples.aeronautics_gravity.item.ActivatedEnderPearlItem;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,7 +12,6 @@ import net.minecraft.world.entity.projectile.ThrownEnderpearl;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.ItemStackHandler;
-import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -58,8 +56,6 @@ public abstract class PackageEntityMixin {
     /** 静止判定: 相邻 tick 位置差平方阈值, < 1e-6 (≈0.001 块位移) 视为静止. 实测传送带上位置差≈0.006. */
     private static final double AG_STILL_POS_DELTA_SQR = 1.0E-6D;
     /** 诊断: 控制台每 N tick 才打一次状态, 避免日志爆炸. -1=关闭. */
-    private static final int AG_DEBUG_INTERVAL = -1;
-    private static final Logger AG_LOG = AeronauticsGravityVisualization.LOGGER;
 
     @Unique
     private int ag$stillTicks = 0;
@@ -122,14 +118,6 @@ public abstract class PackageEntityMixin {
         ag$lastX = self.getX();
         ag$lastY = self.getY();
         ag$lastZ = self.getZ();
-
-        // === [诊断] ===
-        if (AG_DEBUG_INTERVAL > 0 && self.tickCount % AG_DEBUG_INTERVAL == 0) {
-            AG_LOG.info("[AG-PackageRupture] tick={} onGround={} deltaSqr={} posDeltaSqr={} stillTicks={} slot={}",
-                    self.tickCount, self.onGround(),
-                    self.getDeltaMovement().lengthSqr(),
-                    posDeltaSqr, ag$stillTicks, slot);
-        }
 
         // 静止判定: 位置差平方 < 阈值. 传送带上 posDeltaSqr≈0.006, 卡死/落地静止≈0
         boolean still = posDeltaSqr < AG_STILL_POS_DELTA_SQR;
