@@ -11,7 +11,12 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOp
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.item.SmartInventory;
 import com.simibubi.create.foundation.utility.CreateLang;
+import dev.ryanhcode.sable.api.sublevel.ServerSubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
+import dev.ryanhcode.sable.api.sublevel.ticket.SubLevelLoadingTicketType;
+import dev.ryanhcode.sable.sublevel.ServerSubLevel;
+import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
+import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
 import icu.dreamripples.aeronautics_gravity.logistics.WorldAnchorNetwork;
 import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.math.VecHelper;
@@ -21,6 +26,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -49,7 +55,9 @@ import java.util.Objects;
  * **告示牌配置**:照搬 Packager 的 updateSignAddress/getSign(去 ComputerCraft)。6 面任一告示牌,4 行拼接。
  *   贴多个非空告示牌视为配置冲突(白灯),避免按朝向顺序隐式取一个造成困惑。
  *
- * **强加载**:onLoad 调 ServerLevel.setChunkForced(true) 强加载自身区块,接收端永远在线。
+ * **强加载**:onLoad 保活自身区块确保接收端永远在线。普通维度用 ServerLevel.setChunkForced(true);
+ *   载具(SubLevel)上用 Sable addForceLoadTicket 保活载具(setChunkForced 在 plot chunk 上会卡死
+ *   processUnloads, 见 ag$applySubLevelForceLoadTicket)。
  *
  * **灯带状态机**(ANCHOR_INDICATOR 染色,BER 读 getLampColor):
  *   SEND 空闲=红 / SEND 卡住=黄 / RECEIVE 空闲=青 / RECEIVE 缓存满=绿 / RECEIVE 地址冲突=白。
@@ -63,6 +71,12 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
     private static final int COLOR_RECV_IDLE    = 0xFF00CDCD; // 青
     private static final int COLOR_RECV_BUFFERED= 0xFF00FF00; // 绿
     private static final int COLOR_CONFLICT     = 0xFFFFFFFF; // 白
+
+    /** Sable forceLoad ticket 类型: 用 BlockPos 作 key 实现引用计数(同载具多 WorldAnchor 各持独立 ticket) */
+    public static final SubLevelLoadingTicketType<BlockPos> WORLD_ANCHOR_TICKET =
+        SubLevelLoadingTicketType.create(
+            ResourceLocation.fromNamespaceAndPath(AeronauticsGravityVisualization.MOD_ID, "world_anchor"),
+            BlockPos.CODEC);
 
     private AnchorModeBehaviour modeBehaviour;
     public String signBasedAddress = "";
@@ -213,11 +227,12 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
     public void onLoad() {
         super.onLoad();
         if (level instanceof ServerLevel sl && !level.isClientSide) {
-            // 载具(SubLevel)上的世界锚点:BlockEntity.level 是父 ServerLevel,worldPosition 是
-            // SubLevel 内坐标(即父维度的 plot chunk 坐标)。对父维度强加载该 plot chunk 既无意义
-            // (SubLevel 由 Sable 管理生命周期),又会导致退出存档时 ChunkMap.processUnloads 卡死。
-            if (isInsideSubLevel(sl)) return;
-            sl.setChunkForced(worldPosition.getX() >> 4, worldPosition.getZ() >> 4, true);
+            if (isInsideSubLevel(sl)) {
+                // 载具上: 用 Sable forceLoadTicket 保活载具(不踩 setChunkForced 的 processUnloads 卡死坑)
+                ag$applySubLevelForceLoadTicket(sl, true);
+            } else {
+                sl.setChunkForced(worldPosition.getX() >> 4, worldPosition.getZ() >> 4, true);
+            }
         }
     }
 
@@ -225,6 +240,26 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
     private boolean isInsideSubLevel(ServerLevel sl) {
         SubLevelContainer container = SubLevelContainer.getContainer(sl);
         return container != null && container.getPlot(new ChunkPos(worldPosition)) != null;
+    }
+
+    /**
+     * 在载具上用 Sable forceLoadTicket 保活(add=true)/移除保活(add=false)。
+     * 用 BlockPos 作 ticket key 实现引用计数: 同载具多个 WorldAnchor 各持独立 ticket, 一个 destroy
+     * 不影响其他。Sable forceLoadTicket 不写 vanilla ForcedChunksSavedData, 走 Sable 自己的
+     * SubLevelTicketsSavedData, 不踩 setChunkForced 在 plot chunk 上的 processUnloads 卡死坑。
+     * 载具保活后 WorldAnchor tick 正常 -> 漏斗导出包裹 -> PackageEntity 破裂传送。
+     */
+    private void ag$applySubLevelForceLoadTicket(ServerLevel sl, boolean add) {
+        ServerSubLevelContainer container = SubLevelContainer.getContainer(sl);
+        if (container == null) return;
+        LevelPlot plot = container.getPlot(new ChunkPos(worldPosition));
+        if (plot == null) return;
+        if (!(plot.getSubLevel() instanceof ServerSubLevel ssl)) return;
+        if (add) {
+            container.addForceLoadTicket(ssl, WORLD_ANCHOR_TICKET, worldPosition);
+        } else {
+            container.removeForceLoadTicket(ssl, WORLD_ANCHOR_TICKET, worldPosition);
+        }
     }
 
     @Override
@@ -237,8 +272,11 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
     public void destroy() {
         super.destroy();
         if (level instanceof ServerLevel sl && !level.isClientSide) {
-            if (isInsideSubLevel(sl)) return;
-            sl.setChunkForced(worldPosition.getX() >> 4, worldPosition.getZ() >> 4, false);
+            if (isInsideSubLevel(sl)) {
+                ag$applySubLevelForceLoadTicket(sl, false);
+            } else {
+                sl.setChunkForced(worldPosition.getX() >> 4, worldPosition.getZ() >> 4, false);
+            }
         }
     }
 
