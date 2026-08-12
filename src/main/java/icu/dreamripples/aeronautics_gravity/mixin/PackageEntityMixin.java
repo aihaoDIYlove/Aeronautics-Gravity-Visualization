@@ -6,7 +6,9 @@ import com.simibubi.create.content.logistics.box.PackageItem;
 import com.simibubi.create.foundation.item.ItemHelper;
 import icu.dreamripples.aeronautics_gravity.item.ActivatedEnderPearlItem;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.projectile.ThrownEnderpearl;
 import net.minecraft.world.item.ItemStack;
@@ -22,25 +24,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.UUID;
 
 /**
- * 包裹静止 3 秒后破裂 -> 在原地生成一颗向下飞行的 {@link ThrownEnderpearl}(owner=激活珍珠
- * 记录的玩家 UUID), 落地由 vanilla {@code ThrownEnderpearl.onHit} 跨维度传送 owner 到落点.
+ * 含激活末影珍珠的包裹实体存在 3 秒(60 tick)后破裂 -> 在原地生成一颗向下飞行的
+ * {@link ThrownEnderpearl}(owner=激活珍珠记录的玩家 UUID), 落地由 vanilla
+ * {@code ThrownEnderpearl.onHit} 跨维度传送 owner 到落点.
  * <p>
- * 仅与包含 {@link ActivatedEnderPearlItem} 的包裹相关: 普通包裹不受影响(扫不到我们的物品 ->
- * 静止计数不累加 -> 不破裂).
+ * <b>为什么用"实体存在时长"而非"静止判定"</b>: Create 传动系统(传送带=TransportedItemStack,
+ * 锁链=ChainConveyorPackage)上的包裹是 {@link ItemStack} 而非 PackageEntity 实体, 本 Mixin
+ * 无法触及. PackageEntity 只在包裹脱离传动系统(掉落/弹射/玩家丢弃)后存在, 而 Create 的
+ * {@code insertionDelay} 机制保证包裹被传动系统接收时 PackageEntity 被 discard. 所以
+ * "实体存在 3 秒"≈"脱离传动系统 3 秒未被接收" -> 触发跨维度传送. 飞行中的包裹也算(用户决策).
  * <p>
- * 三种"非破裂"路径已被天然挡掉(见 plan 异常行为对照表):
+ * 三种"非破裂"路径天然挡掉:
  * <ul>
- *   <li>被目标物品栏接收 -> PackageEntity 被 Create 直接 {@code discard} 成 ItemStack, tick 停止.</li>
+ *   <li>被目标物品栏接收 -> PackageEntity 被 Create {@code discard} 成 ItemStack, tick 停止.</li>
  *   <li>被玩家拾起 -> 同上, 直接 inventory 化.</li>
- *   <li>被火/爆炸/落水销毁 -> 走 {@code destroy}/{@code hurt} 路径, 不挂本 Mixin 的破裂钩子;
- *       语义: 销毁=受伤语境, 只算"安全抵达并静止落地"才传送(decision A).</li>
+ *   <li>被火/爆炸/落水销毁 -> 走 {@code destroy}/{@code hurt} 路径, 不挂本 Mixin 的破裂钩子.</li>
  * </ul>
  * <p>
- * <b>静止判定</b>: 用相邻 tick 的<t>位置差平方</t>而非 {@code deltaMovement}. 实测发现: Create
- * 包裹卡在传送带末端/溜槽死角时, {@code deltaMovement} 每 tick 被 Create 重新注入恒定 ~0.078 m/tick,
- * 但真实位置不变 -- 用 deltaMovement 会漏判这种"视觉静止"卡死状态. 改用位置差平方阈值 1.0E-6
- * (对应位置变化 <0.001 块/tick), 与传送带上 ~0.006 (≈0.078²) 真实位移差 4 个数量级, 可靠区分.
- * 3 秒计时(60 tick)避开任何短停顿(溜槽/弹射瞬停).
+ * <b>区块加载</b>: 含珍珠期间每 100 tick 加一张 {@link TicketType#PORTAL} 票(300 tick 过期,
+ * distance 3), 保持自身区块加载确保计时持续. 模仿 vanilla {@code Entity.placePortalTicket}.
+ * 破裂后不再续票, 300 tick 内自动释放, 无泄漏.
  * <p>
  * <b>就地生成珍珠</b>: 用 vanilla {@code new ThrownEnderpearl(Level, LivingEntity thrower)}
  * 构造(自动 setOwner=thrower), 再 {@code setPos} 覆写到包裹原位 + {@code shoot(0,-1,0,...)}
@@ -51,21 +54,12 @@ import java.util.UUID;
 @Mixin(PackageEntity.class)
 public abstract class PackageEntityMixin {
 
-    /** 静止 60 game tick = 3 秒后破裂. */
+    /** 实体存在 60 game tick = 3 秒后破裂. */
     private static final int AG_RUPTURE_TICKS = 60;
-    /** 静止判定: 相邻 tick 位置差平方阈值, < 1e-6 (≈0.001 块位移) 视为静止. 实测传送带上位置差≈0.006. */
-    private static final double AG_STILL_POS_DELTA_SQR = 1.0E-6D;
-    /** 诊断: 控制台每 N tick 才打一次状态, 避免日志爆炸. -1=关闭. */
 
+    /** 上次加 PORTAL 票的 tickCount, -1 表示从未加过(首次立即加). */
     @Unique
-    private int ag$stillTicks = 0;
-    /** 上一 tick 的位置, 用于位置差判定. NaN 表示尚未初始化(首次 tick). */
-    @Unique
-    private double ag$lastX = Double.NaN;
-    @Unique
-    private double ag$lastY = Double.NaN;
-    @Unique
-    private double ag$lastZ = Double.NaN;
+    private int ag$lastTicketTick = -1;
 
     /**
      * 影子 Create {@link PackageEntity#destroy(DamageSource)} 私有方法, 复用其破裂粒子包+
@@ -87,48 +81,30 @@ public abstract class PackageEntityMixin {
 
         ItemStackHandler contents = PackageItem.getContents(box);
         int slot = aeronautics_gravity$findFirstActivatedPearl(contents);
-        if (slot < 0) {
-            // 普通包裹 -- 计数重置以免下一个含珍珠的包裹带入旧计数值, 不破裂
-            ag$stillTicks = 0;
-            return;
+        if (slot < 0) return; // 普通包裹, 不处理
+
+        // === 含激活珍珠: 保持自身区块加载, 确保计时能持续到破裂 ===
+        // PORTAL 票 300 tick 过期, 每 100 tick 续一张; 首次(lastTicketTick == -1)立即加.
+        // 模仿 vanilla Entity.placePortalTicket. 不用 setChunkForced(持久化, 移动实体泄漏 +
+        // SubLevel 卡死坑, 见 WorldAnchorBlockEntity). 破裂后不再续票, 300 tick 内自动释放.
+        if (level instanceof ServerLevel sl) {
+            if (ag$lastTicketTick < 0 || self.tickCount - ag$lastTicketTick >= 100) {
+                sl.getChunkSource().addRegionTicket(
+                        TicketType.PORTAL,
+                        self.chunkPosition(),
+                        3,
+                        self.blockPosition());
+                ag$lastTicketTick = self.tickCount;
+            }
         }
 
-        if (self.tickCount <= 20) {
-            // 跳过实体刚 spawn 的位置 settle 阶段: 但仍同步 lastX/Y/Z, 让 settle 结束第一 tick
-            // 拿到的是真实相邻 tick 差值, 而非"包裹 spawn 起始位置 vs settle 后位置"假位移
-            ag$lastX = self.getX();
-            ag$lastY = self.getY();
-            ag$lastZ = self.getZ();
-            return;
-        }
-
-        // 首次进入: 仅初始化 lastX/Y/Z, 这一 tick 不累加(否则会算出 0 位置差假静止)
-        if (Double.isNaN(ag$lastX)) {
-            ag$lastX = self.getX();
-            ag$lastY = self.getY();
-            ag$lastZ = self.getZ();
-            ag$stillTicks = 0;
-            return;
-        }
-
-        double dx = self.getX() - ag$lastX;
-        double dy = self.getY() - ag$lastY;
-        double dz = self.getZ() - ag$lastZ;
-        double posDeltaSqr = dx * dx + dy * dy + dz * dz;
-        ag$lastX = self.getX();
-        ag$lastY = self.getY();
-        ag$lastZ = self.getZ();
-
-        // 静止判定: 位置差平方 < 阈值. 传送带上 posDeltaSqr≈0.006, 卡死/落地静止≈0
-        boolean still = posDeltaSqr < AG_STILL_POS_DELTA_SQR;
-        if (!still) {
-            ag$stillTicks = 0;
-            return;
-        }
-        if (++ag$stillTicks < AG_RUPTURE_TICKS) return;
+        // === 实体存在 3 秒(60 tick)后破裂 ===
+        // PackageEntity 只在脱离传动系统(掉落/弹射/玩家丢弃)后存在; Create 的 insertionDelay 机制
+        // 保证包裹被传动系统接收时 PackageEntity 被 discard. 所以"实体存在 3 秒"≈"脱离传动系统
+        // 3 秒未被接收" -> 触发跨维度传送. 飞行中的包裹也算(用户决策: 不管飞行状态).
+        if (self.tickCount < AG_RUPTURE_TICKS) return;
 
         // ========= 触发破裂 =========
-        ag$stillTicks = 0;
         ItemStack pearlStack = contents.getStackInSlot(slot);
         UUID owner = ActivatedEnderPearlItem.getOwnerUuid(pearlStack);
         if (owner == null) return; // 非法激活珍珠(无 UUID), 放弃
