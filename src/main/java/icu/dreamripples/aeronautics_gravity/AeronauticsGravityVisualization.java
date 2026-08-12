@@ -13,6 +13,10 @@ import icu.dreamripples.aeronautics_gravity.item.ModCreativeTabs;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -22,6 +26,20 @@ import org.slf4j.Logger;
 public class AeronauticsGravityVisualization {
     public static final String MOD_ID = "aeronautics_gravity";
     public static final Logger LOGGER = LogUtils.getLogger();
+
+    // 发光告示牌的 WoodType/BlockSetType:必须在 mod 构造早期注册(static 块,早于 DeferredRegister
+    // 和 Sheets 静态初始化 / LayerDefinitions.buildRoots)。WoodType name 带 namespace,使
+    // Sheets.createSignMaterial 解析到 aeronautics_gravity:entity/signs/glow_sign 贴图,
+    // ModelLayers.createSignModelName 解析到 aeronautics_gravity:sign/glow_sign layer。
+    public static final BlockSetType GLOW_SIGN_BLOCK_SET_TYPE;
+    public static final WoodType GLOW_SIGN_WOOD_TYPE;
+    static {
+        GLOW_SIGN_BLOCK_SET_TYPE = BlockSetType.register(new BlockSetType("aeronautics_gravity_glow_sign"));
+        GLOW_SIGN_WOOD_TYPE = WoodType.register(new WoodType(
+            "aeronautics_gravity:glow_sign", GLOW_SIGN_BLOCK_SET_TYPE,
+            SoundType.GLASS, SoundType.HANGING_SIGN,
+            SoundEvents.FENCE_GATE_CLOSE, SoundEvents.FENCE_GATE_OPEN));
+    }
 
     public AeronauticsGravityVisualization(IEventBus modEventBus) {
         ModDataComponents.DATA_COMPONENTS.register(modEventBus);

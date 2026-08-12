@@ -5,10 +5,12 @@
   "mixins": [
     "AnalogTransmissionBlockEntityAccessor",
     "RotationPropagatorMixin",
-    "PackageEntityMixin"
+    "PackageEntityMixin",
+    "ClipboardEditPacketMixin"
   ],
   "client": [
-    "GoggleOverlayRendererMixin"
+    "GoggleOverlayRendererMixin",
+    "ClipboardScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

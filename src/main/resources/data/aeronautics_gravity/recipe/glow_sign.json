@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:glow_ink_sac" },
+    { "item": "aeronautics_gravity:ultralight_glass" },
+    { "item": "create:clipboard" }
+  ],
+  "result": {
+    "count": 1,
+    "id": "aeronautics_gravity:glow_sign"
+  }
+}

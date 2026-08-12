@@ -89,5 +89,6 @@
   "item.aeronautics_gravity.activated_ender_pearl": "激活的末影珍珠",
   "tooltip.aeronautics_gravity.activated_ender_pearl": "装入包裹派送至远方，包裹静置 3 秒后将你传送到落点",
   "tooltip.aeronautics_gravity.activated_ender_pearl.bound": "已绑定",
-  "tooltip.aeronautics_gravity.activated_ender_pearl.unbound": "未绑定：右键绑定当前玩家"
+  "tooltip.aeronautics_gravity.activated_ender_pearl.unbound": "未绑定：右键绑定当前玩家",
+  "block.aeronautics_gravity.glow_sign": "发光告示牌"
 }

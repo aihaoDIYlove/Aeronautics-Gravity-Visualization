@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "aeronautics_gravity:block/glow_sign" },
+    "facing=south": { "model": "aeronautics_gravity:block/glow_sign", "y": 180 },
+    "facing=east":  { "model": "aeronautics_gravity:block/glow_sign", "y": 90 },
+    "facing=west":  { "model": "aeronautics_gravity:block/glow_sign", "y": 270 }
+  }
+}

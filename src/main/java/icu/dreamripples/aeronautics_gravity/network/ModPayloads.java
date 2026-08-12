@@ -1,6 +1,7 @@
 package icu.dreamripples.aeronautics_gravity.network;
 
 import icu.dreamripples.aeronautics_gravity.advancement.ModTriggers;
+import icu.dreamripples.aeronautics_gravity.block.GlowSignBlockEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -21,11 +22,28 @@ public class ModPayloads {
                 ObserveMachinePayload.STREAM_CODEC,
                 ModPayloads::handle
         );
+        event.registrar("1").playToServer(
+                GlowSignScrollPayload.TYPE,
+                GlowSignScrollPayload.STREAM_CODEC,
+                ModPayloads::handleScroll
+        );
     }
 
     private static void handle(ObserveMachinePayload payload, IPayloadContext context) {
         if (context.player() instanceof ServerPlayer sp) {
             ModTriggers.GOGGLE_OBSERVE.get().trigger(sp);
+        }
+    }
+
+    // 发光告示牌滚轮切换选中地址(C2S):服务端验证交互距离后 setSelected(内含 clamp + SignText 同步)
+    private static void handleScroll(GlowSignScrollPayload payload, IPayloadContext context) {
+        if (context.player() instanceof ServerPlayer sp) {
+            var level = sp.serverLevel();
+            if (!level.isLoaded(payload.pos())) return;
+            if (!sp.canInteractWithBlock(payload.pos(), 4.0)) return;
+            if (level.getBlockEntity(payload.pos()) instanceof GlowSignBlockEntity be) {
+                be.setSelected(be.clampSelected(payload.newSelected()));
+            }
         }
     }
 }

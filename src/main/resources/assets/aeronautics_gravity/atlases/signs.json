@@ -1,0 +1,8 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "aeronautics_gravity:entity/signs/glow_sign"
+    }
+  ]
+}
