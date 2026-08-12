@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -66,7 +67,8 @@ public class GlowSignRenderer implements BlockEntityRenderer<GlowSignBlockEntity
         pose.scale(ts, -ts, ts);
 
         List<String> addresses = be.getAddresses();
-        int selected = be.getSelected();
+        // 客户端 selected 从 NBT 读,可能与新同步的 addresses 长度不匹配,这里 clamp
+        int selected = addresses.isEmpty() ? 0 : Mth.clamp(be.getSelected(), 0, addresses.size() - 1);
         boolean empty = addresses.isEmpty();
 
         for (int line = 0; line < 4; line++) {

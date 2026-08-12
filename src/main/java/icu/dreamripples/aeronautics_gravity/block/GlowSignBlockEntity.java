@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -25,15 +26,24 @@ import java.util.List;
  *
  * 数据双层:
  * <ul>
- *   <li>{@code ClipboardContent}(存于 vanilla BlockEntity 的 components,自动同步):给 ClipboardScreen
- *       编辑 GUI 和 BER 歌词式显示用。地址列表 = 所有页所有 entry 扁平化,每行一个地址。</li>
+ *   <li>{@code ClipboardContent}(存于 vanilla BlockEntity 的 components):给 ClipboardScreen
+ *       编辑 GUI 和 BER 歌词式显示用。地址列表 = 所有页所有 entry 扁平化,每行一个地址。
+ *       由 {@link #getAddresses()} 从 components 实时算(不缓存),保证客户端 components 同步后立即生效。</li>
  *   <li>{@code SignText} front 第 0 行:给 Create 机器 getSign 读取(4 行拼接 = 激活地址)。
- *       由 {@link #updateSignTextFromSelected} 在 selected 变化时同步。</li>
+ *       由 {@link #updateSignTextFromSelected} 在 selected/components 变化时同步(server only)。</li>
  * </ul>
  *
- * 同步要点:vanilla 1.21.1 {@code BlockEntity.saveCustomOnly} 已自动把 components 编码进 NBT "components" key
- * 并同步客户端,所以本 BE 只需手动存 {@code selected}。{@code SignBlockEntity.markUpdated} 不检查 isClientSide,
- * 故 {@code updateSignTextFromSelected} 仅在 server 端调用(客户端 frontText 由 vanilla 自动同步)。
+ * 同步要点(踩坑修正):
+ * <ul>
+ *   <li>vanilla {@code SignBlockEntity.getUpdateTag} 调 {@code saveCustomOnly},后者 <b>不编码 components</b>
+ *       (只有 {@code saveWithoutMetadata} 编码)。故 update packet 默认不含 ClipboardContent,
+ *       客户端 components 恒空 -> 编辑后"不保存"。本 BE 覆写 {@link #getUpdateTag} 手动编码 components。</li>
+ *   <li>客户端 {@code loadWithComponents} 先调 {@code loadAdditional} 再设 components,故
+ *       {@code loadAdditional} 内不能 recompute(读到旧 components)。{@code getAddresses} 改为实时算,
+ *       规避时序问题。</li>
+ *   <li>{@code SignBlockEntity.markUpdated} 不检查 isClientSide,故 {@code updateSignTextFromSelected}
+ *       仅在 server 端调用(客户端 frontText 由 vanilla 自动同步)。</li>
+ * </ul>
  *
  * 锁蜡:{@link #isWaxed()} 恒 true,防玩家右键编辑 / DisplayLink 误改。但 {@code setText} 不检查 isWaxed,
  * 所以程序化写入激活地址不受影响。
@@ -41,8 +51,6 @@ import java.util.List;
 public class GlowSignBlockEntity extends SignBlockEntity {
 
     private int selected = 0;
-    // transient:从 components 重算,不存 NBT
-    private List<String> addresses = new ArrayList<>();
 
     public GlowSignBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -57,9 +65,10 @@ public class GlowSignBlockEntity extends SignBlockEntity {
     @Override
     public void setComponents(DataComponentMap components) {
         super.setComponents(components);
-        recomputeAddresses();
-        selected = clampSelected(selected);
-        updateSignTextFromSelected();
+        if (level != null && !level.isClientSide) {
+            selected = clampSelected(selected);
+            updateSignTextFromSelected();
+        }
     }
 
     /**
@@ -76,9 +85,11 @@ public class GlowSignBlockEntity extends SignBlockEntity {
     // 滚轮切换(server,由 GlowSignScrollPayload handler 调用)
     public void setSelected(int value) {
         int clamped = clampSelected(value);
-        if (clamped == selected && !addresses.isEmpty()) return;
+        if (clamped == selected && !getAddresses().isEmpty()) return;
         selected = clamped;
-        updateSignTextFromSelected();
+        if (level != null && !level.isClientSide) {
+            updateSignTextFromSelected();
+        }
     }
 
     public int getSelected() {
@@ -86,32 +97,38 @@ public class GlowSignBlockEntity extends SignBlockEntity {
     }
 
     public int clampSelected(int value) {
-        return Mth.clamp(value, 0, Math.max(0, addresses.size() - 1));
+        int size = getAddresses().size();
+        return Mth.clamp(value, 0, Math.max(0, size - 1));
     }
 
+    // 从 components 实时算(不缓存):客户端 components 由 vanilla loadWithComponents 同步后立即生效,
+    // 无需 recompute 回调(loadAdditional 在 components 更新前执行,缓存会读到旧值)
     public List<String> getAddresses() {
-        return addresses;
-    }
-
-    // 扁平化:ClipboardContent.pages -> List<String>(每行一个地址,去空白)
-    private void recomputeAddresses() {
-        addresses = new ArrayList<>();
+        List<String> result = new ArrayList<>();
         ClipboardContent content = components().get(AllDataComponents.CLIPBOARD_CONTENT);
-        if (content == null) return;
+        if (content == null) return result;
         for (List<ClipboardEntry> page : content.pages()) {
             for (ClipboardEntry entry : page) {
                 String text = entry.text.getString();
                 if (!text.isBlank()) {
-                    addresses.add(text.trim());
+                    result.add(text.trim());
                 }
             }
         }
+        return result;
     }
 
     // 激活地址写进 SignText front 第 0 行(server only!markUpdated 不检查 isClientSide)
     private void updateSignTextFromSelected() {
         if (level == null || level.isClientSide) return;
-        String address = addresses.isEmpty() ? "" : addresses.get(selected);
+        List<String> addrs = getAddresses();
+        String address;
+        if (addrs.isEmpty()) {
+            address = "";
+        } else {
+            int idx = Mth.clamp(selected, 0, addrs.size() - 1);
+            address = addrs.get(idx);
+        }
         SignText newText = new SignText()
                 .setColor(DyeColor.WHITE)
                 .setHasGlowingText(true)
@@ -119,7 +136,19 @@ public class GlowSignBlockEntity extends SignBlockEntity {
         setText(newText, true);
     }
 
-    // NBT:只存 selected,components 由 vanilla 自动同步
+    // 关键修复:SignBlockEntity.getUpdateTag -> saveCustomOnly,不编码 components!
+    // 不覆写则 ClipboardContent 永远不同步客户端(编辑后客户端 components 仍空,告示牌显示空列表提示)
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
+        DataComponentMap.CODEC.encodeStart(
+                registries.createSerializationContext(NbtOps.INSTANCE), components())
+            .result()
+            .ifPresent(encoded -> tag.put("components", encoded));
+        return tag;
+    }
+
+    // NBT:只存 selected,components 由 vanilla saveWithoutMetadata 自动编码(存盘)
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
@@ -129,18 +158,7 @@ public class GlowSignBlockEntity extends SignBlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        // components 已由 vanilla BlockEntity.load 自动解码(line 86-87)
+        // components 由 vanilla loadWithComponents 在本方法之后解码,故此处不 recompute
         selected = tag.getInt("GlowSelected");
-        recomputeAddresses();
-        selected = clampSelected(selected);
-        // 不调 updateSignTextFromSelected:frontText 由 vanilla 同步,BER 不用 frontText
-    }
-
-    @Override
-    public void clearRemoved() {
-        super.clearRemoved();
-        // 首次放置(无 NBT)或加载后:recompute + clamp(幂等)
-        recomputeAddresses();
-        selected = clampSelected(selected);
     }
 }
