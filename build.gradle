@@ -121,22 +121,22 @@ configurations {
 }
 
 dependencies {
-    // Sable companion（编译期需要，从 Sable JAR 内部提取）
+    // Sable companion (compile-time only, extracted from inside the Sable JAR)
     implementation files('libs/sable-companion.jar')
-    // Simulated（航空学 jarjar 运行时提供，编译期需要 SimSpecialTextures / SimColors）
+    // Simulated (runtime provided via Aeronautics jarjar; compile-time needs SimSpecialTextures / SimColors)
     compileOnly files('libs/simulated.jar')
-    // Catnip（Ponder jarjar 运行时提供旧版 Catnip，包名 net.createmod.catnip.outliner）
+    // Catnip (runtime provided via Ponder jarjar - older Catnip, package net.createmod.catnip.outliner)
     compileOnly files('libs/ponder.jar')
-    // Flywheel（Create jarjar 运行时提供，编译期需要 SimpleBlockEntityVisualizer 用于 Visualizer 注册）
+    // Flywheel (runtime provided via Create jarjar; compile-time needs SimpleBlockEntityVisualizer for Visualizer registration)
     compileOnly files('libs/flywheel.jar')
-    // Create 机械动力
+    // Create
     implementation "maven.modrinth:LNytGWDc:UjX6dr61"
-    // Sable 物理引擎库
+    // Sable physics engine library
     implementation "maven.modrinth:T9PomCSv:NGuyFOeE"
-    // Create Aeronautics 主模组
+    // Create Aeronautics main mod
     implementation "maven.modrinth:oWaK0Q19:w7zlLnea"
 
-    // JEI（仅开发环境使用：API 编译期可见，完整 JAR 通过 localRuntime 运行时加载，不传递给下游）
+    // JEI (dev-env only: API visible at compile time, full JAR loaded at runtime via localRuntime, not transitive to downstream)
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
