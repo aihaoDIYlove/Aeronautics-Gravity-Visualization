@@ -4,6 +4,7 @@ import com.simibubi.create.content.decoration.encasing.CasingBlock;
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlockEntity;
 import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
 import icu.dreamripples.aeronautics_gravity.fluid.ModFluids;
+import icu.dreamripples.aeronautics_gravity.item.AddressingSignBlockItem;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineBlock;
 import net.minecraft.core.BlockPos;
@@ -370,7 +371,7 @@ public class ModBlocks {
 
     public static final DeferredHolder<Item, BlockItem> ADDRESSING_SIGN_ITEM =
             ModItems.ITEMS.register("addressing_sign",
-                    () -> new BlockItem(ADDRESSING_SIGN_BLOCK.get(), new Item.Properties()));
+                    () -> new AddressingSignBlockItem(ADDRESSING_SIGN_BLOCK.get(), new Item.Properties()));
 
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);

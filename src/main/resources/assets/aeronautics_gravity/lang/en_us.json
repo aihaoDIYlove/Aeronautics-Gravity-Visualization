@@ -90,5 +90,8 @@
   "tooltip.aeronautics_gravity.activated_ender_pearl": "Mail in a package; after the package settles for 3 seconds, teleports you to its rupture point",
   "tooltip.aeronautics_gravity.activated_ender_pearl.bound": "Bound",
   "tooltip.aeronautics_gravity.activated_ender_pearl.unbound": "Unbound: right-click to bind to yourself",
-  "block.aeronautics_gravity.addressing_sign": "Addressing Sign"
+  "block.aeronautics_gravity.addressing_sign": "Addressing Sign",
+  "tooltip.aeronautics_gravity.addressing_sign.edit": "Shift+Right-click: Edit address list",
+  "tooltip.aeronautics_gravity.addressing_sign.scroll": "Shift+Scroll: Switch active address",
+  "tooltip.aeronautics_gravity.addressing_sign.use": "Create machines read the active address for routing"
 }
