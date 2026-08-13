@@ -4,6 +4,7 @@ import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.content.logistics.box.PackageEntity;
 import com.simibubi.create.content.logistics.box.PackageItem;
 import com.simibubi.create.foundation.item.ItemHelper;
+import icu.dreamripples.aeronautics_gravity.advancement.ModTriggers;
 import icu.dreamripples.aeronautics_gravity.item.ActivatedEnderPearlItem;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
 import net.minecraft.server.level.ServerLevel;
@@ -123,6 +124,8 @@ public abstract class PackageEntityMixin {
             pearl.setPos(self.getX(), self.getY() + 0.5D, self.getZ());
             pearl.shoot(0.0D, -1.0D, 0.0D, 0.5F, 1.0F);
             level.addFreshEntity(pearl);
+            // 成就"打包自己": 含激活珍珠的包裹成功破裂并生成珍珠 -> 触发(玩家在线即视为成功传送)
+            ModTriggers.PEARL_PACKAGE_TELEPORT.get().trigger(player);
         }
         // 离线 -> 不生成珍珠(避免浪费), 包裹直接破裂, 剩余内容物(已剔除激活珍珠)正常掉出
 

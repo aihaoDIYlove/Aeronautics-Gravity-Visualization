@@ -93,5 +93,19 @@
   "block.aeronautics_gravity.addressing_sign": "Addressing Sign",
   "tooltip.aeronautics_gravity.addressing_sign.edit": "Shift+Right-click: Edit address list",
   "tooltip.aeronautics_gravity.addressing_sign.scroll": "Shift+Scroll: Switch active address",
-  "tooltip.aeronautics_gravity.addressing_sign.use": "Create machines read the active address for routing"
+  "tooltip.aeronautics_gravity.addressing_sign.use": "Create machines read the active address for routing",
+  "advancements.aeronautics_gravity.starlight_logistics_root.title": "Aeronautics Starlight Logistics",
+  "advancements.aeronautics_gravity.starlight_logistics_root.description": "Cross-dimensional logistics powered by starlight",
+  "advancements.aeronautics_gravity.collect_starlight.title": "The Void is Not Empty",
+  "advancements.aeronautics_gravity.collect_starlight.description": "Collect a bottle of starlight fluid from the End Sea",
+  "advancements.aeronautics_gravity.obtain_world_anchor.title": "Cross-Boundary Parcel",
+  "advancements.aeronautics_gravity.obtain_world_anchor.description": "Transmit packages anywhere via a World Anchor, across dimensions and vehicles",
+  "advancements.aeronautics_gravity.obtain_addressing_sign.title": "Switch the Address!",
+  "advancements.aeronautics_gravity.obtain_addressing_sign.description": "Freely switch preset addresses with an Addressing Sign",
+  "advancements.aeronautics_gravity.crystallize_levitite.title": "Crystallized?!",
+  "advancements.aeronautics_gravity.crystallize_levitite.description": "Crystallize the levitation mixture with starlight fluid",
+  "advancements.aeronautics_gravity.pearl_package_teleport.title": "Pack Yourself",
+  "advancements.aeronautics_gravity.pearl_package_teleport.description": "Pack an activated pearl tagged with yourself and ship it afar",
+  "advancements.aeronautics_gravity.obtain_portable_diagram.title": "Pocket-Sized",
+  "advancements.aeronautics_gravity.obtain_portable_diagram.description": "Craft a Portable Contraption Diagram"
 }

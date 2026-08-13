@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "id": "aeronautics_gravity:portable_diagram"
+    },
+    "title": {
+      "translate": "advancements.aeronautics_gravity.obtain_portable_diagram.title"
+    },
+    "description": {
+      "translate": "advancements.aeronautics_gravity.obtain_portable_diagram.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "parent": "aeronautics_gravity:root",
+  "criteria": {
+    "get_portable_diagram": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "aeronautics_gravity:portable_diagram"
+          }
+        ]
+      }
+    }
+  },
+  "sends_telemetry_event": false
+}

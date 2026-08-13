@@ -14,7 +14,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -199,9 +198,10 @@ public class ModBlocks {
                     () -> new BlockItem(ULTRALIGHT_GLASS_BLOCK.get(), new Item.Properties()));
 
     // 星空液体方块: source 流体不蔓延(见 StarlightFluid.tick), 贴图为自制 starlight_still/flow (tools/gen_starlight.py).
+    // 用 StarlightLiquidBlock 子类: 实体浸入时获得发光效果(光灵箭同款, 15秒, 见 StarlightGlowHandler).
     // 不注册 BlockItem -- 流体方块用桶拾取, 不作为物品.
-    public static final DeferredHolder<Block, LiquidBlock> STARLIGHT_BLOCK =
-            BLOCKS.register("starlight", () -> new LiquidBlock(
+    public static final DeferredHolder<Block, StarlightLiquidBlock> STARLIGHT_BLOCK =
+            BLOCKS.register("starlight", () -> new StarlightLiquidBlock(
                     ModFluids.STARLIGHT.get(),
                     BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()));
 

@@ -32,4 +32,9 @@ public class ModTriggers {
 
     public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> GOGGLE_OBSERVE =
             TRIGGERS.register("goggle_observe", SparkWandKillTrigger::new);
+
+    // 打包自己成就: 含激活珍珠的包裹破裂并生成末影珍珠(玩家在线)时触发.
+    // 触发点在 PackageEntityMixin 破裂分支(player != null), 语义已确保, matches 恒真.
+    public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> PEARL_PACKAGE_TELEPORT =
+            TRIGGERS.register("pearl_package_teleport", SparkWandKillTrigger::new);
 }

@@ -93,5 +93,19 @@
   "block.aeronautics_gravity.addressing_sign": "寻址牌",
   "tooltip.aeronautics_gravity.addressing_sign.edit": "Shift+右键：编辑地址列表",
   "tooltip.aeronautics_gravity.addressing_sign.scroll": "Shift+滚轮：切换激活地址",
-  "tooltip.aeronautics_gravity.addressing_sign.use": "机器会自行读取高亮激活地址"
+  "tooltip.aeronautics_gravity.addressing_sign.use": "机器会自行读取高亮激活地址",
+  "advancements.aeronautics_gravity.starlight_logistics_root.title": "航空学：星空物流",
+  "advancements.aeronautics_gravity.starlight_logistics_root.description": "跨越维度与载具的星空物流网络",
+  "advancements.aeronautics_gravity.collect_starlight.title": "虚空不空",
+  "advancements.aeronautics_gravity.collect_starlight.description": "深入末地之海收集一瓶星空液体",
+  "advancements.aeronautics_gravity.obtain_world_anchor.title": "跨界包裹",
+  "advancements.aeronautics_gravity.obtain_world_anchor.description": "通过世界锚点可在任意位置传输包裹，可跨越维度与载具",
+  "advancements.aeronautics_gravity.obtain_addressing_sign.title": "切换地址！",
+  "advancements.aeronautics_gravity.obtain_addressing_sign.description": "通过寻址牌可自由切换预设地址",
+  "advancements.aeronautics_gravity.crystallize_levitite.title": "结晶了？！",
+  "advancements.aeronautics_gravity.crystallize_levitite.description": "使用星空液体结晶悬浮混合物",
+  "advancements.aeronautics_gravity.pearl_package_teleport.title": "打包自己",
+  "advancements.aeronautics_gravity.pearl_package_teleport.description": "将含有自己标签的激活珍珠打包起来，送往远方",
+  "advancements.aeronautics_gravity.obtain_portable_diagram.title": "随身便携",
+  "advancements.aeronautics_gravity.obtain_portable_diagram.description": "合成一个便携图解"
 }

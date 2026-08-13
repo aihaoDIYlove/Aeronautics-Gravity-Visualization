@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "id": "aeronautics_gravity:incomplete_levitite"
+    },
+    "title": {
+      "translate": "advancements.aeronautics_gravity.crystallize_levitite.title"
+    },
+    "description": {
+      "translate": "advancements.aeronautics_gravity.crystallize_levitite.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "aeronautics_gravity:starlight_logistics_root",
+  "criteria": {
+    "get_levitite": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "aeronautics_gravity:incomplete_levitite"
+          }
+        ]
+      }
+    }
+  },
+  "sends_telemetry_event": false
+}
