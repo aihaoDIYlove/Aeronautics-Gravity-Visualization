@@ -13,7 +13,7 @@ import com.simibubi.create.foundation.block.connected.CTSpriteShiftEntry;
 import com.simibubi.create.foundation.block.connected.ConnectedTextureBehaviour;
 import com.simibubi.create.foundation.block.connected.SimpleCTBehaviour;
 import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
-import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionVisual;
+import icu.dreamripples.aeronautics_gravity.client.ConvenientAnalogTransmissionVisual;
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineRenderer;
 import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlock;
 import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlockEntity;
@@ -75,8 +75,10 @@ public class AeronauticsGravityClient {
             // 注册自定义 WoodType 到 Sheets(SIGN_MATERIALS 是静态收集,后注册的 WoodType 需手动补登记)
             Sheets.addWoodType(AeronauticsGravityVisualization.ADDRESSING_SIGN_WOOD_TYPE);
             ModPartialModels.init();
+            // 更方便的模拟传动器:自定义 visual 解耦显示转速与网络转速
+            // (主BE.speed 恒为输出 targetSpeed;shaft visual 按 source 归属显示输入/输出转速)
             SimpleBlockEntityVisualizer.builder(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_BE.get())
-                    .factory(AnalogTransmissionVisual::new).apply();
+                    .factory(ConvenientAnalogTransmissionVisual::new).apply();
             // 红石配重/配轻块灯带染色 visual(读 BlockState tier 算颜色,无 NBT sync)
             SimpleBlockEntityVisualizer.builder(ModBlocks.REDSTONE_COUNTERWEIGHT_BE.get())
                     .factory(RedstoneCounterweightVisual::new).apply();

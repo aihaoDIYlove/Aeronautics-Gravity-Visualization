@@ -35,6 +35,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * <p>
  * 信号 0 时 targetSpeed=0，注入返回 0--传动杆与齿轮环断开，
  * 齿轮环可独立作为普通齿轮传递应力--类似离合器效果。
+ * <p>
+ * 视觉错位修复不在此处：主BE.speed 由网络逻辑持有（=targetSpeed，输出转速），传动杆 visual
+ * 若直接读主BE.speed 会显示输出转速而非输入转速。显示解耦由 ConvenientAnalogTransmissionVisual
+ * 在客户端按 source 归属计算"显示转速"完成，网络逻辑完全不动。
  */
 @Mixin(RotationPropagator.class)
 public class RotationPropagatorMixin {
