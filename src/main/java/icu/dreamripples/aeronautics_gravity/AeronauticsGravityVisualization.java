@@ -29,14 +29,14 @@ public class AeronauticsGravityVisualization {
 
     // 寻址牌的 WoodType/BlockSetType:必须在 mod 构造早期注册(static 块,早于 DeferredRegister
     // 和 Sheets 静态初始化 / LayerDefinitions.buildRoots)。WoodType name 带 namespace,使
-    // Sheets.createSignMaterial 解析到 aeronautics_gravity:entity/signs/glow_sign 贴图,
-    // ModelLayers.createSignModelName 解析到 aeronautics_gravity:sign/glow_sign layer。
-    public static final BlockSetType GLOW_SIGN_BLOCK_SET_TYPE;
-    public static final WoodType GLOW_SIGN_WOOD_TYPE;
+    // Sheets.createSignMaterial 解析到 aeronautics_gravity:entity/signs/addressing_sign 贴图,
+    // ModelLayers.createSignModelName 解析到 aeronautics_gravity:sign/addressing_sign layer。
+    public static final BlockSetType ADDRESSING_SIGN_BLOCK_SET_TYPE;
+    public static final WoodType ADDRESSING_SIGN_WOOD_TYPE;
     static {
-        GLOW_SIGN_BLOCK_SET_TYPE = BlockSetType.register(new BlockSetType("aeronautics_gravity_glow_sign"));
-        GLOW_SIGN_WOOD_TYPE = WoodType.register(new WoodType(
-            "aeronautics_gravity:glow_sign", GLOW_SIGN_BLOCK_SET_TYPE,
+        ADDRESSING_SIGN_BLOCK_SET_TYPE = BlockSetType.register(new BlockSetType("aeronautics_gravity_addressing_sign"));
+        ADDRESSING_SIGN_WOOD_TYPE = WoodType.register(new WoodType(
+            "aeronautics_gravity:addressing_sign", ADDRESSING_SIGN_BLOCK_SET_TYPE,
             SoundType.GLASS, SoundType.HANGING_SIGN,
             SoundEvents.FENCE_GATE_CLOSE, SoundEvents.FENCE_GATE_OPEN));
     }

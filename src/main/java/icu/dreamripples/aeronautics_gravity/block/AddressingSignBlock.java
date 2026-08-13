@@ -46,36 +46,36 @@ import net.neoforged.api.distmarker.OnlyIn;
  *   <li>{@link #useWithoutItem}:shift+右键打开 Create {@link ClipboardScreen} 编辑地址;普通右键无反应。</li>
  * </ul>
  *
- * 木牌渲染由 {@code GlowSignRenderer} 接管(不画木牌,只画歌词式文字),故 block model 为空。
+ * 木牌渲染由 {@code AddressingSignRenderer} 接管(不画木牌,只画歌词式文字),故 block model 为空。
  */
-public class GlowSignBlock extends WallSignBlock {
+public class AddressingSignBlock extends WallSignBlock {
 
-    public static final MapCodec<GlowSignBlock> CODEC = RecordCodecBuilder.mapCodec(
+    public static final MapCodec<AddressingSignBlock> CODEC = RecordCodecBuilder.mapCodec(
         p -> p.group(
             WoodType.CODEC.fieldOf("wood_type").forGetter(SignBlock::type),
             propertiesCodec()
-        ).apply(p, GlowSignBlock::new)
+        ).apply(p, AddressingSignBlock::new)
     );
 
     @Override
     public MapCodec<WallSignBlock> codec() {
         // WallSignBlock.codec() 已窄化为 MapCodec<WallSignBlock>(泛型不协变,子类无法继续窄化为
-        // MapCodec<GlowSignBlock>),故 cast CODEC。运行时安全:CODEC 实际构造 GlowSignBlock 实例。
+        // MapCodec<AddressingSignBlock>),故 cast CODEC。运行时安全:CODEC 实际构造 AddressingSignBlock 实例。
         return (MapCodec<WallSignBlock>) (MapCodec<?>) CODEC;
     }
 
-    public GlowSignBlock(WoodType type, BlockBehaviour.Properties properties) {
+    public AddressingSignBlock(WoodType type, BlockBehaviour.Properties properties) {
         super(type, properties);
     }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new GlowSignBlockEntity(ModBlocks.GLOW_SIGN_BE.get(), pos, state);
+        return new AddressingSignBlockEntity(ModBlocks.ADDRESSING_SIGN_BE.get(), pos, state);
     }
 
     @Override
     public String getDescriptionId() {
-        return "block.aeronautics_gravity.glow_sign";
+        return "block.aeronautics_gravity.addressing_sign";
     }
 
     @Override
@@ -95,7 +95,7 @@ public class GlowSignBlock extends WallSignBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player,
                                                BlockHitResult hitResult) {
         if (player.isShiftKeyDown()
-                && level.getBlockEntity(pos) instanceof GlowSignBlockEntity be) {
+                && level.getBlockEntity(pos) instanceof AddressingSignBlockEntity be) {
             if (level.isClientSide) {
                 openClipboardScreen(be.components(), pos, player);
             }
@@ -115,6 +115,6 @@ public class GlowSignBlock extends WallSignBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
                                                                   BlockEntityType<T> blockEntityType) {
-        return createTickerHelper(blockEntityType, ModBlocks.GLOW_SIGN_BE.get(), SignBlockEntity::tick);
+        return createTickerHelper(blockEntityType, ModBlocks.ADDRESSING_SIGN_BE.get(), SignBlockEntity::tick);
     }
 }

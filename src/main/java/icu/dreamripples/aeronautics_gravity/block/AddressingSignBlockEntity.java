@@ -48,11 +48,11 @@ import java.util.List;
  * 锁蜡:{@link #isWaxed()} 恒 true,防玩家右键编辑 / DisplayLink 误改。但 {@code setText} 不检查 isWaxed,
  * 所以程序化写入激活地址不受影响。
  */
-public class GlowSignBlockEntity extends SignBlockEntity {
+public class AddressingSignBlockEntity extends SignBlockEntity {
 
     private int selected = 0;
 
-    public GlowSignBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public AddressingSignBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
 
@@ -82,7 +82,7 @@ public class GlowSignBlockEntity extends SignBlockEntity {
         }
     }
 
-    // 滚轮切换(server,由 GlowSignScrollPayload handler 调用)
+    // 滚轮切换(server,由 AddressingSignScrollPayload handler 调用)
     public void setSelected(int value) {
         int clamped = clampSelected(value);
         if (clamped == selected && !getAddresses().isEmpty()) return;
@@ -152,13 +152,13 @@ public class GlowSignBlockEntity extends SignBlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putInt("GlowSelected", selected);
+        tag.putInt("AddressingSelected", selected);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         // components 由 vanilla loadWithComponents 在本方法之后解码,故此处不 recompute
-        selected = tag.getInt("GlowSelected");
+        selected = tag.getInt("AddressingSelected");
     }
 }

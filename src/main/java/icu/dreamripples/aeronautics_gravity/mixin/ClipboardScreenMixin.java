@@ -1,7 +1,7 @@
 package icu.dreamripples.aeronautics_gravity.mixin;
 
 import com.simibubi.create.content.equipment.clipboard.ClipboardScreen;
-import icu.dreamripples.aeronautics_gravity.block.GlowSignBlock;
+import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  *
  * 拦截 tick 里的 {@code Minecraft.setScreen} 调用(共两处:距离检查 + CLIPBOARD 方块检查)。
  * handler 判断:玩家仍在交互范围内(canInteractWithBlock=true,即距离检查已通过)+ targetedBlock
- * 是 GlowSign -> 跳过 setScreen(对应 CLIPBOARD 检查处)。距离检查处(玩家超出范围)正常关闭。
+ * 是 AddressingSign -> 跳过 setScreen(对应 CLIPBOARD 检查处)。距离检查处(玩家超出范围)正常关闭。
  *
  * 用 setScreen 而非 BlockEntry.has 拦截:Registrate 的 BlockEntry 不在 compile classpath
  * (Create 的 jarjar),@Redirect on BlockEntry.has 要求 owner 参数为 BlockEntry 类型(无法编译)。
@@ -28,14 +28,14 @@ public abstract class ClipboardScreenMixin {
     @Redirect(method = "tick",
         at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
-    private void aeronautics_gravity$skipCloseForGlowSign(Minecraft mc, Screen screen) {
+    private void aeronautics_gravity$skipCloseForAddressingSign(Minecraft mc, Screen screen) {
         ClipboardScreen self = (ClipboardScreen) (Object) this;
         BlockPos pos = self.targetedBlock;
-        // 仅 CLIPBOARD 检查处跳过:玩家在范围内(距离检查已过)+ 方块是 GlowSign
+        // 仅 CLIPBOARD 检查处跳过:玩家在范围内(距离检查已过)+ 方块是 AddressingSign
         if (pos != null && mc.player != null && mc.level != null
                 && mc.player.canInteractWithBlock(pos, 10)) {
             BlockState state = mc.level.getBlockState(pos);
-            if (state.getBlock() instanceof GlowSignBlock) return;  // 跳过 setScreen
+            if (state.getBlock() instanceof AddressingSignBlock) return;  // 跳过 setScreen
         }
         mc.setScreen(screen);
     }

@@ -15,10 +15,10 @@ import com.simibubi.create.foundation.block.connected.SimpleCTBehaviour;
 import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionVisual;
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineRenderer;
-import icu.dreamripples.aeronautics_gravity.block.GlowSignBlock;
-import icu.dreamripples.aeronautics_gravity.block.GlowSignBlockEntity;
+import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlock;
+import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlockEntity;
 import icu.dreamripples.aeronautics_gravity.block.ModBlocks;
-import icu.dreamripples.aeronautics_gravity.network.GlowSignScrollPayload;
+import icu.dreamripples.aeronautics_gravity.network.AddressingSignScrollPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -30,7 +30,7 @@ import icu.dreamripples.aeronautics_gravity.client.ModPartialModels;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightVisual;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightLightVisual;
 import icu.dreamripples.aeronautics_gravity.client.StabilizerRenderer;
-import icu.dreamripples.aeronautics_gravity.client.GlowSignRenderer;
+import icu.dreamripples.aeronautics_gravity.client.AddressingSignRenderer;
 import icu.dreamripples.aeronautics_gravity.client.WorldAnchorRenderer;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.BlockModelShaper;
@@ -70,10 +70,10 @@ public class AeronauticsGravityClient {
         // 变速式便携引擎:复用 Simulated 的 PortableEngineRenderer(BE 继承 PortableEngineBlockEntity,多态成立)
         BlockEntityRenderers.register(ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINE_BE.get(), PortableEngineRenderer::new);
         // 寻址牌:自定义 BER(歌词式 4 行,不画木牌,只画文字)
-        BlockEntityRenderers.register(ModBlocks.GLOW_SIGN_BE.get(), GlowSignRenderer::new);
+        BlockEntityRenderers.register(ModBlocks.ADDRESSING_SIGN_BE.get(), AddressingSignRenderer::new);
         event.enqueueWork(() -> {
             // 注册自定义 WoodType 到 Sheets(SIGN_MATERIALS 是静态收集,后注册的 WoodType 需手动补登记)
-            Sheets.addWoodType(AeronauticsGravityVisualization.GLOW_SIGN_WOOD_TYPE);
+            Sheets.addWoodType(AeronauticsGravityVisualization.ADDRESSING_SIGN_WOOD_TYPE);
             ModPartialModels.init();
             SimpleBlockEntityVisualizer.builder(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_BE.get())
                     .factory(AnalogTransmissionVisual::new).apply();
@@ -199,8 +199,8 @@ public class AeronauticsGravityClient {
         if (mc.player == null || !mc.player.isShiftKeyDown()) return;
         if (!(mc.hitResult instanceof BlockHitResult hit) || hit.getType() != BlockHitResult.Type.BLOCK) return;
         BlockPos pos = hit.getBlockPos();
-        if (mc.level == null || !(mc.level.getBlockState(pos).getBlock() instanceof GlowSignBlock)) return;
-        if (!(mc.level.getBlockEntity(pos) instanceof GlowSignBlockEntity be)) return;
+        if (mc.level == null || !(mc.level.getBlockState(pos).getBlock() instanceof AddressingSignBlock)) return;
+        if (!(mc.level.getBlockEntity(pos) instanceof AddressingSignBlockEntity be)) return;
 
         int size = be.getAddresses().size();
         if (size == 0) return;
@@ -208,7 +208,7 @@ public class AeronauticsGravityClient {
         int delta = event.getScrollDeltaY() > 0 ? -1 : 1;
         int next = Mth.clamp(current + delta, 0, size - 1);
         if (next == current) return;
-        mc.getConnection().send(new GlowSignScrollPayload(pos, next));
+        mc.getConnection().send(new AddressingSignScrollPayload(pos, next));
         event.setCanceled(true);
     }
 }

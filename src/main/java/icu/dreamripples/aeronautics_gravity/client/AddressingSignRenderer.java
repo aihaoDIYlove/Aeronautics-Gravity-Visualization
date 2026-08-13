@@ -2,8 +2,8 @@ package icu.dreamripples.aeronautics_gravity.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import icu.dreamripples.aeronautics_gravity.block.GlowSignBlock;
-import icu.dreamripples.aeronautics_gravity.block.GlowSignBlockEntity;
+import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlock;
+import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlockEntity;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -29,7 +29,7 @@ import java.util.List;
  * 空列表时第 2 行显示 "shift+右键" 灰色提示。只画正面(不 mulPose 180)。
  */
 @OnlyIn(Dist.CLIENT)
-public class GlowSignRenderer implements BlockEntityRenderer<GlowSignBlockEntity> {
+public class AddressingSignRenderer implements BlockEntityRenderer<AddressingSignBlockEntity> {
 
     private static final float RENDER_SCALE = 0.6666667F;
     private static final float TEXT_OFFSET_Y = 0.33333334F;
@@ -47,15 +47,15 @@ public class GlowSignRenderer implements BlockEntityRenderer<GlowSignBlockEntity
 
     private final Font font;
 
-    public GlowSignRenderer(BlockEntityRendererProvider.Context context) {
+    public AddressingSignRenderer(BlockEntityRendererProvider.Context context) {
         this.font = context.getFont();
     }
 
     @Override
-    public void render(GlowSignBlockEntity be, float partialTick, PoseStack pose,
+    public void render(AddressingSignBlockEntity be, float partialTick, PoseStack pose,
                        MultiBufferSource buffer, int packedLight, int packedOverlay) {
         BlockState state = be.getBlockState();
-        if (!(state.getBlock() instanceof GlowSignBlock signBlock)) return;
+        if (!(state.getBlock() instanceof AddressingSignBlock signBlock)) return;
 
         pose.pushPose();
         // translateSign (wall 分支)

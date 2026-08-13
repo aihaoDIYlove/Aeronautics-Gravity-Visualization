@@ -1,7 +1,7 @@
 {
   "render_type": "minecraft:cutout",
   "textures": {
-    "particle": "aeronautics_gravity:block/glow_sign_empty"
+    "particle": "aeronautics_gravity:block/addressing_sign_empty"
   },
   "elements": []
 }

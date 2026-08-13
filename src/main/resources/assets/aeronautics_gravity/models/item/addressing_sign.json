@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "aeronautics_gravity:item/glow_sign"
+    "layer0": "aeronautics_gravity:item/addressing_sign"
   }
 }

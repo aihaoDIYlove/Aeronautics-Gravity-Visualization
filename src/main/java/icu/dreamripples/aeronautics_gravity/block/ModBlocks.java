@@ -351,9 +351,9 @@ public class ModBlocks {
     // 寻址牌:继承 WallSignBlock,无物理碰撞(可穿过)+ 选取箱保留。纯透明贴图(BER 不画木牌),
     // 文字默认发光+白色。shift+右键打开 Create ClipboardScreen 编辑地址列表(数据存 ClipboardContent),
     // shift+滚轮切换选中地址(歌词式 4 行显示)。激活地址同步写 SignText front 第 0 行供机器 getSign 读取。
-    public static final DeferredHolder<Block, GlowSignBlock> GLOW_SIGN_BLOCK =
-            BLOCKS.register("glow_sign", () -> new GlowSignBlock(
-                    AeronauticsGravityVisualization.GLOW_SIGN_WOOD_TYPE,
+    public static final DeferredHolder<Block, AddressingSignBlock> ADDRESSING_SIGN_BLOCK =
+            BLOCKS.register("addressing_sign", () -> new AddressingSignBlock(
+                    AeronauticsGravityVisualization.ADDRESSING_SIGN_WOOD_TYPE,
                     BlockBehaviour.Properties.of()
                             .mapColor(MapColor.NONE)
                             .sound(SoundType.GLASS)
@@ -363,14 +363,14 @@ public class ModBlocks {
                             .isSuffocating((s, l, p) -> false)
                             .isViewBlocking((s, l, p) -> false)));
 
-    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GlowSignBlockEntity>> GLOW_SIGN_BE =
-            BLOCK_ENTITIES.register("glow_sign", () -> BlockEntityType.Builder
-                    .of(ModBlocks::createGlowSignBlockEntity, GLOW_SIGN_BLOCK.get())
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AddressingSignBlockEntity>> ADDRESSING_SIGN_BE =
+            BLOCK_ENTITIES.register("addressing_sign", () -> BlockEntityType.Builder
+                    .of(ModBlocks::createAddressingSignBlockEntity, ADDRESSING_SIGN_BLOCK.get())
                     .build(null));
 
-    public static final DeferredHolder<Item, BlockItem> GLOW_SIGN_ITEM =
-            ModItems.ITEMS.register("glow_sign",
-                    () -> new BlockItem(GLOW_SIGN_BLOCK.get(), new Item.Properties()));
+    public static final DeferredHolder<Item, BlockItem> ADDRESSING_SIGN_ITEM =
+            ModItems.ITEMS.register("addressing_sign",
+                    () -> new BlockItem(ADDRESSING_SIGN_BLOCK.get(), new Item.Properties()));
 
     private static ConvenientAnalogTransmissionBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return new ConvenientAnalogTransmissionBlockEntity(CONVENIENT_ANALOG_TRANSMISSION_BE.get(), pos, state);
@@ -430,7 +430,7 @@ public class ModBlocks {
         return new VariableSpeedPortableEngineBlockEntity(VARIABLE_SPEED_PORTABLE_ENGINE_BE.get(), pos, state);
     }
 
-    private static GlowSignBlockEntity createGlowSignBlockEntity(BlockPos pos, BlockState state) {
-        return new GlowSignBlockEntity(GLOW_SIGN_BE.get(), pos, state);
+    private static AddressingSignBlockEntity createAddressingSignBlockEntity(BlockPos pos, BlockState state) {
+        return new AddressingSignBlockEntity(ADDRESSING_SIGN_BE.get(), pos, state);
     }
 }
