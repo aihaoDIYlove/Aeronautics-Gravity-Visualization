@@ -18,7 +18,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 import java.util.List;
 
 /**
- * 发光告示牌 BER:不画木牌(纯透明),只画歌词式 4 行文字。
+ * 寻址牌 BER:不画木牌(纯透明),只画歌词式 4 行文字。
  *
  * 朝向复刻 {@code SignRenderer.translateSign} 的 wall 分支:translate(0.5, 0.75*scale, 0.5) +
  * mulPose(YP, -yRot) + wall extra translate(0, -0.3125, -0.4375)。文字 scale = 0.015625 * 0.6666667,
@@ -39,7 +39,9 @@ public class GlowSignRenderer implements BlockEntityRenderer<GlowSignBlockEntity
     private static final int MAX_TEXT_WIDTH = 90;
 
     private static final int SELECTED_COLOR = 0xFFFFFF;   // 白(选中行)
-    private static final int SELECTED_DARK = -988212;      // 轮廓色(SignRenderer.BLACK_TEXT_OUTLINE_COLOR)
+    // 白色发光文字的 outline 色 = SignRenderer.getDarkColor(白色) = RGB*0.4 = (102,102,102) 深灰。
+    // 注意:-988212(BLACK_TEXT_OUTLINE_COLOR)是浅米色,给黑色发光文字用的,白字用它会对比不足发糊。
+    private static final int SELECTED_DARK = 0x666666;
     private static final int CONTEXT_COLOR = 0x666666;     // 灰(上下文行)
     private static final int FULL_LIGHT = 15728880;        // 满光(发光行)
 

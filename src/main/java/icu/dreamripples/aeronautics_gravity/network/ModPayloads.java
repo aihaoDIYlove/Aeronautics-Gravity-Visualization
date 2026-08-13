@@ -35,7 +35,7 @@ public class ModPayloads {
         }
     }
 
-    // 发光告示牌滚轮切换选中地址(C2S):服务端验证交互距离后 setSelected(内含 clamp + SignText 同步)
+    // 寻址牌滚轮切换选中地址(C2S):服务端验证交互距离后 setSelected(内含 clamp + SignText 同步)
     private static void handleScroll(GlowSignScrollPayload payload, IPayloadContext context) {
         if (context.player() instanceof ServerPlayer sp) {
             var level = sp.serverLevel();

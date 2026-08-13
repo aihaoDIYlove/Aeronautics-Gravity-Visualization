@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
  * 放宽 {@link ClipboardScreen#tick()} 的 CLIPBOARD 方块检查:原逻辑仅允许 Create 剪切板方块,
- * 否则 {@code minecraft.setScreen(null)} 强制关闭。本 Mixin 让发光告示牌也能保持 ClipboardScreen 开启。
+ * 否则 {@code minecraft.setScreen(null)} 强制关闭。本 Mixin 让寻址牌也能保持 ClipboardScreen 开启。
  *
  * 拦截 tick 里的 {@code Minecraft.setScreen} 调用(共两处:距离检查 + CLIPBOARD 方块检查)。
  * handler 判断:玩家仍在交互范围内(canInteractWithBlock=true,即距离检查已通过)+ targetedBlock

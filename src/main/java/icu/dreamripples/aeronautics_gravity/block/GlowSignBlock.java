@@ -31,7 +31,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 /**
- * 发光透明墙牌:继承 {@link WallSignBlock}(自带"只能贴侧面"的 canSurvive + getStateForPlacement)。
+ * 寻址牌:继承 {@link WallSignBlock}(自带"只能贴侧面"的 canSurvive + getStateForPlacement)。
  *
  * 关键覆写:
  * <ul>

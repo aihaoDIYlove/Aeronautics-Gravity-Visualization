@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * {@link ClipboardEditPacket#handle} 原逻辑仅处理 {@code instanceof ClipboardBlockEntity} 的目标,
- * 否则 return(数据写不进发光告示牌)。本 Mixin 在 HEAD 注入:若目标是 {@link GlowSignBlockEntity},
+ * 否则 return(数据写不进寻址牌)。本 Mixin 在 HEAD 注入:若目标是 {@link GlowSignBlockEntity},
  * 用同款 {@code PatchedDataComponentMap} + {@code setComponents} 写入 ClipboardContent,然后 cancel
  * 跳过原逻辑。非 GlowSign 目标直接 return,走原 ClipboardBlockEntity 分支不受影响。
  *

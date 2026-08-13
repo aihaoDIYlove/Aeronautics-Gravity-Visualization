@@ -27,7 +27,7 @@ public class AeronauticsGravityVisualization {
     public static final String MOD_ID = "aeronautics_gravity";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    // 发光告示牌的 WoodType/BlockSetType:必须在 mod 构造早期注册(static 块,早于 DeferredRegister
+    // 寻址牌的 WoodType/BlockSetType:必须在 mod 构造早期注册(static 块,早于 DeferredRegister
     // 和 Sheets 静态初始化 / LayerDefinitions.buildRoots)。WoodType name 带 namespace,使
     // Sheets.createSignMaterial 解析到 aeronautics_gravity:entity/signs/glow_sign 贴图,
     // ModelLayers.createSignModelName 解析到 aeronautics_gravity:sign/glow_sign layer。

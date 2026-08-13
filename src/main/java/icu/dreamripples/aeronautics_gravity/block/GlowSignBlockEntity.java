@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 发光透明墙牌 BE:继承 SignBlockEntity 以满足 Create {@code PackagerBlockEntity.getSign} 的
+ * 寻址牌 BE:继承 SignBlockEntity 以满足 Create {@code PackagerBlockEntity.getSign} 的
  * {@code instanceof SignBlockEntity} 检查(否则机器读不到地址)。
  *
  * 数据双层:

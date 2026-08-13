@@ -348,7 +348,7 @@ public class ModBlocks {
                 return BlockEntityType.Builder.of(ModBlocks::createVariableSpeedEngineBlockEntity, blocks).build(null);
             });
 
-    // 发光透明墙牌:继承 WallSignBlock,无物理碰撞(可穿过)+ 选取箱保留。纯透明贴图(BER 不画木牌),
+    // 寻址牌:继承 WallSignBlock,无物理碰撞(可穿过)+ 选取箱保留。纯透明贴图(BER 不画木牌),
     // 文字默认发光+白色。shift+右键打开 Create ClipboardScreen 编辑地址列表(数据存 ClipboardContent),
     // shift+滚轮切换选中地址(歌词式 4 行显示)。激活地址同步写 SignText front 第 0 行供机器 getSign 读取。
     public static final DeferredHolder<Block, GlowSignBlock> GLOW_SIGN_BLOCK =

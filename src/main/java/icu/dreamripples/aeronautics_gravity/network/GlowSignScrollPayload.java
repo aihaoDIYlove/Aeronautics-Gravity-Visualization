@@ -8,7 +8,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * 发光告示牌滚轮切换选中地址(C2S)。客户端 shift+滚轮时发送,服务端 handler 验证后调用
+ * 寻址牌滚轮切换选中地址(C2S)。客户端 shift+滚轮时发送,服务端 handler 验证后调用
  * {@code GlowSignBlockEntity.setSelected}。携带 newSelected 而非 delta:服务端 clamp 防越界,
  * 且客户端已计算目标值(停末页不回绕)。
  */

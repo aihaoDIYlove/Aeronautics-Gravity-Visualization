@@ -69,7 +69,7 @@ public class AeronauticsGravityClient {
         BlockEntityRenderers.register(ModBlocks.WORLD_ANCHOR_BE.get(), WorldAnchorRenderer::new);
         // 变速式便携引擎:复用 Simulated 的 PortableEngineRenderer(BE 继承 PortableEngineBlockEntity,多态成立)
         BlockEntityRenderers.register(ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINE_BE.get(), PortableEngineRenderer::new);
-        // 发光告示牌:自定义 BER(歌词式 4 行,不画木牌,只画文字)
+        // 寻址牌:自定义 BER(歌词式 4 行,不画木牌,只画文字)
         BlockEntityRenderers.register(ModBlocks.GLOW_SIGN_BE.get(), GlowSignRenderer::new);
         event.enqueueWork(() -> {
             // 注册自定义 WoodType 到 Sheets(SIGN_MATERIALS 是静态收集,后注册的 WoodType 需手动补登记)
@@ -191,7 +191,7 @@ public class AeronauticsGravityClient {
         MassVisualizer.renderOverlay(event);
     }
 
-    // 发光告示牌 shift+滚轮切换选中地址:上滚=上一个(deltaY>0 -> -1),下滚=下一个,停末页不回绕。
+    // 寻址牌 shift+滚轮切换选中地址:上滚=上一个(deltaY>0 -> -1),下滚=下一个,停末页不回绕。
     // cancel 事件防止 vanilla 潜行滚轮切物品栏。
     @SubscribeEvent
     public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
