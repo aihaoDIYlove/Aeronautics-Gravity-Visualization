@@ -32,5 +32,10 @@ public class ModCapabilities {
                 });
         // 世界锚点:暴露 ItemHandler(双向,漏斗/溜槽导入导出包裹)
         WorldAnchorBlockEntity.registerCapabilities(event);
+        // 顺序供料器:全 6 面统一 capped handler(insert 路由补货,extract 只当前步 1/步)
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlocks.SEQUENTIAL_FEEDER_BE.get(),
+                (be, context) -> be.getItemHandler());
     }
 }
