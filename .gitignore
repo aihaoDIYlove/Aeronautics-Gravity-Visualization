@@ -46,3 +46,4 @@ tmp_decompile/
 build_err.txt
 # 根目录临时图片/截图
 /1.png
+/tools
