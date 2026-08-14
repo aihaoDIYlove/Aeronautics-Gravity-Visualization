@@ -203,7 +203,8 @@ public class ModBlocks {
     public static final DeferredHolder<Block, StarlightLiquidBlock> STARLIGHT_BLOCK =
             BLOCKS.register("starlight", () -> new StarlightLiquidBlock(
                     ModFluids.STARLIGHT.get(),
-                    BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()));
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).noLootTable()
+                            .lightLevel(state -> 7)));  // 流体方块投射光亮度 7(岩浆 15/火把 14; 此处走 BlockBehaviour.Properties, FluidType.lightLevel 只让桶贴图发光不投射)
 
     // 自稳定方块:PD 混合 + 倾斜速度自适应增益调度,互斥调节 MASS_TIER(1..16)/LIFT_TIER(1..16)维持载具水平。
     // 红石仅使能(signal=0 停用);右键 ScrollValueBehaviour 调死区 0..30°(默认 3°)。详见 StabilizerBlockEntity Javadoc。

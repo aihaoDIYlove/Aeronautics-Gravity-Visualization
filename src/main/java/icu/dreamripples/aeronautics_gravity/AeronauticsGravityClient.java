@@ -18,6 +18,7 @@ import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngin
 import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlock;
 import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlockEntity;
 import icu.dreamripples.aeronautics_gravity.block.ModBlocks;
+import icu.dreamripples.aeronautics_gravity.fluid.ModFluids;
 import icu.dreamripples.aeronautics_gravity.network.AddressingSignScrollPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -32,6 +33,8 @@ import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightLightVis
 import icu.dreamripples.aeronautics_gravity.client.StabilizerRenderer;
 import icu.dreamripples.aeronautics_gravity.client.AddressingSignRenderer;
 import icu.dreamripples.aeronautics_gravity.client.WorldAnchorRenderer;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -96,6 +99,10 @@ public class AeronauticsGravityClient {
             GogglesItem.addIsWearingPredicate(player ->
                     player.getMainHandItem().is(ModItems.SPARK_WAND.get())
                             || player.getOffhandItem().is(ModItems.SPARK_WAND.get()));
+            // 星空流体 render layer: vanilla ItemBlockRenderTypes.getRenderLayer 对非水流体默认 solid,
+            // 贴图 alpha 被忽略 -> 液体不透明看不到液下物品。显式注册 translucent 让贴图 alpha 生效。
+            ItemBlockRenderTypes.setRenderLayer(ModFluids.STARLIGHT.get(), RenderType.translucent());
+            ItemBlockRenderTypes.setRenderLayer(ModFluids.STARLIGHT_FLOWING.get(), RenderType.translucent());
         });
     }
 

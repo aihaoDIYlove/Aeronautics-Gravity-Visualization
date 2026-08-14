@@ -43,7 +43,8 @@ public class ModFluids {
                             .viscosity(1500)
                             .density(1400)
                             .canConvertToSource(false)   // 不形成无限源
-                            .canSwim(false),
+                            .canSwim(false)
+                            .lightLevel(7),  // 流体发光: 方块层投射光见 ModBlocks.STARLIGHT_BLOCK.lightLevel; 此处让桶贴图(DynamicFluidContainerModel)也全亮一致
                     STILL_TEXTURE, FLOWING_TEXTURE));
 
     public static final DeferredHolder<Fluid, StarlightFluid> STARLIGHT =
