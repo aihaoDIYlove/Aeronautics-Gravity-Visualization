@@ -36,6 +36,7 @@
   "item.aeronautics_gravity.incomplete_counterweight": "Incomplete Counterweight",
   "item.aeronautics_gravity.incomplete_counterweight_light": "Incomplete Buoyant Counterweight",
   "item.aeronautics_gravity.incomplete_levitite": "Incomplete Levitite",
+  "item.aeronautics_gravity.incomplete_sequential_feeder": "Incomplete Sequential Feeder",
   "block.aeronautics_gravity.world_anchor": "World Anchor",
   "tooltip.aeronautics_gravity.world_anchor.mode": "Mode",
   "tooltip.aeronautics_gravity.world_anchor.mode.send": "Send",
@@ -107,5 +108,11 @@
   "advancements.aeronautics_gravity.pearl_package_teleport.title": "Pack Yourself",
   "advancements.aeronautics_gravity.pearl_package_teleport.description": "Pack an activated pearl tagged with yourself and ship it afar",
   "advancements.aeronautics_gravity.obtain_portable_diagram.title": "Pocket-Sized",
-  "advancements.aeronautics_gravity.obtain_portable_diagram.description": "Craft a Portable Contraption Diagram"
+  "advancements.aeronautics_gravity.obtain_portable_diagram.description": "Craft a Portable Contraption Diagram",
+  "block.aeronautics_gravity.sequential_feeder": "Sequential Feeder",
+  "gui.aeronautics_gravity.sequential_feeder.marker_slots": "Marker Slots:",
+  "gui.aeronautics_gravity.sequential_feeder.inventory_slots": "Inventory Slots:",
+  "tooltip.aeronautics_gravity.sequential_feeder.mode": "Control Mode",
+  "tooltip.aeronautics_gravity.sequential_feeder.mode.redstone_pulse": "Redstone Pulse",
+  "tooltip.aeronautics_gravity.sequential_feeder.mode.ignore_redstone": "Ignore Redstone"
 }

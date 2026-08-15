@@ -432,6 +432,33 @@ public class ModBlocks {
         return new VariableSpeedPortableEngineBlockEntity(VARIABLE_SPEED_PORTABLE_ENGINE_BE.get(), pos, state);
     }
 
+    // 顺序供料器:可编程投料磁带。9 标记槽(幽灵)+ 9 物品槽,红石上升沿在"本步已输出"
+    // 时前进指针(自节拍),外部机械手/漏斗每次最多取当前步 1 个。详见 SequentialFeederBlockEntity。
+    public static final DeferredHolder<Block, SequentialFeederBlock> SEQUENTIAL_FEEDER_BLOCK =
+            BLOCKS.register("sequential_feeder",
+                    () -> new SequentialFeederBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SequentialFeederBlockEntity>> SEQUENTIAL_FEEDER_BE =
+            BLOCK_ENTITIES.register("sequential_feeder",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createSequentialFeederBlockEntity,
+                                    SEQUENTIAL_FEEDER_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> SEQUENTIAL_FEEDER_ITEM =
+            ModItems.ITEMS.register("sequential_feeder",
+                    () -> new BlockItem(SEQUENTIAL_FEEDER_BLOCK.get(), new Item.Properties()));
+
+    private static SequentialFeederBlockEntity createSequentialFeederBlockEntity(BlockPos pos, BlockState state) {
+        return new SequentialFeederBlockEntity(SEQUENTIAL_FEEDER_BE.get(), pos, state);
+    }
+
     private static AddressingSignBlockEntity createAddressingSignBlockEntity(BlockPos pos, BlockState state) {
         return new AddressingSignBlockEntity(ADDRESSING_SIGN_BE.get(), pos, state);
     }

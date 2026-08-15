@@ -18,6 +18,7 @@ import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngin
 import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlock;
 import icu.dreamripples.aeronautics_gravity.block.AddressingSignBlockEntity;
 import icu.dreamripples.aeronautics_gravity.block.ModBlocks;
+import icu.dreamripples.aeronautics_gravity.block.ModMenus;
 import icu.dreamripples.aeronautics_gravity.fluid.ModFluids;
 import icu.dreamripples.aeronautics_gravity.network.AddressingSignScrollPayload;
 import net.minecraft.client.Minecraft;
@@ -27,6 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.client.event.InputEvent;
 import icu.dreamripples.aeronautics_gravity.item.ModItems;
 import icu.dreamripples.aeronautics_gravity.client.MassVisualizer;
+import icu.dreamripples.aeronautics_gravity.client.SequentialFeederScreen;
 import icu.dreamripples.aeronautics_gravity.client.ModPartialModels;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightVisual;
 import icu.dreamripples.aeronautics_gravity.client.RedstoneCounterweightLightVisual;
@@ -59,7 +61,13 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 @EventBusSubscriber(modid = AeronauticsGravityVisualization.MOD_ID, value = Dist.CLIENT)
 public class AeronauticsGravityClient {
 
-    public AeronauticsGravityClient() {
+    public AeronauticsGravityClient(net.neoforged.bus.api.IEventBus modEventBus) {
+        // 顺序供料器 Screen(RegisterMenuScreensEvent 走 MOD bus;构造器入参即 mod bus)
+        modEventBus.addListener(AeronauticsGravityClient::onRegisterMenuScreens);
+    }
+
+    private static void onRegisterMenuScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
+        event.register(ModMenus.SEQUENTIAL_FEEDER.get(), SequentialFeederScreen::new);
     }
 
     @SubscribeEvent
