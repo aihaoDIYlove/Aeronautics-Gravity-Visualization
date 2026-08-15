@@ -82,7 +82,10 @@ public class SequentialFeederMenu extends MenuBase<SequentialFeederBlockEntity> 
             addSlot(new SlotItemHandler(contentHolder.inventory, i, x + i * 20, y) {
                 @Override
                 public boolean isActive() {
-                    return contentHolder.isMarked(getSlotIndex());
+                    // 已标记,或槽里还有遗留物品(标记被取消后槽保持显示,玩家能取走存货,
+                    // 取空后才隐藏 -- 否则取消标记会把物品"锁死"在不可见槽里)
+                    return contentHolder.isMarked(getSlotIndex())
+                            || !contentHolder.inventory.getStackInSlot(getSlotIndex()).isEmpty();
                 }
             });
         // 玩家槽：3 行背包 + 快捷栏，间距 20 以匹配贴图槽位网格
