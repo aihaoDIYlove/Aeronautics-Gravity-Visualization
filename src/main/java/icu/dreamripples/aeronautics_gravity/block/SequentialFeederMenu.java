@@ -71,22 +71,22 @@ public class SequentialFeederMenu extends MenuBase<SequentialFeederBlockEntity> 
 
     @Override
     protected void addSlots() {
-        int x = 8;
-        int y = 18;
+        int x = 16;
+        int y = 33;
         // 9 标记槽(幽灵)
         for (int i = 0; i < SequentialFeederBlockEntity.SLOTS; i++)
-            addSlot(new MarkerSlot(contentHolder.markers, i, x + i * 18, y));
+            addSlot(new MarkerSlot(contentHolder.markers, i, x + i * 20, y));
         // 9 物品槽(实体)
-        y += 36;
+        y = 78;
         for (int i = 0; i < SequentialFeederBlockEntity.SLOTS; i++)
-            addSlot(new SlotItemHandler(contentHolder.inventory, i, x + i * 18, y) {
+            addSlot(new SlotItemHandler(contentHolder.inventory, i, x + i * 20, y) {
                 @Override
                 public boolean isActive() {
                     return contentHolder.isMarked(getSlotIndex());
                 }
             });
-        // 玩家槽
-        addPlayerSlots(8, 116);
+        // 玩家槽(与 SequentialFeederScreen 坐标对齐)
+        addPlayerSlots(16, 106);
     }
 
     @Override

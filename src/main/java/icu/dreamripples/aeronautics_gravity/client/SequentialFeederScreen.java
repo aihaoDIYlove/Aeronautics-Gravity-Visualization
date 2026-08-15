@@ -1,22 +1,23 @@
 package icu.dreamripples.aeronautics_gravity.client;
 
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
-import icu.dreamripples.aeronautics_gravity.block.SequentialFeederBlockEntity;
+import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
 import icu.dreamripples.aeronautics_gravity.block.SequentialFeederMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 顺序供料器 Screen(v1 占位 UI,无自定义贴图 -- 整体测完用户补自制贴图)。
- * 面板/槽框/箭头全程序绘制(GuiGraphics.fill),布局与 SequentialFeederMenu.addSlots 对齐:
+ * 顺序供料器 Screen -- Create 风格 GUI 贴图(玩家手绘版,箭头精灵在贴图右上角)。
+ * 槽位坐标与 SequentialFeederMenu.addSlots 严格对齐。
  *
  * <pre>
- * 标记槽 y=18:  [?] [?] [?] ... (9 格,幽灵)
- * 物品槽 y=54:  [ ] [ ] [ ] ... (9 格,实体;未标记时隐藏)
- * 箭头   y=36:       ↑(着色: 绿=本步已取走 黄=待取 红=缺货)
- * 玩家栏 y=116
+ * 标记槽 y=34:  [?] [?] [?] ... (9 格,幽灵)
+ * 箭头   y=52:       ↑(贴图右上角 8x9 精灵,位于当前标记槽内)
+ * 物品槽 y=53:  [ ] [ ] [ ] ... (9 格,实体;未标记时隐藏)
+ * 玩家栏 y=97
  * </pre>
  *
  * 箭头颜色派生自 [currentStep, stepOutputUsed, inventory[currentStep]](ContainerData
@@ -24,18 +25,19 @@ import net.minecraft.world.item.ItemStack;
  */
 public class SequentialFeederScreen extends AbstractSimiContainerScreen<SequentialFeederMenu> {
 
-    private static final int COLOR_BG = 0xFFC6C6C6;       // 面板灰(vanilla GUI 同款)
-    private static final int COLOR_SLOT = 0xFF8B8B8B;     // 槽底
-    private static final int COLOR_SLOT_DARK = 0xFF373737; // 槽内阴影
-    private static final int COLOR_ARROW_GREEN = 0xFF3FBF3F; // 已取走
-    private static final int COLOR_ARROW_YELLOW = 0xFFE9E24B; // 待取/有货
-    private static final int COLOR_ARROW_RED = 0xFFE33B3B;    // 缺货
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(AeronauticsGravityVisualization.MOD_ID, "textures/gui/sequential_feeder.png");
 
-    // 与 SequentialFeederMenu.addSlots 的坐标一致
-    private static final int SLOT_X = 8;
-    private static final int MARKER_Y = 18;
-    private static final int ITEM_Y = 54;
-    private static final int ARROW_Y = 36;
+    // 贴图右上角三种颜色箭头精灵(均为 8x9)
+    private static final int ARROW_W = 8, ARROW_H = 9;
+    private static final int ARROW_RED_U = 230, ARROW_RED_V = 0;
+    private static final int ARROW_YELLOW_U = 239, ARROW_YELLOW_V = 0;
+    private static final int ARROW_GREEN_U = 248, ARROW_GREEN_V = 0;
+
+    // 与 SequentialFeederMenu.addSlots 的坐标一致(修改时两边同步!)
+    private static final int SLOT_X = 16;
+    private static final int ARROW_Y = 52;
+    private static final int PLAYER_LABEL_Y = 70;
 
     public SequentialFeederScreen(SequentialFeederMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
@@ -43,7 +45,8 @@ public class SequentialFeederScreen extends AbstractSimiContainerScreen<Sequenti
 
     @Override
     protected void init() {
-        setWindowSize(176, 166);
+        // 176 宽 + 180 高: 标记/物品槽 90 高 + 箭头 + 玩家区标签+3行+快捷栏 96
+        setWindowSize(208, 203);
         super.init();
     }
 
@@ -52,55 +55,36 @@ public class SequentialFeederScreen extends AbstractSimiContainerScreen<Sequenti
         int x = leftPos;
         int y = topPos;
 
-        // 面板底
-        graphics.fill(x, y, x + imageWidth, y + imageHeight, COLOR_BG);
+        // Create 风格背景贴图(玩家栏面板、三色箭头都在贴图里)
+        graphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight, 256, 256);
 
-        // 标记槽(9)
-        for (int i = 0; i < 9; i++)
-            drawSlotBg(graphics, x + SLOT_X + i * 18, y + MARKER_Y);
-        // 物品槽(9)
-        for (int i = 0; i < 9; i++)
-            drawSlotBg(graphics, x + SLOT_X + i * 18, y + ITEM_Y);
+        // 标题 & 玩家栏标签(颜色用深棕,与 Create 字体色接近)
+        int titleColor = 0x593A2A;
+        graphics.drawString(font, this.title, x + 82, y + 4, titleColor, false);
+        graphics.drawString(font, this.playerInventoryTitle, x + 8, y + PLAYER_LABEL_Y, titleColor, false);
 
-        // 玩家栏 + 快捷栏
-        for (int row = 0; row < 3; row++)
-            for (int col = 0; col < 9; col++)
-                drawSlotBg(graphics, x + 8 + col * 18, y + 116 + row * 18);
-        for (int col = 0; col < 9; col++)
-            drawSlotBg(graphics, x + 8 + col * 18, y + 174);
-
-        // 标题 & 玩家栏标签
-        graphics.drawString(font, this.title, x + 8, y + 6, 0x404040, false);
-        graphics.drawString(font, this.playerInventoryTitle, x + 8, y + 112, 0x404040, false);
-
-        // 着色箭头指向当前步(颜色派生自状态)
+        // 着色箭头指向当前步(从贴图右上角精灵 blit)
         int step = menu.contentHolder.feederData.get(0);
         boolean used = menu.contentHolder.feederData.get(1) != 0;
-        drawArrow(graphics, x + SLOT_X + step * 18 + 8, y + ARROW_Y, step, used);
+        int slotCenterX = x + SLOT_X + step * 20 + 8;
+        drawArrow(graphics, slotCenterX, y + ARROW_Y, step, used);
     }
 
-    private void drawSlotBg(GuiGraphics graphics, int x, int y) {
-        graphics.fill(x - 1, y - 1, x + 17, y + 17, COLOR_SLOT_DARK);
-        graphics.fill(x, y, x + 16, y + 16, COLOR_SLOT);
-    }
-
-    /**
-     * 程序画上指箭头:以 为中心,宽 10 高 8。两个矩形近似三角(梯形拼尖)。
-     */
+    /** 从贴图右上角 blit 对应颜色箭头精灵,8x9,水平居中于当前步槽。 */
     private void drawArrow(GuiGraphics graphics, int cx, int y, int step, boolean used) {
         ItemStack current = menu.getSlot(SequentialFeederMenu.ITEM_SLOTS_START + step).getItem();
-        int color;
-        if (current.isEmpty())
-            color = COLOR_ARROW_RED;   // 缺货(含未标记: 未标记槽物品槽 isActive=false 但这里槽空)
-        else if (used)
-            color = COLOR_ARROW_GREEN; // 本步已取走
-        else
-            color = COLOR_ARROW_YELLOW; // 有货待取
-        // 尖(2px 台阶收窄至 0)
-        graphics.fill(cx - 1, y, cx + 1, y + 2, color);
-        graphics.fill(cx - 3, y + 2, cx + 3, y + 4, color);
-        // 杆
-        graphics.fill(cx - 2, y + 4, cx + 2, y + 8, color);
+        int u, v;
+        if (current.isEmpty()) {
+            u = ARROW_RED_U;
+            v = ARROW_RED_V;   // 缺货(含未标记)
+        } else if (used) {
+            u = ARROW_GREEN_U;
+            v = ARROW_GREEN_V; // 本步已取走
+        } else {
+            u = ARROW_YELLOW_U;
+            v = ARROW_YELLOW_V; // 有货待取
+        }
+        graphics.blit(TEXTURE, cx - ARROW_W / 2, y, u, v, ARROW_W, ARROW_H, 256, 256);
     }
 
     @Override
