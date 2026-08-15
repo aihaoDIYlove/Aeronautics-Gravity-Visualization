@@ -124,12 +124,11 @@ public class SequentialFeederMenu extends MenuBase<SequentialFeederBlockEntity> 
 
     @Override
     public void clicked(int slotId, int dragType, ClickType clickType, Player player) {
-        if (slotId < 0 || slotId >= PLAYER_SLOTS_START || clickType == ClickType.THROW) {
-            if (slotId >= PLAYER_SLOTS_START)
-                super.clicked(slotId, dragType, clickType, player);
-            return;
-        }
-        if (slotId < ITEM_SLOTS_START) {
+        // 只拦截标记槽(0..8)走幽灵逻辑;其余全部放行 vanilla。
+        // 不能按"slotId<0 直接丢弃"写:手持物品按住拖动时客户端会把点击转成
+        // QUICK_CRAFT 协议(slotId=-999 的起止包 + 途经槽包),吞掉 -999 会让
+        // 按下期间鼠标有轻微位移的"点击放置"整组失效 -- 表现为玩家栏偶发放不进。
+        if (slotId >= MARKER_SLOTS_START && slotId < ITEM_SLOTS_START) {
             handleGhostClick(slotId, dragType, clickType, player);
             return;
         }
