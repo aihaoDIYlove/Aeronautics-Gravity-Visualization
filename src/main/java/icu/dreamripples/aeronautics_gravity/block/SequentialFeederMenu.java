@@ -25,10 +25,8 @@ import net.neoforged.neoforge.items.SlotItemHandler;
  * 这里继承 MenuBase 后移植幽灵点击逻辑(Create GhostItemMenu 同款行为):
  * 手持物品左键幽灵槽 -> 设标记(count=1);空手左键 -> 清标记;创造中键 -> 取满堆。
  *
- * <p>两个服务端构造(holder)与客户端构造(extraData)都直接包装 BE 本体的
- * markers/inventory handler -- 服务端是权威,客户端菜单经 sendToMenu 的 update tag
- * 反查 client BE 拿到同一份 handler(ToolboxMenu 模式),内容变化由 SmartInventory
- * 自动 notifyUpdate -> sendData 同步。
+ * <p>两端构造都直接包装 BE 本体的 markers/inventory handler: 服务端权威,客户端经
+ * sendToMenu 的 update tag 反查 client BE 拿同一份 handler(ToolboxMenu 模式)。
  *
  * <p>槽布局(index -> GUI): 0..8 = 标记槽, 9..17 = 物品槽, 18..53 = 玩家。
  */

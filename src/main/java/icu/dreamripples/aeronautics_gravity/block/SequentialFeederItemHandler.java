@@ -10,21 +10,14 @@ import javax.annotation.Nonnull;
  * 顺序供料器对外 IItemHandler(全 6 面统一)。
  *
  * <ul>
- *   <li>{@link #insertItem}: 补货。遍历全部 9 槽,找第一个标记匹配(isSameItemSameComponents)
- *       且未满的槽塞入;无匹配/全满 -> 原样返回(发送方保留物品)。不受 currentStep 影响,
- *       任意时刻可给任意已标记槽补货,补货不影响就绪状态(armed)。</li>
- *   <li>{@link #extractItem}: 取料。只放行当前步槽(currentStep),带 1/步闸门:
- *       当前步未就绪(armed=false)或当前槽空 -> 永远返回空;否则至多出 1 个,
- *       非模拟取走后解除授权(armed=false)。脉冲模式靠红石上升沿重新授权当前步,
- *       忽略模式取走即换步自动续挂。</li>
- *   <li>{@link #getStackInSlot(int)}: 装箱视角只暴露当前步槽(共 1 槽)——漏斗/溜槽抽出端
- *       与机械手只看得见"现在对外供的料"。insert 视角仍是 9 槽(通过 insertItem 路由)。</li>
+ *   <li>{@link #insertItem}: 补货。路由到第一个标记匹配(isSameItemSameComponents)且未满
+ *       的槽,任意时刻可给任意已标记槽补货,不影响 currentStep 与 stepState。</li>
+ *   <li>{@link #extractItem}: 取料。只放行当前步槽且要求 ARMED(见 BE 状态机),至多 1 个
+ *       (1/步闸门),非模拟取走后 onStepOutputTaken 转移状态。</li>
+ *   <li>{@link #getStackInSlot(int)}: 装箱视角只暴露当前步槽 -- 漏斗/机械手只看得见
+ *       "现在对外供的料";insert 视角仍是 9 槽。getSlots 报 9 但 extract 只对
+ *       currentStep 生效:insert 语义是"容器整体",extract 语义是"当前步"。</li>
  * </ul>
- *
- * <p>提取槽布局说明: IItemHandler 契约中 getSlots/insertItem/extractItem 三个方法
- * 的 slot 下标空间一致;本 handler 把 getSlots 报 9 但 extractItem 只对 currentStep
- * 槽生效,其余槽 extract 恒空 —— insert 语义是"容器整体",extract 语义是"当前步"。
- * 这对漏斗(只调 extractItem(currentStep, ...))与 Create 拆包机(insertItem 逐个)都正确。
  */
 public class SequentialFeederItemHandler implements IItemHandler {
 
