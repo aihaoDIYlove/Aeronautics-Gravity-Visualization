@@ -56,6 +56,11 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
     private int currentStep = 0;
     private boolean stepOutputUsed = false;
     private boolean prevPowered = false;
+    /**
+     * 指针因标记取消而<b>非时钟</b>前移且原步输出额度未用完(used=true)时置位:
+     * 下一红石脉冲只把 used 复位(重挂当前槽),不前进 -- 否则脉冲会跳过新槽整轮不供料。
+     */
+    private boolean rearmPending = false;
 
     private final SequentialFeederItemHandler itemHandler = new SequentialFeederItemHandler(this);
 
@@ -142,13 +147,16 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
 
     /**
      * 标记槽变化(设置/清除标记)。校正 currentStep:若当前槽标记被清且恰为当前步,
-     * 前移到下一个已标记槽(回环)并复位 used;全部未标记则归 0 复位。
+     * 前移到下一个已标记槽(回环);全部未标记则归 0。
+     *
+     * <p>标记取消<b>不是时钟脉冲</b>,前进时保留 stepOutputUsed -- 否则本步输出额度
+     * 已用掉(used=true 等脉冲)时取消标记会复位 used,机械手无脉冲就白取下一槽 1 个。
      */
     private void onMarkerChanged(int changedSlot) {
         if (level == null)
             return;
         if (markers.getStackInSlot(changedSlot).isEmpty() && currentStep == changedSlot) {
-            advanceToNextMarked();
+            advanceToNextMarked(true);
         }
         if (!level.isClientSide)
             notifyUpdate();
@@ -156,22 +164,39 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
 
     /**
      * 指针前进到下一个已标记槽(回环;跳过未标记)。若无任何标记,currentStep 归 0。
-     * 每次前进复位 stepOutputUsed。服务端调用,调用方负责同步。
+     *
+     * @param keepUsed true 时不复位 stepOutputUsed -- 用于标记取消/读档校正这类
+     *                 非时钟脉冲的前进:本步输出额度已用掉就不因指针跳转白送输出。
+     *                 此时若 used=true 再置 rearmPending,让下一脉冲只重挂不前进。
+     *                 红石 tick 前进传 false(脉冲换步,新步待取)。
      */
-    public void advanceToNextMarked() {
+    public void advanceToNextMarked(boolean keepUsed) {
         for (int i = 1; i <= SLOTS; i++) {
             int candidate = (currentStep + i) % SLOTS;
             if (isMarked(candidate)) {
                 currentStep = candidate;
-                stepOutputUsed = false;
+                if (keepUsed) {
+                    if (stepOutputUsed)
+                        rearmPending = true;
+                } else {
+                    stepOutputUsed = false;
+                    rearmPending = false;
+                }
                 setChanged();
                 return;
             }
         }
-        // 无任何标记: 归 0 并复位(指针空转)
+        // 无任何标记: 归 0(keepUsed 时保留 used,防止跳回 0 号槽白送一次输出;
+        // used 已用掉时同样挂 rearmPending,全清后再标记不跳过新槽)
         if (currentStep != 0 || stepOutputUsed) {
             currentStep = 0;
-            stepOutputUsed = false;
+            if (keepUsed) {
+                if (stepOutputUsed)
+                    rearmPending = true;
+            } else {
+                stepOutputUsed = false;
+                rearmPending = false;
+            }
             setChanged();
         }
     }
@@ -185,9 +210,14 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
             return;
         boolean powered = level.hasNeighborSignal(worldPosition);
         if (powered && !prevPowered) {
-            // 上升沿: 自节拍 R 语义 -- 仅当本步已输出(被取走)才前进,否则丢弃脉冲
-            if (stepOutputUsed)
-                advanceToNextMarked();
+            // 上升沿: 先还非时钟前移欠下的"重挂",再走自节拍 R 语义
+            if (rearmPending) {
+                rearmPending = false;
+                stepOutputUsed = false;
+            } else if (stepOutputUsed) {
+                // 上升沿: 自节拍 R 语义 -- 仅当本步已输出(被取走)才前进,否则丢弃脉冲
+                advanceToNextMarked(false);
+            }
         }
         prevPowered = powered;
     }
@@ -202,6 +232,7 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
         tag.putInt("CurrentStep", currentStep);
         tag.putBoolean("StepOutputUsed", stepOutputUsed);
         tag.putBoolean("PrevPowered", prevPowered);
+        tag.putBoolean("RearmPending", rearmPending);
     }
 
     @Override
@@ -214,9 +245,11 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
         currentStep = tag.contains("CurrentStep") ? tag.getInt("CurrentStep") : 0;
         stepOutputUsed = tag.getBoolean("StepOutputUsed");
         prevPowered = tag.getBoolean("PrevPowered");
+        rearmPending = tag.getBoolean("RearmPending");
         // NBT 里的 currentStep 可能因标记变化而悬空(如标记在客户端菜单直接改),读后校正
+        // 读档校正非时钟脉冲,保留 used 防白送
         if (!isMarked(currentStep) && hasAnyMarker())
-            advanceToNextMarked();
+            advanceToNextMarked(true);
     }
 
     private boolean hasAnyMarker() {

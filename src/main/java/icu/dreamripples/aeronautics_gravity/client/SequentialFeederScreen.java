@@ -84,6 +84,14 @@ public class SequentialFeederScreen extends AbstractSimiContainerScreen<Sequenti
     }
 
     @Override
+    protected boolean isHovering(int x, int y, int width, int height, double mouseX, double mouseY) {
+        // 槽位网格间距 20px(贴图),vanilla 命中区只有 16px 槽 ±1px = 18px,
+        // 每格会留 2px 死区,点在槽边缘时点击被吞(表现为"放不进去要多点几下")。
+        // 放宽到整 20px 网格,消除死区。
+        return super.isHovering(x - 1, y - 1, width + 2, height + 2, mouseX, mouseY);
+    }
+
+    @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
         renderTooltip(graphics, mouseX, mouseY);
