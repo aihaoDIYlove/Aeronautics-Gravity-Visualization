@@ -110,5 +110,8 @@
   "advancements.aeronautics_gravity.obtain_portable_diagram.description": "Craft a Portable Contraption Diagram",
   "block.aeronautics_gravity.sequential_feeder": "Sequential Feeder",
   "gui.aeronautics_gravity.sequential_feeder.marker_slots": "Marker Slots:",
-  "gui.aeronautics_gravity.sequential_feeder.inventory_slots": "Inventory Slots:"
+  "gui.aeronautics_gravity.sequential_feeder.inventory_slots": "Inventory Slots:",
+  "tooltip.aeronautics_gravity.sequential_feeder.mode": "Control Mode",
+  "tooltip.aeronautics_gravity.sequential_feeder.mode.redstone_pulse": "Redstone Pulse",
+  "tooltip.aeronautics_gravity.sequential_feeder.mode.ignore_redstone": "Ignore Redstone"
 }

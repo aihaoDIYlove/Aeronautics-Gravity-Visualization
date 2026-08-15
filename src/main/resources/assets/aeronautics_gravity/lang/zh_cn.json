@@ -110,5 +110,8 @@
   "advancements.aeronautics_gravity.obtain_portable_diagram.description": "合成一个便携图解",
   "block.aeronautics_gravity.sequential_feeder": "顺序供料器",
   "gui.aeronautics_gravity.sequential_feeder.marker_slots": "标记槽：",
-  "gui.aeronautics_gravity.sequential_feeder.inventory_slots": "库存槽："
+  "gui.aeronautics_gravity.sequential_feeder.inventory_slots": "库存槽：",
+  "tooltip.aeronautics_gravity.sequential_feeder.mode": "控制模式",
+  "tooltip.aeronautics_gravity.sequential_feeder.mode.redstone_pulse": "红石脉冲控制",
+  "tooltip.aeronautics_gravity.sequential_feeder.mode.ignore_redstone": "忽略红石"
 }
