@@ -12,10 +12,11 @@ import javax.annotation.Nonnull;
  * <ul>
  *   <li>{@link #insertItem}: 补货。遍历全部 9 槽,找第一个标记匹配(isSameItemSameComponents)
  *       且未满的槽塞入;无匹配/全满 -> 原样返回(发送方保留物品)。不受 currentStep 影响,
- *       任意时刻可给任意已标记槽补货,补货不重置 stepOutputUsed。</li>
+ *       任意时刻可给任意已标记槽补货,补货不影响就绪状态(armed)。</li>
  *   <li>{@link #extractItem}: 取料。只放行当前步槽(currentStep),带 1/步闸门:
- *       本步已输出(stepOutputUsed)或当前槽空 -> 永远返回空;否则至多出 1 个,
- *       非模拟取走后置 stepOutputUsed。红石脉冲在 used==true 时前进指针(自节拍)。</li>
+ *       当前步未就绪(armed=false)或当前槽空 -> 永远返回空;否则至多出 1 个,
+ *       非模拟取走后解除授权(armed=false)。脉冲模式靠红石上升沿重新授权当前步,
+ *       忽略模式取走即换步自动续挂。</li>
  *   <li>{@link #getStackInSlot(int)}: 装箱视角只暴露当前步槽(共 1 槽)——漏斗/溜槽抽出端
  *       与机械手只看得见"现在对外供的料"。insert 视角仍是 9 槽(通过 insertItem 路由)。</li>
  * </ul>
@@ -78,7 +79,7 @@ public class SequentialFeederItemHandler implements IItemHandler {
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (amount <= 0 || slot != be.getCurrentStep())
             return ItemStack.EMPTY;
-        if (be.isStepOutputUsed())
+        if (!be.isArmed())
             return ItemStack.EMPTY;
         ItemStack available = be.inventory.getStackInSlot(slot);
         if (available.isEmpty())
@@ -86,7 +87,7 @@ public class SequentialFeederItemHandler implements IItemHandler {
         int toTake = Math.min(1, amount); // 1/步闸门
         ItemStack extracted = be.inventory.extractItem(slot, toTake, simulate);
         if (!simulate && !extracted.isEmpty())
-            be.markStepOutputUsed();
+            be.onStepOutputTaken();
         return extracted;
     }
 }

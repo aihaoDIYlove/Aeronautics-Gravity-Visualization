@@ -2,6 +2,7 @@ package icu.dreamripples.aeronautics_gravity.client;
 
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
 import icu.dreamripples.aeronautics_gravity.AeronauticsGravityVisualization;
+import icu.dreamripples.aeronautics_gravity.block.SequentialFeederBlockEntity;
 import icu.dreamripples.aeronautics_gravity.block.SequentialFeederMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -24,11 +25,12 @@ public class SequentialFeederScreen extends AbstractSimiContainerScreen<Sequenti
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(AeronauticsGravityVisualization.MOD_ID, "textures/gui/sequential_feeder.png");
 
-    // 贴图右上角三种颜色箭头精灵(均为 8x9)
+    // 贴图右上角四种颜色箭头精灵(均为 8x9)
     private static final int ARROW_W = 8, ARROW_H = 9;
-    private static final int ARROW_RED_U = 230, ARROW_RED_V = 0;
-    private static final int ARROW_YELLOW_U = 239, ARROW_YELLOW_V = 0;
-    private static final int ARROW_GREEN_U = 248, ARROW_GREEN_V = 0;
+    private static final int ARROW_GRAY_U = 221, ARROW_GRAY_V = 0;   // WAITING 未就绪(等待授权)
+    private static final int ARROW_RED_U = 230, ARROW_RED_V = 0;     // ARMED 就绪但缺货
+    private static final int ARROW_YELLOW_U = 239, ARROW_YELLOW_V = 0; // ARMED 就绪待取
+    private static final int ARROW_GREEN_U = 248, ARROW_GREEN_V = 0; // TAKEN 已取走(等下一脉冲)
 
     // 与 SequentialFeederMenu.addSlots 的坐标一致(修改时两边同步!)
     private static final int SLOT_X = 16;
@@ -68,24 +70,29 @@ public class SequentialFeederScreen extends AbstractSimiContainerScreen<Sequenti
 
         // 着色箭头指向当前步
         int step = menu.contentHolder.feederData.get(0);
-        boolean used = menu.contentHolder.feederData.get(1) != 0;
+        int stateOrd = menu.contentHolder.feederData.get(1);
         int slotCenterX = x + SLOT_X + step * 20 + 8;
-        drawArrow(graphics, slotCenterX, y + ARROW_Y, step, used);
+        drawArrow(graphics, slotCenterX, y + ARROW_Y, step, stateOrd);
     }
 
     /** 从贴图右上角 blit 对应颜色箭头精灵,8x9,水平居中于当前步槽。 */
-    private void drawArrow(GuiGraphics graphics, int cx, int y, int step, boolean used) {
-        ItemStack current = menu.getSlot(SequentialFeederMenu.ITEM_SLOTS_START + step).getItem();
+    private void drawArrow(GuiGraphics graphics, int cx, int y, int step, int stateOrd) {
         int u, v;
-        if (current.isEmpty()) {
-            u = ARROW_RED_U;
-            v = ARROW_RED_V;   // 缺货(含未标记)
-        } else if (used) {
+        if (stateOrd == SequentialFeederBlockEntity.StepState.WAITING.ordinal()) {
+            u = ARROW_GRAY_U;
+            v = ARROW_GRAY_V;   // 未就绪: 等待红石授权(脉冲模式)
+        } else if (stateOrd == SequentialFeederBlockEntity.StepState.TAKEN.ordinal()) {
             u = ARROW_GREEN_U;
-            v = ARROW_GREEN_V; // 本步已取走
+            v = ARROW_GREEN_V;  // 已取走: 等下一脉冲前进
         } else {
-            u = ARROW_YELLOW_U;
-            v = ARROW_YELLOW_V; // 有货待取
+            ItemStack current = menu.getSlot(SequentialFeederMenu.ITEM_SLOTS_START + step).getItem();
+            if (current.isEmpty()) {
+                u = ARROW_RED_U;
+                v = ARROW_RED_V; // 就绪但缺货(含未标记)
+            } else {
+                u = ARROW_YELLOW_U;
+                v = ARROW_YELLOW_V; // 就绪待取
+            }
         }
         graphics.blit(TEXTURE, cx - ARROW_W / 2, y, u, v, ARROW_W, ARROW_H, 256, 256);
     }

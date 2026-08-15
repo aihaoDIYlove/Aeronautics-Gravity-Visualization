@@ -30,26 +30,28 @@ import java.util.List;
 /**
  * 顺序供料器 BE - 可编程投料磁带。9 标记槽(幽灵物品) + 9 物品槽一一对应。
  *
- * <p>**状态机**(完整语义见类 Javadoc 与 SequentialFeederItemHandler):
+ * <p>**状态机**(三态,完整语义见 {@link SequentialFeederItemHandler}):
  * <ul>
  *   <li>{@code currentStep}: 指向某个<b>已标记</b>槽的下标(未标记槽不参与回环)。</li>
- *   <li>{@code stepOutputUsed}: 本步那 1 个是否已被外部取走。外部(机械手/漏斗)每次最多取 1 个,
- *       取走后置 true;红石脉冲只在 used==true 时前进一格(自节拍 R 语义),否则脉冲丢弃。</li>
- *   <li>指针前进后 used 复位,新当前槽待取。当前槽空(缺货)则 extract 永远为空 -> used 永不置
- *       true -> 整机停住等补货(自动满足"停住不跳步")。</li>
+ *   <li>{@code WAITING}(未就绪,GUI 灰箭头): <b>初始态</b>。放置/读档即此态 -- 首次配置
+ *       不白送输出。脉冲模式: 红石上升沿 -> ARMED(挂载当前步)。</li>
+ *   <li>{@code ARMED}(就绪,GUI 黄箭头/缺货红箭头): 当前步授权输出至多 1 个。外部
+ *       (机械手/漏斗)取走 -> TAKEN。此态下脉冲<b>丢弃</b>(自节拍,防超前)。</li>
+ *   <li>{@code TAKEN}(已取走,GUI 绿箭头): 本步额度已消费,指针未动。脉冲模式: 下一
+ *       上升沿 -> 前进到下一个已标记槽并 ARMED。</li>
+ *   <li>当前槽空(缺货)则 extract 永远为空 -> 整机停住等补货(自动满足"停住不跳步")。</li>
  * </ul>
+ *
+ * <p>**忽略红石模式**: 取走即前进并重新 ARMED(恒就绪,等效持续输出);单标记槽时回环
+ * 自身。切入该模式时若 TAKEN 先前进(本步额度已消费);切入脉冲模式时 ARMED 降级
+ * WAITING(旧模式残留的授权不带走,防切换瞬间白送)。
+ *
+ * <p>**非时钟前进的降级**: 标记取消/读档校正这类<b>非</b>"输出-脉冲"节拍的指针前进,
+ * 若状态为 TAKEN 则降级 WAITING -- 新当前槽从未输出,下一脉冲直接挂载它而非再跳一格
+ * (否则会整轮跳过新槽)。全部标记清空时同样归 WAITING。
  *
  * <p>**对外 IItemHandler**(全 6 面统一,见 {@link SequentialFeederItemHandler}):
  * insert 路由到任意匹配标记的未满槽(补货随时),extract 只放行当前步槽且带 1/步闸门。
- *
- * <p>**红石控制模式**(6 面弹板,参考世界锚点 AnchorMode):
- * <ul>
- *   <li>REDSTONE_PULSE(默认): 现有自节拍语义,vanilla {@code hasNeighborSignal} 上升沿
- *       ({@code prevPowered} 写 NBT 防重载假脉冲)。</li>
- *   <li>IGNORE_REDSTONE: 忽略红石,当前步 1 个被取走即自动换到下一步(单标记槽时回环自身,
- *       等效持续输出)。</li>
- * </ul>
- * 标记被清导致 currentStep 悬空时,重算序列并前移到下一个已标记槽(回环)。
  */
 public class SequentialFeederBlockEntity extends SmartBlockEntity implements MenuProvider {
 
@@ -66,28 +68,24 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
         }
     };
 
-    // 状态机字段(currentStep/stepOutputUsed 另经 ContainerData 同步给打开的菜单)
+    // 状态机字段(currentStep/stepState 另经 ContainerData 同步给打开的菜单)
     private int currentStep = 0;
-    private boolean stepOutputUsed = false;
+    /** 当前步状态。初始 WAITING -- 首个脉冲/忽略模式才授权,防止配置完白送 1 个。 */
+    private StepState stepState = StepState.WAITING;
     private boolean prevPowered = false;
-    /**
-     * 指针因标记取消而<b>非时钟</b>前移且原步输出额度未用完(used=true)时置位:
-     * 下一红石脉冲只把 used 复位(重挂当前槽),不前进 -- 否则脉冲会跳过新槽整轮不供料。
-     */
-    private boolean rearmPending = false;
 
     private final SequentialFeederItemHandler itemHandler = new SequentialFeederItemHandler(this);
 
     /** 红石控制模式弹板(6 面)。value=0 -> REDSTONE_PULSE(默认)。 */
     private FeederModeBehaviour modeBehaviour;
 
-    /** 菜单数据通道: [0]=currentStep, [1]=stepOutputUsed(0/1) */
+    /** 菜单数据通道: [0]=currentStep, [1]=stepState.ordinal() */
     public final ContainerData feederData = new ContainerData() {
         @Override
         public int get(int index) {
             return switch (index) {
                 case 0 -> currentStep;
-                case 1 -> stepOutputUsed ? 1 : 0;
+                case 1 -> stepState.ordinal();
                 default -> 0;
             };
         }
@@ -115,10 +113,16 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
                 this,
                 new FeederModeValueBoxTransform());
         modeBehaviour.value = 0; // 默认 REDSTONE_PULSE
-        // 切到忽略红石时若本步已输出(used=true 等脉冲)立即换步,否则无人推进卡死
+        // 切模式时同步状态: 切忽略先还 TAKEN 欠的前进再恒就绪(该模式自走);切脉冲时
+        // ARMED 降级 WAITING -- 旧模式残留的授权不带走,否则切换瞬间机械手白取 1 个
         modeBehaviour.withCallback(i -> {
-            if (i == FeederMode.IGNORE_REDSTONE.ordinal() && stepOutputUsed)
-                advanceToNextMarked(false);
+            if (i == FeederMode.IGNORE_REDSTONE.ordinal()) {
+                if (stepState == StepState.TAKEN)
+                    advanceToNextMarked();
+                stepState = StepState.ARMED;
+            } else if (stepState == StepState.ARMED) {
+                stepState = StepState.WAITING;
+            }
         });
         behaviours.add(modeBehaviour);
     }
@@ -143,8 +147,9 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
         return itemHandler;
     }
 
-    public boolean isStepOutputUsed() {
-        return stepOutputUsed;
+    /** 当前步是否就绪(授权输出) */
+    public boolean isArmed() {
+        return stepState == StepState.ARMED;
     }
 
     /** 槽 i 是否已标记 */
@@ -153,18 +158,14 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
     }
 
     /**
-     * 外部取走当前步 1 个后被 SequentialFeederItemHandler 调用:置 used,notifyUpdate 同步客户端。
-     * 忽略红石模式下取走即换步(advanceToNextMarked(false) 内部复位 used),无需等脉冲。
+     * 外部取走当前步 1 个后被 SequentialFeederItemHandler 调用:TAKEN(欠一次前进)。
+     * 忽略红石模式下立即前进并重新 ARMED(取走即换步,无需脉冲)。
      */
-    public void markStepOutputUsed() {
-        if (stepOutputUsed)
-            return;
-        stepOutputUsed = true;
+    public void onStepOutputTaken() {
+        stepState = StepState.TAKEN;
         if (getMode() == FeederMode.IGNORE_REDSTONE) {
-            advanceToNextMarked(false);
-            if (level != null && !level.isClientSide)
-                notifyUpdate();
-            return;
+            advanceToNextMarked();
+            stepState = StepState.ARMED;
         }
         setChanged();
         if (level != null && !level.isClientSide)
@@ -187,56 +188,38 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
 
     /**
      * 标记槽变化(设置/清除标记)。校正 currentStep:若当前槽标记被清且恰为当前步,
-     * 前移到下一个已标记槽(回环);全部未标记则归 0。
+     * 前进到下一个已标记槽(回环);全部未标记则归 0。
      *
-     * <p>标记取消<b>不是时钟脉冲</b>,前进时保留 stepOutputUsed -- 否则本步输出额度
-     * 已用掉(used=true 等脉冲)时取消标记会复位 used,机械手无脉冲就白取下一槽 1 个。
+     * <p>这是<b>非时钟</b>前进:若状态为 TAKEN 降级 WAITING -- 前进不是"输出-脉冲"
+     * 节拍驱动的,新当前槽从未输出,下一脉冲应直接挂载而非再跳一格(否则整轮跳过新槽)。
      */
     private void onMarkerChanged(int changedSlot) {
         if (level == null)
             return;
         if (markers.getStackInSlot(changedSlot).isEmpty() && currentStep == changedSlot) {
-            advanceToNextMarked(true);
+            advanceToNextMarked();
+            if (!hasAnyMarker() || stepState == StepState.TAKEN)
+                stepState = StepState.WAITING;
         }
         if (!level.isClientSide)
             notifyUpdate();
     }
 
     /**
-     * 指针前进到下一个已标记槽(回环;跳过未标记)。若无任何标记,currentStep 归 0。
-     *
-     * @param keepUsed true 时不复位 stepOutputUsed -- 用于标记取消/读档校正这类
-     *                 非时钟脉冲的前进:本步输出额度已用掉就不因指针跳转白送输出。
-     *                 此时若 used=true 再置 rearmPending,让下一脉冲只重挂不前进。
-     *                 红石 tick 前进传 false(脉冲换步,新步待取)。
+     * 指针前进到下一个已标记槽(回环;跳过未标记)。只动指针,不改状态;
+     * 无任何标记时 currentStep 归 0(状态由调用方决定,见各调用点的降级规则)。
      */
-    public void advanceToNextMarked(boolean keepUsed) {
+    public void advanceToNextMarked() {
         for (int i = 1; i <= SLOTS; i++) {
             int candidate = (currentStep + i) % SLOTS;
             if (isMarked(candidate)) {
                 currentStep = candidate;
-                if (keepUsed) {
-                    if (stepOutputUsed)
-                        rearmPending = true;
-                } else {
-                    stepOutputUsed = false;
-                    rearmPending = false;
-                }
                 setChanged();
                 return;
             }
         }
-        // 无任何标记: 归 0(keepUsed 时保留 used,防止跳回 0 号槽白送一次输出;
-        // used 已用掉时同样挂 rearmPending,全清后再标记不跳过新槽)
-        if (currentStep != 0 || stepOutputUsed) {
+        if (currentStep != 0) {
             currentStep = 0;
-            if (keepUsed) {
-                if (stepOutputUsed)
-                    rearmPending = true;
-            } else {
-                stepOutputUsed = false;
-                rearmPending = false;
-            }
             setChanged();
         }
     }
@@ -248,15 +231,27 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
         super.tick();
         if (level == null || level.isClientSide)
             return;
+        // 忽略模式恒就绪(读档回填:读 NBT 不触发 modeBehaviour 回调,这里兜底;
+        // WAITING 是该模式下的瞬态 -- 初始/全清后重新标记,由 tick 恢复)
+        if (getMode() == FeederMode.IGNORE_REDSTONE && stepState == StepState.WAITING && hasAnyMarker()) {
+            stepState = StepState.ARMED;
+            setChanged();
+        }
         boolean powered = level.hasNeighborSignal(worldPosition);
         if (getMode() == FeederMode.REDSTONE_PULSE && powered && !prevPowered) {
-            // 上升沿: 先还非时钟前移欠下的"重挂",再走自节拍 R 语义
-            if (rearmPending) {
-                rearmPending = false;
-                stepOutputUsed = false;
-            } else if (stepOutputUsed) {
-                // 上升沿: 自节拍 R 语义 -- 仅当本步已输出(被取走)才前进,否则丢弃脉冲
-                advanceToNextMarked(false);
+            // 上升沿: WAITING -> 挂载当前步;TAKEN -> 前进一格再挂载(自节拍 R 语义);
+            // ARMED -> 丢弃(已就绪未取走,防超前)
+            switch (stepState) {
+                case WAITING -> {
+                    stepState = StepState.ARMED;
+                    setChanged();
+                }
+                case TAKEN -> {
+                    advanceToNextMarked();
+                    stepState = hasAnyMarker() ? StepState.ARMED : StepState.WAITING;
+                    setChanged();
+                }
+                case ARMED -> { }
             }
         }
         prevPowered = powered;
@@ -270,9 +265,8 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
         tag.put("Inventory", inventory.serializeNBT(registries));
         tag.put("Markers", markers.serializeNBT(registries));
         tag.putInt("CurrentStep", currentStep);
-        tag.putBoolean("StepOutputUsed", stepOutputUsed);
+        tag.putInt("StepState", stepState.ordinal());
         tag.putBoolean("PrevPowered", prevPowered);
-        tag.putBoolean("RearmPending", rearmPending);
     }
 
     @Override
@@ -283,13 +277,23 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
         if (tag.contains("Markers"))
             markers.deserializeNBT(registries, tag.getCompound("Markers"));
         currentStep = tag.contains("CurrentStep") ? tag.getInt("CurrentStep") : 0;
-        stepOutputUsed = tag.getBoolean("StepOutputUsed");
+        if (tag.contains("StepState")) {
+            int ord = tag.getInt("StepState");
+            stepState = ord >= 0 && ord < StepState.values().length
+                    ? StepState.values()[ord] : StepState.WAITING;
+        } else if (tag.contains("Armed")) { // 中间版(单布尔 armed)
+            stepState = tag.getBoolean("Armed") ? StepState.ARMED : StepState.WAITING;
+        } else { // 原始版("StepOutputUsed" 反向标志): true=额度已消费欠前进 -> TAKEN
+            stepState = tag.getBoolean("StepOutputUsed") ? StepState.TAKEN : StepState.WAITING;
+        }
         prevPowered = tag.getBoolean("PrevPowered");
-        rearmPending = tag.getBoolean("RearmPending");
-        // NBT 里的 currentStep 可能因标记变化而悬空(如标记在客户端菜单直接改),读后校正
-        // 读档校正非时钟脉冲,保留 used 防白送
-        if (!isMarked(currentStep) && hasAnyMarker())
-            advanceToNextMarked(true);
+        // NBT 里的 currentStep 可能因标记变化而悬空(如标记在客户端菜单直接改),读后校正。
+        // 读档校正非时钟前进,TAKEN 降级 WAITING 防跳步
+        if (!isMarked(currentStep) && hasAnyMarker()) {
+            advanceToNextMarked();
+            if (stepState == StepState.TAKEN)
+                stepState = StepState.WAITING;
+        }
     }
 
     private boolean hasAnyMarker() {
@@ -297,6 +301,16 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
             if (isMarked(i))
                 return true;
         return false;
+    }
+
+    /** 当前步状态 - 见类 Javadoc 状态机说明 */
+    public enum StepState {
+        /** 未就绪(灰箭头): 等待首个脉冲/模式自走授权 */
+        WAITING,
+        /** 就绪(黄箭头): 当前步授权输出至多 1 个 */
+        ARMED,
+        /** 已取走(绿箭头): 本步额度已消费,下一脉冲前进并就绪 */
+        TAKEN
     }
 
     /** 红石控制模式 ScrollOptionBehaviour - 独立 BehaviourType + 独立 NBT key(参考世界锚点 AnchorModeBehaviour) */
@@ -339,8 +353,8 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
 
     /**
      * 红石控制模式 - 6 面弹板切换。
-     * REDSTONE_PULSE: 红石脉冲控制(默认,现有自节拍语义)。
-     * IGNORE_REDSTONE: 忽略红石,取走即换步。
+     * REDSTONE_PULSE: 红石脉冲控制(默认,脉冲上升沿授权/前进,见 StepState)。
+     * IGNORE_REDSTONE: 忽略红石,取走即换步(恒就绪)。
      * 图标复用 Create 的 I_ACTIVE(脉冲)/I_PASSIVE(忽略)。
      */
     public enum FeederMode implements INamedIconOptions {
