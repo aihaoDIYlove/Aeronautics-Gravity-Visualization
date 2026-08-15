@@ -34,6 +34,7 @@
   "item.aeronautics_gravity.incomplete_counterweight": "配重块（半成品）",
   "item.aeronautics_gravity.incomplete_counterweight_light": "配“轻”块（半成品）",
   "item.aeronautics_gravity.incomplete_levitite": "浮空水晶（半成品）",
+  "item.aeronautics_gravity.incomplete_sequential_feeder": "顺序供料器（半成品）",
   "block.aeronautics_gravity.stabilizer": "自稳定方块",
   "item.aeronautics_gravity.incomplete_world_anchor": "世界锚点框架",
   "block.aeronautics_gravity.world_anchor": "世界锚点",

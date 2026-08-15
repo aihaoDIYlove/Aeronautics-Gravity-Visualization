@@ -52,6 +52,11 @@ public class ModItems {
     public static final Supplier<Item> INCOMPLETE_COUNTERWEIGHT_LIGHT =
             ITEMS.register("incomplete_counterweight_light", () -> new Item(new Item.Properties().stacksTo(64)));
 
+    // 顺序供料器(半成品): 序列装配中间产物, 贴图复用 block/sequential_feeder.png.
+    // 安山机壳 + 4 步机械手安装(列表过滤器/红石/安山漏斗/木桶) -> 顺序供料器(100%).
+    public static final Supplier<Item> INCOMPLETE_SEQUENTIAL_FEEDER =
+            ITEMS.register("incomplete_sequential_feeder", () -> new Item(new Item.Properties().stacksTo(64)));
+
     // 浮空水晶(半成品): 序列装配中间产物, 贴图复用 aeronautics:block/levitite.
     // 超轻玻璃 + 注液 500mb 浮空混合物 + 注液 500mb 星空液体 -> 浮空水晶(100%).
     public static final Supplier<Item> INCOMPLETE_LEVITITE =
