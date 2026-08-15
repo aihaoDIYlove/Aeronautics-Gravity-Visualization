@@ -33,10 +33,16 @@ public class SequentialFeederScreen extends AbstractSimiContainerScreen<Sequenti
     // 与 SequentialFeederMenu.addSlots 的坐标一致(修改时两边同步!)
     private static final int SLOT_X = 16;
     private static final int ARROW_Y = 52;
-    private static final int PLAYER_LABEL_Y = 70;
+    private static final int MARKER_LABEL_Y = 22;
+    private static final int INVENTORY_LABEL_Y = 67;
+
+    private final Component markerLabel;
+    private final Component inventoryLabel;
 
     public SequentialFeederScreen(SequentialFeederMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
+        this.markerLabel = Component.translatable("gui.aeronautics_gravity.sequential_feeder.marker_slots");
+        this.inventoryLabel = Component.translatable("gui.aeronautics_gravity.sequential_feeder.inventory_slots");
     }
 
     @Override
@@ -54,10 +60,11 @@ public class SequentialFeederScreen extends AbstractSimiContainerScreen<Sequenti
         // 手绘 GUI 背景
         graphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight, 256, 256);
 
-        // 标题 & 玩家栏标签
+        // 标题 & 分区标签
         int titleColor = 0x593A2A;
         graphics.drawString(font, this.title, x + 82, y + 4, titleColor, false);
-        graphics.drawString(font, this.playerInventoryTitle, x + 8, y + PLAYER_LABEL_Y, titleColor, false);
+        graphics.drawString(font, markerLabel, x + 16, y + MARKER_LABEL_Y, titleColor, false);
+        graphics.drawString(font, inventoryLabel, x + 16, y + INVENTORY_LABEL_Y, titleColor, false);
 
         // 着色箭头指向当前步
         int step = menu.contentHolder.feederData.get(0);

@@ -108,5 +108,7 @@
   "advancements.aeronautics_gravity.pearl_package_teleport.description": "将含有自己标签的激活珍珠打包起来，送往远方",
   "advancements.aeronautics_gravity.obtain_portable_diagram.title": "随身便携",
   "advancements.aeronautics_gravity.obtain_portable_diagram.description": "合成一个便携图解",
-  "block.aeronautics_gravity.sequential_feeder": "顺序供料器"
+  "block.aeronautics_gravity.sequential_feeder": "顺序供料器",
+  "gui.aeronautics_gravity.sequential_feeder.marker_slots": "标记槽：",
+  "gui.aeronautics_gravity.sequential_feeder.inventory_slots": "库存槽："
 }

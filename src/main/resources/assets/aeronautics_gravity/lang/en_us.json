@@ -108,5 +108,7 @@
   "advancements.aeronautics_gravity.pearl_package_teleport.description": "Pack an activated pearl tagged with yourself and ship it afar",
   "advancements.aeronautics_gravity.obtain_portable_diagram.title": "Pocket-Sized",
   "advancements.aeronautics_gravity.obtain_portable_diagram.description": "Craft a Portable Contraption Diagram",
-  "block.aeronautics_gravity.sequential_feeder": "Sequential Feeder"
+  "block.aeronautics_gravity.sequential_feeder": "Sequential Feeder",
+  "gui.aeronautics_gravity.sequential_feeder.marker_slots": "Marker Slots:",
+  "gui.aeronautics_gravity.sequential_feeder.inventory_slots": "Inventory Slots:"
 }
