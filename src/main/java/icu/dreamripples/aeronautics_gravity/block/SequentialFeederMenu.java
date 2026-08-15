@@ -85,8 +85,13 @@ public class SequentialFeederMenu extends MenuBase<SequentialFeederBlockEntity> 
                     return contentHolder.isMarked(getSlotIndex());
                 }
             });
-        // 玩家槽(与 SequentialFeederScreen 坐标对齐)
-        addPlayerSlots(16, 106);
+        // 玩家槽：3 行背包 + 快捷栏，间距 20 以匹配贴图槽位网格
+        y = 106;
+        for (int row = 0; row < 3; row++)
+            for (int col = 0; col < 9; col++)
+                addSlot(new Slot(playerInventory, col + row * 9 + 9, x + col * 20, y + row * 20));
+        for (int col = 0; col < 9; col++)
+            addSlot(new Slot(playerInventory, col, x + col * 20, y + 65));
     }
 
     @Override

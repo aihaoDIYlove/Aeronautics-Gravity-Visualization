@@ -10,18 +10,14 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 顺序供料器 Screen -- Create 风格 GUI 贴图(玩家手绘版,箭头精灵在贴图右上角)。
- * 槽位坐标与 SequentialFeederMenu.addSlots 严格对齐。
+ * 顺序供料器 Screen -- 与 SequentialFeederMenu.addSlots 坐标严格对齐。
  *
  * <pre>
- * 标记槽 y=34:  [?] [?] [?] ... (9 格,幽灵)
- * 箭头   y=52:       ↑(贴图右上角 8x9 精灵,位于当前标记槽内)
- * 物品槽 y=53:  [ ] [ ] [ ] ... (9 格,实体;未标记时隐藏)
- * 玩家栏 y=97
+ * 标记槽 y=33:  [?] [?] [?] ... (9 格,幽灵)
+ * 箭头   y=52:       ↑(位于当前标记槽内)
+ * 物品槽 y=78:  [ ] [ ] [ ] ... (9 格,实体;未标记时隐藏)
+ * 玩家栏 y=106:      3 行背包 + 快捷栏
  * </pre>
- *
- * 箭头颜色派生自 [currentStep, stepOutputUsed, inventory[currentStep]](ContainerData
- * + 菜单槽同步),不存字段,永不过期。
  */
 public class SequentialFeederScreen extends AbstractSimiContainerScreen<SequentialFeederMenu> {
 
@@ -45,7 +41,7 @@ public class SequentialFeederScreen extends AbstractSimiContainerScreen<Sequenti
 
     @Override
     protected void init() {
-        // 176 宽 + 180 高: 标记/物品槽 90 高 + 箭头 + 玩家区标签+3行+快捷栏 96
+        // 208 宽 + 203 高
         setWindowSize(208, 203);
         super.init();
     }
@@ -55,15 +51,15 @@ public class SequentialFeederScreen extends AbstractSimiContainerScreen<Sequenti
         int x = leftPos;
         int y = topPos;
 
-        // Create 风格背景贴图(玩家栏面板、三色箭头都在贴图里)
+        // 手绘 GUI 背景
         graphics.blit(TEXTURE, x, y, 0, 0, imageWidth, imageHeight, 256, 256);
 
-        // 标题 & 玩家栏标签(颜色用深棕,与 Create 字体色接近)
+        // 标题 & 玩家栏标签
         int titleColor = 0x593A2A;
         graphics.drawString(font, this.title, x + 82, y + 4, titleColor, false);
         graphics.drawString(font, this.playerInventoryTitle, x + 8, y + PLAYER_LABEL_Y, titleColor, false);
 
-        // 着色箭头指向当前步(从贴图右上角精灵 blit)
+        // 着色箭头指向当前步
         int step = menu.contentHolder.feederData.get(0);
         boolean used = menu.contentHolder.feederData.get(1) != 0;
         int slotCenterX = x + SLOT_X + step * 20 + 8;
