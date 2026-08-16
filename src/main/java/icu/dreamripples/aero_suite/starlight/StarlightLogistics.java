@@ -1,17 +1,14 @@
-package icu.dreamripples.aero_suite.common;
+package icu.dreamripples.aero_suite.starlight;
 
-import com.mojang.logging.LogUtils;
+import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
+import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
+import icu.dreamripples.aero_suite.common.AeroSuite;
+import icu.dreamripples.aero_suite.common.AeroSuiteIds;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
-import icu.dreamripples.aero_suite.common.registry.ModCreativeTabs;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
-import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
-import icu.dreamripples.aero_suite.simplification.block.ModMenus;
 import icu.dreamripples.aero_suite.starlight.component.ModDataComponents;
 import icu.dreamripples.aero_suite.starlight.fluid.ModFluids;
 import icu.dreamripples.aero_suite.starlight.network.ModPayloads;
-import com.simibubi.create.api.stress.BlockStressValues;
-import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
-import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -21,40 +18,40 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import org.slf4j.Logger;
 
-@Mod(AeronauticsGravityVisualization.MOD_ID)
-public class AeronauticsGravityVisualization {
-    public static final String MOD_ID = "aeronautics_gravity";
-    public static final Logger LOGGER = LogUtils.getLogger();
+/**
+ * mod3 入口: 航空学：星空物流(starlight_logistics)。
+ * 持有星空液体/玻璃/机壳/稳定器/世界锚点/寻址牌/激活珍珠的注册 + DataComponent + 网络。
+ */
+@Mod(StarlightLogistics.MOD_ID)
+public class StarlightLogistics {
+    public static final String MOD_ID = AeroSuiteIds.STARLIGHT_ID;
 
     // 寻址牌的 WoodType/BlockSetType:必须在 mod 构造早期注册(static 块,早于 DeferredRegister
     // 和 Sheets 静态初始化 / LayerDefinitions.buildRoots)。WoodType name 带 namespace,使
-    // Sheets.createSignMaterial 解析到 aeronautics_gravity:entity/signs/addressing_sign 贴图,
-    // ModelLayers.createSignModelName 解析到 aeronautics_gravity:sign/addressing_sign layer。
+    // Sheets.createSignMaterial 解析到 starlight_logistics:entity/signs/addressing_sign 贴图,
+    // ModelLayers.createSignModelName 解析到 starlight_logistics:sign/addressing_sign layer。
+    // (LayerDefinitions.buildRoots 遍历 WoodType.values() 自动建 sign layer, 不能手动再注册。)
     public static final BlockSetType ADDRESSING_SIGN_BLOCK_SET_TYPE;
     public static final WoodType ADDRESSING_SIGN_WOOD_TYPE;
     static {
-        ADDRESSING_SIGN_BLOCK_SET_TYPE = BlockSetType.register(new BlockSetType("aeronautics_gravity_addressing_sign"));
+        ADDRESSING_SIGN_BLOCK_SET_TYPE = BlockSetType.register(new BlockSetType("starlight_logistics_addressing_sign"));
         ADDRESSING_SIGN_WOOD_TYPE = WoodType.register(new WoodType(
-            "aeronautics_gravity:addressing_sign", ADDRESSING_SIGN_BLOCK_SET_TYPE,
+            "starlight_logistics:addressing_sign", ADDRESSING_SIGN_BLOCK_SET_TYPE,
             SoundType.GLASS, SoundType.HANGING_SIGN,
             SoundEvents.FENCE_GATE_CLOSE, SoundEvents.FENCE_GATE_OPEN));
     }
 
-    public AeronauticsGravityVisualization(IEventBus modEventBus) {
+    public StarlightLogistics(IEventBus modEventBus) {
         ModDataComponents.DATA_COMPONENTS.register(modEventBus);
-        ModItems.ITEMS.register(modEventBus);
-        ModBlocks.BLOCKS.register(modEventBus);
-        ModBlocks.BLOCK_ENTITIES.register(modEventBus);
-        ModMenus.MENUS.register(modEventBus);
+        ModItems.STARLIGHT_ITEMS.register(modEventBus);
+        ModBlocks.STARLIGHT_BLOCKS.register(modEventBus);
+        ModBlocks.STARLIGHT_BLOCK_ENTITIES.register(modEventBus);
         ModFluids.FLUID_TYPES.register(modEventBus);
         ModFluids.FLUIDS.register(modEventBus);
-        ModCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
-        ModTriggers.TRIGGERS.register(modEventBus);
         ModPayloads.register(modEventBus);
-        modEventBus.addListener(AeronauticsGravityVisualization::onCommonSetup);
-        LOGGER.info("Aeronautics Gravity Visualization loaded!");
+        modEventBus.addListener(StarlightLogistics::onCommonSetup);
+        AeroSuite.LOGGER.info("Aeronautics: Starlight Logistics loaded!");
     }
 
     // 把 starlight_encased_fluid_pipe 注册为 Create fluid_pipe 的 encased 变体,
@@ -67,10 +64,6 @@ public class AeronauticsGravityVisualization {
             FluidPipeBlock pipe = (FluidPipeBlock) BuiltInRegistries.BLOCK.get(
                     ResourceLocation.fromNamespaceAndPath("create", "fluid_pipe"));
             EncasingRegistry.addVariant(pipe, ModBlocks.STARLIGHT_ENCASED_FLUID_PIPE_BLOCK.get());
-            // 变速式便携引擎:注册应力容量(超热 ×2 由 BE.calculateAddedStressCapacity 覆盖)
-            for (var holder : ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINES.values()) {
-                BlockStressValues.CAPACITIES.register(holder.get(), () -> 64.0);
-            }
         });
     }
 }

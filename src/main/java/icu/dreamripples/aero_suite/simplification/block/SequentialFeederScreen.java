@@ -1,9 +1,9 @@
 package icu.dreamripples.aero_suite.simplification.block;
 
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
+import icu.dreamripples.aero_suite.simplification.SimplificationRelated;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederMenu;
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
 public class SequentialFeederScreen extends AbstractSimiContainerScreen<SequentialFeederMenu> {
 
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(AeronauticsGravityVisualization.MOD_ID, "textures/gui/sequential_feeder.png");
+            ResourceLocation.fromNamespaceAndPath(SimplificationRelated.MOD_ID, "textures/gui/sequential_feeder.png");
 
     // 贴图右上角四种颜色箭头精灵(均为 8x9)
     private static final int ARROW_W = 8, ARROW_H = 9;
@@ -43,8 +43,8 @@ public class SequentialFeederScreen extends AbstractSimiContainerScreen<Sequenti
 
     public SequentialFeederScreen(SequentialFeederMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
-        this.markerLabel = Component.translatable("gui.aeronautics_gravity.sequential_feeder.marker_slots");
-        this.inventoryLabel = Component.translatable("gui.aeronautics_gravity.sequential_feeder.inventory_slots");
+        this.markerLabel = Component.translatable("gui.simplification_related.sequential_feeder.marker_slots");
+        this.inventoryLabel = Component.translatable("gui.simplification_related.sequential_feeder.inventory_slots");
     }
 
     @Override

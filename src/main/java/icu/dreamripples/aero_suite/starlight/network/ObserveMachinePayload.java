@@ -1,4 +1,5 @@
 package icu.dreamripples.aero_suite.starlight.network;
+import icu.dreamripples.aero_suite.gravity.GravityVisualization;
 
 import io.netty.buffer.ByteBuf;
 import icu.dreamripples.aero_suite.gravity.GoggleOverlayRendererMixin;
@@ -13,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
  */
 public record ObserveMachinePayload() implements CustomPacketPayload {
     public static final Type<ObserveMachinePayload> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "observe_machine"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(GravityVisualization.MOD_ID, "observe_machine"));
 
     // 空载荷:unit 编解码器恒返回同一实例。playToServer 要求 StreamCodec<? super RegistryFriendlyByteBuf, T>,
     // StreamCodec<ByteBuf, T> 兼容(RegistryFriendlyByteBuf extends ByteBuf)。

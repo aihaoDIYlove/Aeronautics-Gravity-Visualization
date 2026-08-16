@@ -58,12 +58,12 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         CreateLang.builder()
-                .add(Component.translatable("block.aeronautics_gravity.convenient_analog_transmission")
+                .add(Component.translatable("block.simplification_related.convenient_analog_transmission")
                         .withStyle(ChatFormatting.WHITE))
                 .forGoggles(tooltip);
 
         CreateLang.builder()
-                .add(Component.translatable("tooltip.aeronautics_gravity.current_output_speed")
+                .add(Component.translatable("tooltip.simplification_related.current_output_speed")
                         .withStyle(ChatFormatting.GRAY))
                 .forGoggles(tooltip, 1);
         CreateLang.number(getTargetSpeed())

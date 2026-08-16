@@ -104,14 +104,14 @@ public class ActivatedEnderPearlItem extends Item {
                                 TooltipFlag flag) {
         PearlOwner owner = getOwner(stack);
         if (owner != null) {
-            tooltip.add(Component.translatable("tooltip.aeronautics_gravity.activated_ender_pearl.bound")
+            tooltip.add(Component.translatable("tooltip.starlight_logistics.activated_ender_pearl.bound")
                     .append(Component.literal(": " + owner.name()))
                     .withStyle(ChatFormatting.LIGHT_PURPLE));
         } else {
-            tooltip.add(Component.translatable("tooltip.aeronautics_gravity.activated_ender_pearl.unbound")
+            tooltip.add(Component.translatable("tooltip.starlight_logistics.activated_ender_pearl.unbound")
                     .withStyle(ChatFormatting.GRAY));
         }
-        tooltip.add(Component.translatable("tooltip.aeronautics_gravity.activated_ender_pearl")
+        tooltip.add(Component.translatable("tooltip.starlight_logistics.activated_ender_pearl")
                 .withStyle(ChatFormatting.DARK_GRAY));
     }
 }

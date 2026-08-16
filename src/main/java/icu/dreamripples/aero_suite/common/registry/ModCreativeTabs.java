@@ -1,7 +1,7 @@
 package icu.dreamripples.aero_suite.common.registry;
 
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import icu.dreamripples.aero_suite.common.registry.CreativeTabInjections;
+import icu.dreamripples.aero_suite.gravity.GravityVisualization;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import net.minecraft.core.registries.Registries;
@@ -13,11 +13,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
-            DeferredRegister.create(Registries.CREATIVE_MODE_TAB, AeronauticsGravityVisualization.MOD_ID);
+            DeferredRegister.create(Registries.CREATIVE_MODE_TAB, GravityVisualization.MOD_ID);
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_TAB =
             CREATIVE_MODE_TABS.register("main", () -> CreativeModeTab.builder()
-                    .title(Component.translatable("itemGroup.aeronautics_gravity.main"))
+                    .title(Component.translatable("itemGroup.gravity_visualization.main"))
                     .icon(() -> ModItems.SPARK_WAND.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.SPARK_WAND.get());

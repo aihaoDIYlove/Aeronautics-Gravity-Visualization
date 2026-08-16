@@ -79,7 +79,7 @@ public class VoidHosePulleyBlockEntity extends HosePulleyBlockEntity {
         } else {
             // 不 active: 提示抽取所需的最低 Y(末地之海渲染顶部 = startY - 2)
             CreateLang.builder()
-                    .add(Component.translatable("tooltip.aeronautics_gravity.hose_too_high", getRequiredY())
+                    .add(Component.translatable("tooltip.starlight_logistics.hose_too_high", getRequiredY())
                             .withStyle(ChatFormatting.GRAY))
                     .forGoggles(tooltip);
         }
@@ -87,7 +87,7 @@ public class VoidHosePulleyBlockEntity extends HosePulleyBlockEntity {
         tooltip.add(Component.empty());
         // 当前软管最底端高度(总是显示, 玩家需知道末端是否进入末地之海)
         CreateLang.builder()
-                .add(Component.translatable("tooltip.aeronautics_gravity.hose_bottom")
+                .add(Component.translatable("tooltip.starlight_logistics.hose_bottom")
                         .withStyle(ChatFormatting.GRAY))
                 .forGoggles(tooltip);
         CreateLang.number(getHoseBottomY())

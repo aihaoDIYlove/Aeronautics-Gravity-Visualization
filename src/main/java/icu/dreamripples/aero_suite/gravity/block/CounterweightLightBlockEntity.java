@@ -40,7 +40,7 @@ public class CounterweightLightBlockEntity extends SmartBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         liftTier = new LiftTierScrollValueBehaviour(
-                Component.translatable("block.aeronautics_gravity.counterweight_light.lift_tier"),
+                Component.translatable("block.gravity_visualization.counterweight_light.lift_tier"),
                 this,
                 new LiftTierValueBoxTransform()
         ).between(MIN_TIER, MAX_TIER).withCallback(this::applyTier);
@@ -76,7 +76,7 @@ public class CounterweightLightBlockEntity extends SmartBlockEntity {
         @Override
         public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
             return new ValueSettingsBoard(label, MAX_TIER, 1,
-                    ImmutableList.of(Component.translatable("aeronautics_gravity.unit.lift_kpg")),
+                    ImmutableList.of(Component.translatable("gravity_visualization.unit.lift_kpg")),
                     new ValueSettingsFormatter(this::formatSettings));
         }
 

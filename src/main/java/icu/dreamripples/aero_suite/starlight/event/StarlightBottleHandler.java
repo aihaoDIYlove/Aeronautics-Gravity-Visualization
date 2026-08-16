@@ -1,9 +1,9 @@
 package icu.dreamripples.aero_suite.starlight.event;
 
 import dev.simulated_team.simulated.content.end_sea.EndSeaPhysics;
+import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import dev.simulated_team.simulated.content.end_sea.EndSeaPhysicsData;
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -31,7 +31,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
  * 注: 本方案假设"对载具方块右键触发 RightClickBlock"(Sable 让客户端射线检测 SubLevel 载具)。
  * 若实测载具方块不触发 RightClickBlock, 需改用 SableRaycastHelper 在 RightClickItem 内做射线检测。
  */
-@EventBusSubscriber(modid = AeronauticsGravityVisualization.MOD_ID)
+@EventBusSubscriber(modid = StarlightLogistics.MOD_ID)
 public class StarlightBottleHandler {
 
     private static boolean isGlassBottle(ItemStack held) {

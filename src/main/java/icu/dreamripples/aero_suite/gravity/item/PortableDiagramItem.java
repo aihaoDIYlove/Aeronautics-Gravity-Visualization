@@ -69,7 +69,7 @@ public class PortableDiagramItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("tooltip.aeronautics_gravity.portable_diagram")
+        tooltip.add(Component.translatable("tooltip.gravity_visualization.portable_diagram")
                 .withStyle(ChatFormatting.GRAY));
     }
 }

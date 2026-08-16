@@ -78,7 +78,7 @@ public class AddressingSignBlock extends WallSignBlock {
 
     @Override
     public String getDescriptionId() {
-        return "block.aeronautics_gravity.addressing_sign";
+        return "block.starlight_logistics.addressing_sign";
     }
 
     @Override

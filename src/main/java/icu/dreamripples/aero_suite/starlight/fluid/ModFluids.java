@@ -1,7 +1,7 @@
 package icu.dreamripples.aero_suite.starlight.fluid;
 
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import icu.dreamripples.aero_suite.starlight.fluid.StarlightFluid;
 import icu.dreamripples.aero_suite.starlight.fluid.StarlightFluidType;
@@ -25,23 +25,23 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
  * （不是 {@code Registries.FLUID_TYPE}）；LiquidBlock/BucketItem 构造接直接 Fluid 而非 Supplier；
  * BucketItem/LiquidBlock 的 fluid capability 由 NeoForge 默认提供，无需手写。
  * <p>
- * 贴图为本 mod 自制的 starlight_still/flow (末地之海色调星海动画, tools/gen_starlight.py 生成), lang key = {@code fluid.aeronautics_gravity.starlight}。
+ * 贴图为本 mod 自制的 starlight_still/flow (末地之海色调星海动画, tools/gen_starlight.py 生成), lang key = {@code fluid.starlight_logistics.starlight}。
  */
 public class ModFluids {
     public static final DeferredRegister<FluidType> FLUID_TYPES =
-            DeferredRegister.create(NeoForgeRegistries.FLUID_TYPES, AeronauticsGravityVisualization.MOD_ID);
+            DeferredRegister.create(NeoForgeRegistries.FLUID_TYPES, StarlightLogistics.MOD_ID);
     public static final DeferredRegister<Fluid> FLUIDS =
-            DeferredRegister.create(Registries.FLUID, AeronauticsGravityVisualization.MOD_ID);
+            DeferredRegister.create(Registries.FLUID, StarlightLogistics.MOD_ID);
 
     private static final ResourceLocation STILL_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(AeronauticsGravityVisualization.MOD_ID, "fluid/starlight_still");
+            ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "fluid/starlight_still");
     private static final ResourceLocation FLOWING_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(AeronauticsGravityVisualization.MOD_ID, "fluid/starlight_flow");
+            ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "fluid/starlight_flow");
 
     public static final DeferredHolder<FluidType, StarlightFluidType> STARLIGHT_FLUID_TYPE =
             FLUID_TYPES.register("starlight", () -> new StarlightFluidType(
                     FluidType.Properties.create()
-                            .descriptionId("fluid.aeronautics_gravity.starlight")
+                            .descriptionId("fluid.starlight_logistics.starlight")
                             .viscosity(1500)
                             .density(1400)
                             .canConvertToSource(false)   // 不形成无限源

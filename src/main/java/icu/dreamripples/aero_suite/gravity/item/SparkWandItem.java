@@ -1,12 +1,12 @@
 package icu.dreamripples.aero_suite.gravity.item;
 
 import dev.ryanhcode.sable.Sable;
+import icu.dreamripples.aero_suite.common.AeroSuite;
 import icu.dreamripples.aero_suite.gravity.ModEnchantments;
 import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
 import icu.dreamripples.aero_suite.gravity.client.MassVisualizer;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
@@ -80,14 +80,14 @@ public class SparkWandItem extends Item {
             // 通过 Sable 的 HELPER 直接查找瞄准位置所在的 SubLevel
             SubLevel subLevel = Sable.HELPER.getContaining(clientLevel, hitPos);
 
-            AeronauticsGravityVisualization.LOGGER.info(
+            AeroSuite.LOGGER.info(
                     "[SparkWand] useOn at {}, subLevel={}",
                     hitPos, subLevel);
 
             if (subLevel instanceof ClientSubLevel cs) {
                 boolean heavy = context.getPlayer() != null && context.getPlayer().isShiftKeyDown();
                 MassVisualizer.toggle(cs, heavy);
-                AeronauticsGravityVisualization.LOGGER.info("[SparkWand] => toggled (heavy={})!", heavy);
+                AeroSuite.LOGGER.info("[SparkWand] => toggled (heavy={})!", heavy);
             }
         }
         return InteractionResult.SUCCESS;
@@ -146,9 +146,9 @@ public class SparkWandItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.spark_wand.full").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.spark_wand.heavy").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.spark_wand.goggles").withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.spark_wand.fire").withStyle(ChatFormatting.GOLD));
+        tooltipComponents.add(Component.translatable("tooltip.gravity_visualization.spark_wand.full").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("tooltip.gravity_visualization.spark_wand.heavy").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("tooltip.gravity_visualization.spark_wand.goggles").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("tooltip.gravity_visualization.spark_wand.fire").withStyle(ChatFormatting.GOLD));
     }
 }

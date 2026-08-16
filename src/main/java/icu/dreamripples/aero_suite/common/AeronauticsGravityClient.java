@@ -1,6 +1,8 @@
 package icu.dreamripples.aero_suite.common;
 
 import com.simibubi.create.CreateClient;
+import icu.dreamripples.aero_suite.gravity.GravityVisualization;
+import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import icu.dreamripples.aero_suite.gravity.client.MassVisualizer;
@@ -57,8 +59,8 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
-@Mod(value = AeronauticsGravityVisualization.MOD_ID, dist = Dist.CLIENT)
-@EventBusSubscriber(modid = AeronauticsGravityVisualization.MOD_ID, value = Dist.CLIENT)
+@Mod(value = GravityVisualization.MOD_ID, dist = Dist.CLIENT)
+@EventBusSubscriber(modid = GravityVisualization.MOD_ID, value = Dist.CLIENT)
 public class AeronauticsGravityClient {
 
     public AeronauticsGravityClient(net.neoforged.bus.api.IEventBus modEventBus) {
@@ -84,7 +86,7 @@ public class AeronauticsGravityClient {
         BlockEntityRenderers.register(ModBlocks.ADDRESSING_SIGN_BE.get(), AddressingSignRenderer::new);
         event.enqueueWork(() -> {
             // 注册自定义 WoodType 到 Sheets(SIGN_MATERIALS 是静态收集,后注册的 WoodType 需手动补登记)
-            Sheets.addWoodType(AeronauticsGravityVisualization.ADDRESSING_SIGN_WOOD_TYPE);
+            Sheets.addWoodType(StarlightLogistics.ADDRESSING_SIGN_WOOD_TYPE);
             ModPartialModels.init();
             // 更方便的模拟传动器:自定义 visual 解耦显示转速与网络转速
             // (主BE.speed 恒为输出 targetSpeed;shaft visual 按 source 归属显示输入/输出转速)
@@ -127,13 +129,13 @@ public class AeronauticsGravityClient {
     }
 
     private static void registerGlassCT(ModelEvent.ModifyBakingResult event, String name) {
-        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", name);
+        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, name);
         Block block = BuiltInRegistries.BLOCK.get(blockId);
         if (block == Blocks.AIR) return;
         CTSpriteShiftEntry shift = CTSpriteShifter.getCT(
                 AllCTTypes.OMNIDIRECTIONAL,
-                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/" + name),
-                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/" + name + "_connected"));
+                ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "block/" + name),
+                ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "block/" + name + "_connected"));
         ConnectedTextureBehaviour behaviour = new SimpleCTBehaviour(shift);
         for (BlockState state : block.getStateDefinition().getPossibleStates()) {
             ModelResourceLocation mrl = BlockModelShaper.stateToModelLocation(blockId, state);
@@ -148,13 +150,13 @@ public class AeronauticsGravityClient {
     // 同机壳 entry, 所以 CT 包装和 CasingConnectivity 注册必须用同一 CTSpriteShiftEntry. 等价 Create 的
     // BuilderTransformers.casing(connectedTextures(EncasedCTBehaviour) + casingConnectivity(makeCasing)).
     private static void registerCasingCT(ModelEvent.ModifyBakingResult event, String name) {
-        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", name);
+        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, name);
         Block block = BuiltInRegistries.BLOCK.get(blockId);
         if (block == Blocks.AIR) return;
         CTSpriteShiftEntry shift = CTSpriteShifter.getCT(
                 AllCTTypes.OMNIDIRECTIONAL,
-                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/" + name),
-                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/" + name + "_connected"));
+                ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "block/" + name),
+                ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "block/" + name + "_connected"));
         CreateClient.CASING_CONNECTIVITY.makeCasing(block, shift);
         ConnectedTextureBehaviour behaviour = new EncasedCTBehaviour(shift);
         for (BlockState state : block.getStateDefinition().getPossibleStates()) {
@@ -169,13 +171,13 @@ public class AeronauticsGravityClient {
     // 套壳管道 CT + CasingConnectivity: 用 starlight_casing 的 shift(机壳面连接), 只在非管道连接方向
     // 显示机壳连接(仿 Create encased_fluid_pipe 的 predicate: !getValue(FACING_TO_PROPERTY_MAP)).
     private static void registerEncasedPipeCT(ModelEvent.ModifyBakingResult event, String name) {
-        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", name);
+        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, name);
         Block block = BuiltInRegistries.BLOCK.get(blockId);
         if (block == Blocks.AIR) return;
         CTSpriteShiftEntry shift = CTSpriteShifter.getCT(
                 AllCTTypes.OMNIDIRECTIONAL,
-                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/starlight_casing"),
-                ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "block/starlight_casing_connected"));
+                ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "block/starlight_casing"),
+                ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "block/starlight_casing_connected"));
         CreateClient.CASING_CONNECTIVITY.make(block, shift,
                 (s, f) -> !s.getValue(EncasedPipeBlock.FACING_TO_PROPERTY_MAP.get(f)));
         ConnectedTextureBehaviour behaviour = new EncasedCTBehaviour(shift);

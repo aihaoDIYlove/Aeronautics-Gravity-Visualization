@@ -32,7 +32,7 @@ public class RedstoneCounterweightBlockEntity extends BlockEntity implements IHa
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         int tier = getBlockState().getValue(RedstoneCounterweightBlock.MASS_TIER);
         CreateLang.builder()
-            .add(Component.translatable("tooltip.aeronautics_gravity.current_mass")
+            .add(Component.translatable("tooltip.gravity_visualization.current_mass")
                 .withStyle(ChatFormatting.GRAY))
             .forGoggles(tooltip);
         CreateLang.number(tier)

@@ -1,4 +1,5 @@
 package icu.dreamripples.aero_suite.starlight.network;
+import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 
 import io.netty.buffer.ByteBuf;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
@@ -15,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
  */
 public record AddressingSignScrollPayload(BlockPos pos, int newSelected) implements CustomPacketPayload {
     public static final Type<AddressingSignScrollPayload> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath("aeronautics_gravity", "addressing_sign_scroll"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "addressing_sign_scroll"));
 
     public static final StreamCodec<ByteBuf, AddressingSignScrollPayload> STREAM_CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC, AddressingSignScrollPayload::pos,

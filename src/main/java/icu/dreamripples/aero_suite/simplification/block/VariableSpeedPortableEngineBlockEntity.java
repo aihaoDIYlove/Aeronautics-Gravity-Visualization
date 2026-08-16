@@ -52,7 +52,7 @@ public class VariableSpeedPortableEngineBlockEntity extends PortableEngineBlockE
         // 移除原版方向弹板(字段保留避免 tick NPE),用转速弹板替代
         behaviours.remove(this.movementDirection);
         speedSetting = new SpeedTierScrollBehaviour(
-                Component.translatable("block.aeronautics_gravity.variable_speed_portable_engine.speed"),
+                Component.translatable("block.simplification_related.variable_speed_portable_engine.speed"),
                 this, new VariableSpeedValueBoxTransform());
         speedSetting.value = 1;  // 第一档 32 RPM
         speedSetting.withCallback(i -> updateGeneratedRotation());
@@ -85,7 +85,7 @@ public class VariableSpeedPortableEngineBlockEntity extends PortableEngineBlockE
         // 转速/超热追加在后,使"应力发生器状态"作为抬头在最上方。
         super.addToGoggleTooltip(tooltip, isPlayerSneaking);
         CreateLang.builder()
-                .add(Component.translatable("tooltip.aeronautics_gravity.current_output_speed")
+                .add(Component.translatable("tooltip.simplification_related.current_output_speed")
                         .withStyle(ChatFormatting.GRAY))
                 .forGoggles(tooltip);
         CreateLang.number(Math.abs(getGeneratedSpeed()))
@@ -94,7 +94,7 @@ public class VariableSpeedPortableEngineBlockEntity extends PortableEngineBlockE
                 .forGoggles(tooltip, 1);
         if (isSuperHeated()) {
             CreateLang.builder()
-                    .add(Component.translatable("tooltip.aeronautics_gravity.superheated_stress_boost")
+                    .add(Component.translatable("tooltip.simplification_related.superheated_stress_boost")
                             .withStyle(ChatFormatting.LIGHT_PURPLE))
                     .forGoggles(tooltip);
         }

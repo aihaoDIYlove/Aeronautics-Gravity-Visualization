@@ -32,7 +32,7 @@ public class RedstoneCounterweightLightBlockEntity extends BlockEntity implement
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         int tier = getBlockState().getValue(RedstoneCounterweightLightBlock.LIFT_TIER);
         CreateLang.builder()
-            .add(Component.translatable("tooltip.aeronautics_gravity.current_lift")
+            .add(Component.translatable("tooltip.gravity_visualization.current_lift")
                 .withStyle(ChatFormatting.GRAY))
             .forGoggles(tooltip);
         CreateLang.number(tier)

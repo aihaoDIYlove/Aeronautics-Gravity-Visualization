@@ -23,11 +23,11 @@ public class AddressingSignBlockItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context,
                                 List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.addressing_sign.edit")
+        tooltipComponents.add(Component.translatable("tooltip.starlight_logistics.addressing_sign.edit")
                 .withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.addressing_sign.scroll")
+        tooltipComponents.add(Component.translatable("tooltip.starlight_logistics.addressing_sign.scroll")
                 .withStyle(ChatFormatting.GRAY));
-        tooltipComponents.add(Component.translatable("tooltip.aeronautics_gravity.addressing_sign.use")
+        tooltipComponents.add(Component.translatable("tooltip.starlight_logistics.addressing_sign.use")
                 .withStyle(ChatFormatting.GOLD));
     }
 }

@@ -1,10 +1,10 @@
 package icu.dreamripples.aero_suite.starlight.event;
 
 import dev.simulated_team.simulated.content.end_sea.EndSeaPhysics;
+import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.starlight.block.StarlightLiquidBlock;
 import icu.dreamripples.aero_suite.starlight.event.StarlightBottleHandler;
 import dev.simulated_team.simulated.content.end_sea.EndSeaPhysicsData;
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -31,7 +31,7 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
  * 创建 {@link MobEffectInstance} 对象. {@code addEffect} 默认按 max 合并, 不会无限堆叠时长; 持续接触
  * 保持 15 秒, 离开后自然到期.
  */
-@EventBusSubscriber(modid = AeronauticsGravityVisualization.MOD_ID)
+@EventBusSubscriber(modid = StarlightLogistics.MOD_ID)
 public class StarlightGlowHandler {
 
     private static final int GLOW_DURATION = 15 * 20;    // 15 秒 = 300 tick

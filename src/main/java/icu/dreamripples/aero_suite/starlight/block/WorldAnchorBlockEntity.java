@@ -1,6 +1,7 @@
 package icu.dreamripples.aero_suite.starlight.block;
 
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.starlight.logistics.WorldAnchorNetwork;
 import com.simibubi.create.content.logistics.box.PackageItem;
@@ -18,7 +19,6 @@ import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.ticket.SubLevelLoadingTicketType;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.ChatFormatting;
@@ -76,7 +76,7 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
     /** Sable forceLoad ticket 类型: 用 BlockPos 作 key 实现引用计数(同载具多 WorldAnchor 各持独立 ticket) */
     public static final SubLevelLoadingTicketType<BlockPos> WORLD_ANCHOR_TICKET =
         SubLevelLoadingTicketType.create(
-            ResourceLocation.fromNamespaceAndPath(AeronauticsGravityVisualization.MOD_ID, "world_anchor"),
+            ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "world_anchor"),
             BlockPos.CODEC);
 
     private AnchorModeBehaviour modeBehaviour;
@@ -106,7 +106,7 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
         super.addBehaviours(behaviours); // openTracker (世界锚点不开 UI,保留无害)
         modeBehaviour = new AnchorModeBehaviour(
                 AnchorMode.class,
-                Component.translatable("tooltip.aeronautics_gravity.world_anchor.mode"),
+                Component.translatable("tooltip.starlight_logistics.world_anchor.mode"),
                 this,
                 new AnchorModeValueBoxTransform());
         modeBehaviour.value = 0; // 默认 SEND
@@ -303,14 +303,14 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
         AnchorMode mode = getMode();
 
         CreateLang.builder()
-                .add(Component.translatable("block.aeronautics_gravity.world_anchor")
+                .add(Component.translatable("block.starlight_logistics.world_anchor")
                         .withStyle(ChatFormatting.WHITE))
                 .forGoggles(tooltip);
 
         // 模式(SEND=红 / RECEIVE=青, 对齐灯带色)
         ChatFormatting modeColor = (mode == AnchorMode.SEND) ? ChatFormatting.RED : ChatFormatting.AQUA;
         CreateLang.builder()
-                .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.mode")
+                .add(Component.translatable("tooltip.starlight_logistics.world_anchor.mode")
                         .withStyle(ChatFormatting.GRAY))
                 .add(Component.literal(": ")
                         .withStyle(ChatFormatting.DARK_GRAY))
@@ -321,14 +321,14 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
         // 内容物(1 格包裹; 显示包裹地址, 空槽显示"空")
         ItemStack box = inventory.getStackInSlot(0);
         CreateLang.builder()
-                .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.contents")
+                .add(Component.translatable("tooltip.starlight_logistics.world_anchor.contents")
                         .withStyle(ChatFormatting.GRAY))
                 .add(Component.literal(": ")
                         .withStyle(ChatFormatting.DARK_GRAY))
                 .forGoggles(tooltip, 1);
         if (box.isEmpty()) {
             CreateLang.builder()
-                    .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.empty")
+                    .add(Component.translatable("tooltip.starlight_logistics.world_anchor.empty")
                             .withStyle(ChatFormatting.GRAY))
                     .forGoggles(tooltip, 2);
         } else {
@@ -342,21 +342,21 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
             // 卡住: 上次导出失败(无接收端/冲突/满), 黄色提示
             if (failedLastExport) {
                 CreateLang.builder()
-                        .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.pending_send")
+                        .add(Component.translatable("tooltip.starlight_logistics.world_anchor.pending_send")
                                 .withStyle(ChatFormatting.YELLOW))
                         .forGoggles(tooltip, 1);
             }
         } else {
             // RECEIVE: 地址行(告示牌配置的 addressFilter)
             CreateLang.builder()
-                    .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.address")
+                    .add(Component.translatable("tooltip.starlight_logistics.world_anchor.address")
                             .withStyle(ChatFormatting.GRAY))
                     .add(Component.literal(": ")
                             .withStyle(ChatFormatting.DARK_GRAY))
                     .forGoggles(tooltip, 1);
             if (signBasedAddress.isBlank()) {
                 CreateLang.builder()
-                        .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.no_address")
+                        .add(Component.translatable("tooltip.starlight_logistics.world_anchor.no_address")
                                 .withStyle(ChatFormatting.GRAY))
                         .forGoggles(tooltip, 2);
             } else {
@@ -368,14 +368,14 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
             // 地址冲突(本地多告示牌 / 跨维度同 filter), 白色, 跟在地址值下
             if (signConflict || conflicted) {
                 CreateLang.builder()
-                        .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.address_conflict")
+                        .add(Component.translatable("tooltip.starlight_logistics.world_anchor.address_conflict")
                                 .withStyle(ChatFormatting.WHITE))
                         .forGoggles(tooltip, 2);
             }
             // 缓存满(待导出), 绿色提示
             if (isBackedUp()) {
                 CreateLang.builder()
-                        .add(Component.translatable("tooltip.aeronautics_gravity.world_anchor.pending_export")
+                        .add(Component.translatable("tooltip.starlight_logistics.world_anchor.pending_export")
                                 .withStyle(ChatFormatting.GREEN))
                         .forGoggles(tooltip, 1);
             }
@@ -442,7 +442,7 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
 
         AnchorMode(AllIcons icon) {
             this.icon = icon;
-            this.translationKey = "tooltip.aeronautics_gravity.world_anchor.mode." + name().toLowerCase();
+            this.translationKey = "tooltip.starlight_logistics.world_anchor.mode." + name().toLowerCase();
         }
 
         @Override

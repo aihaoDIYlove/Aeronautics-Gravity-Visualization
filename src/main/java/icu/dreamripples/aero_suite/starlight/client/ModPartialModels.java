@@ -1,7 +1,7 @@
 package icu.dreamripples.aero_suite.starlight.client;
 
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -14,11 +14,11 @@ public class ModPartialModels {
 
     public static final PartialModel REDSTONE_INDICATOR =
             PartialModel.of(ResourceLocation.fromNamespaceAndPath(
-                    AeronauticsGravityVisualization.MOD_ID, "block/redstone_indicator"));
+                    StarlightLogistics.MOD_ID, "block/redstone_indicator"));
 
     public static final PartialModel ANCHOR_INDICATOR =
             PartialModel.of(ResourceLocation.fromNamespaceAndPath(
-                    AeronauticsGravityVisualization.MOD_ID, "block/anchor_indicator"));
+                    StarlightLogistics.MOD_ID, "block/anchor_indicator"));
 
     public static void init() {
         // 触发 static 字段初始化,完成 PartialModel 注册

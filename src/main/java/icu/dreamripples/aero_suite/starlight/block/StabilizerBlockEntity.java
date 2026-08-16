@@ -98,7 +98,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         deadbandBehaviour = new DeadbandScrollValueBehaviour(
-                Component.translatable("block.aeronautics_gravity.stabilizer.deadband"),
+                Component.translatable("block.starlight_logistics.stabilizer.deadband"),
                 this,
                 new DeadbandValueBoxTransform()  // 侧面 4 面
         ).between(MIN_DEADBAND, MAX_DEADBAND);
@@ -107,7 +107,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
 
         redstoneModeBehaviour = new RedstoneModeBehaviour(
                 RedstoneMode.class,
-                Component.translatable("tooltip.aeronautics_gravity.stabilizer.redstone_mode"),
+                Component.translatable("tooltip.starlight_logistics.stabilizer.redstone_mode"),
                 this,
                 new RedstoneModeValueBoxTransform()  // 上下 2 面
         );
@@ -225,7 +225,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         int liftTier = state.getValue(StabilizerBlock.LIFT_TIER);
 
         CreateLang.builder()
-                .add(Component.translatable("block.aeronautics_gravity.stabilizer")
+                .add(Component.translatable("block.starlight_logistics.stabilizer")
                         .withStyle(ChatFormatting.WHITE))
                 .forGoggles(tooltip);
 
@@ -233,20 +233,20 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         int currentTier;
         ChatFormatting modeColor;
         if (massTier > 1) {
-            modeKey = "tooltip.aeronautics_gravity.stabilizer.mass_mode";
+            modeKey = "tooltip.starlight_logistics.stabilizer.mass_mode";
             currentTier = massTier;
             modeColor = ChatFormatting.RED;
         } else if (liftTier > 1) {
-            modeKey = "tooltip.aeronautics_gravity.stabilizer.lift_mode";
+            modeKey = "tooltip.starlight_logistics.stabilizer.lift_mode";
             currentTier = liftTier;
             modeColor = ChatFormatting.AQUA;
         } else {
-            modeKey = "tooltip.aeronautics_gravity.stabilizer.idle";
+            modeKey = "tooltip.starlight_logistics.stabilizer.idle";
             currentTier = 0;
             modeColor = ChatFormatting.DARK_GRAY;
         }
         CreateLang.builder()
-                .add(Component.translatable("tooltip.aeronautics_gravity.stabilizer.mode")
+                .add(Component.translatable("tooltip.starlight_logistics.stabilizer.mode")
                         .withStyle(ChatFormatting.GRAY))
                 .add(Component.literal(": ")
                         .withStyle(ChatFormatting.DARK_GRAY))
@@ -256,7 +256,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
 
         if (currentTier > 0) {
             CreateLang.builder()
-                    .add(Component.translatable("tooltip.aeronautics_gravity.stabilizer.output")
+                    .add(Component.translatable("tooltip.starlight_logistics.stabilizer.output")
                             .withStyle(ChatFormatting.GRAY))
                     .forGoggles(tooltip, 1);
             CreateLang.number(currentTier)
@@ -266,7 +266,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         }
 
         CreateLang.builder()
-                .add(Component.translatable("block.aeronautics_gravity.stabilizer.deadband")
+                .add(Component.translatable("block.starlight_logistics.stabilizer.deadband")
                         .withStyle(ChatFormatting.GRAY))
                 .forGoggles(tooltip, 1);
         CreateLang.number(deadbandBehaviour.getValue())
@@ -277,7 +277,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         // 红石模式(上下两面切换的当前值)
         RedstoneMode mode = redstoneModeBehaviour.get();
         CreateLang.builder()
-                .add(Component.translatable("tooltip.aeronautics_gravity.stabilizer.redstone_mode")
+                .add(Component.translatable("tooltip.starlight_logistics.stabilizer.redstone_mode")
                         .withStyle(ChatFormatting.GRAY))
                 .add(Component.literal(": ")
                         .withStyle(ChatFormatting.DARK_GRAY))
@@ -300,7 +300,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         @Override
         public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
             return new ValueSettingsBoard(label, MAX_DEADBAND, 1,
-                    ImmutableList.of(Component.translatable("aeronautics_gravity.unit.deadband_deg")),
+                    ImmutableList.of(Component.translatable("starlight_logistics.unit.deadband_deg")),
                     new ValueSettingsFormatter(this::formatSettings));
         }
 
@@ -394,7 +394,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
 
         RedstoneMode(AllIcons icon) {
             this.icon = icon;
-            this.translationKey = "tooltip.aeronautics_gravity.stabilizer.redstone_mode." + name().toLowerCase();
+            this.translationKey = "tooltip.starlight_logistics.stabilizer.redstone_mode." + name().toLowerCase();
         }
 
         @Override

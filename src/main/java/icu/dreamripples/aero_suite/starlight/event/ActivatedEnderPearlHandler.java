@@ -1,7 +1,7 @@
 package icu.dreamripples.aero_suite.starlight.event;
 
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
+import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.starlight.component.PearlOwner;
 import icu.dreamripples.aero_suite.starlight.event.StarlightBottleHandler;
 import icu.dreamripples.aero_suite.starlight.item.ActivatedEnderPearlItem;
@@ -25,7 +25,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
  * <p>
  * 与 {@code StarlightBottleHandler} 同形: 主手目标物 + 副手材料 → 右键替换 + 消耗.
  */
-@EventBusSubscriber(modid = AeronauticsGravityVisualization.MOD_ID)
+@EventBusSubscriber(modid = StarlightLogistics.MOD_ID)
 public class ActivatedEnderPearlHandler {
 
     @SubscribeEvent

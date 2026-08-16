@@ -101,7 +101,7 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         modeBehaviour = new FeederModeBehaviour(
                 FeederMode.class,
-                Component.translatable("tooltip.aeronautics_gravity.sequential_feeder.mode"),
+                Component.translatable("tooltip.simplification_related.sequential_feeder.mode"),
                 this,
                 new FeederModeValueBoxTransform());
         modeBehaviour.value = 0; // 默认 REDSTONE_PULSE
@@ -162,7 +162,7 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("block.aeronautics_gravity.sequential_feeder");
+        return Component.translatable("block.simplification_related.sequential_feeder");
     }
 
     @Override
@@ -336,7 +336,7 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
 
         FeederMode(AllIcons icon) {
             this.icon = icon;
-            this.translationKey = "tooltip.aeronautics_gravity.sequential_feeder.mode." + name().toLowerCase();
+            this.translationKey = "tooltip.simplification_related.sequential_feeder.mode." + name().toLowerCase();
         }
 
         @Override

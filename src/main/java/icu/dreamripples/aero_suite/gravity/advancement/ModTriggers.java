@@ -1,7 +1,7 @@
 package icu.dreamripples.aero_suite.gravity.advancement;
 
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import icu.dreamripples.aero_suite.gravity.advancement.SparkWandKillTrigger;
+import icu.dreamripples.aero_suite.gravity.GravityVisualization;
 import icu.dreamripples.aero_suite.starlight.PackageEntityMixin;
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,12 +17,12 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * 直接调用会抛 "Registry is already frozen"。改用 DeferredRegister 在 RegisterEvent
  * (冻结前) 注入条目,与注册方块/物品同构。
  *
- * JSON 中 "trigger": "aeronautics_gravity:spark_wand_kill" 由 CriteriaTriggers.CODEC
+ * JSON 中 "trigger": "gravity_visualization:spark_wand_kill" 由 CriteriaTriggers.CODEC
  * 从 TRIGGER_TYPES Registry 按 id 查找,DeferredRegister 注册后即可命中。
  */
 public class ModTriggers {
     public static final DeferredRegister<CriterionTrigger<?>> TRIGGERS =
-            DeferredRegister.create(BuiltInRegistries.TRIGGER_TYPES, AeronauticsGravityVisualization.MOD_ID);
+            DeferredRegister.create(BuiltInRegistries.TRIGGER_TYPES, GravityVisualization.MOD_ID);
 
     public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> SPARK_WAND_KILL =
             TRIGGERS.register("spark_wand_kill", SparkWandKillTrigger::new);

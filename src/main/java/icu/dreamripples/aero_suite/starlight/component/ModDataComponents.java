@@ -1,7 +1,7 @@
 package icu.dreamripples.aero_suite.starlight.component;
 
-import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import icu.dreamripples.aero_suite.starlight.PackageEntityMixin;
+import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.starlight.component.PearlOwner;
 import icu.dreamripples.aero_suite.starlight.event.ActivatedEnderPearlHandler;
 import net.minecraft.core.component.DataComponentType;
@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  */
 public class ModDataComponents {
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS =
-            DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, AeronauticsGravityVisualization.MOD_ID);
+            DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, StarlightLogistics.MOD_ID);
 
     /**
      * 激活的末影珍珠:记录拥有者玩家 UUID + 玩家名. 玩家主手 ender_pearl + 副手 echo_shard
