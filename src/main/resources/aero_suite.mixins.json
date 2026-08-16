@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "icu.dreamripples.aero_suite",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "simplification.AnalogTransmissionBlockEntityAccessor",
+    "simplification.RotationPropagatorMixin",
+    "starlight.PackageEntityMixin",
+    "starlight.ClipboardEditPacketMixin"
+  ],
+  "client": [
+    "gravity.GoggleOverlayRendererMixin",
+    "starlight.ClipboardScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -34,7 +34,8 @@ repositories {
 }
 
 base {
-    archivesName = mod_id
+    // jar 名不再跟随单个 mod id（现在是三合一），用项目名
+    archivesName = 'Aeronautics_Suite'
 }
 
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
@@ -83,7 +84,7 @@ neoForge {
             // gameDirectory = project.file('run-data')
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+            programArguments.addAll '--mod', "${project.mod_id},${project.mod_id_2},${project.mod_id_3}", '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
 
         // applies to all the run configs above
@@ -104,9 +105,14 @@ neoForge {
 
     mods {
         // define mod <-> source bindings
-        // these are used to tell the game which sources are for which mod
-        // multi mod projects should define one per mod
+        // 一个 jar 三个 mod，全部绑同一 sourceSet；注册拆分在 Java 侧按 @Mod 分流
         "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+        "${mod_id_2}" {
+            sourceSet(sourceSets.main)
+        }
+        "${mod_id_3}" {
             sourceSet(sourceSets.main)
         }
     }
@@ -164,6 +170,10 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             loader_version_range   : loader_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
+            mod_id_2               : mod_id_2,
+            mod_name_2             : mod_name_2,
+            mod_id_3               : mod_id_3,
+            mod_name_3             : mod_name_3,
             mod_license            : mod_license,
             mod_version            : mod_version,
     ]
