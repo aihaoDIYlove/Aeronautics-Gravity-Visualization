@@ -1,6 +1,8 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.starlight.block;
 
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import icu.dreamripples.aero_suite.starlight.logistics.WorldAnchorNetwork;
 import com.simibubi.create.content.logistics.box.PackageItem;
 import com.simibubi.create.content.logistics.packagePort.PackagePortBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;
@@ -16,8 +18,7 @@ import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
 import dev.ryanhcode.sable.api.sublevel.ticket.SubLevelLoadingTicketType;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
 import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
-import icu.dreamripples.aero_suite.logistics.WorldAnchorNetwork;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.ChatFormatting;

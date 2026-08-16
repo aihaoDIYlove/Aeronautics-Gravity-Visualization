@@ -1,9 +1,11 @@
-package icu.dreamripples.aero_suite.client;
+package icu.dreamripples.aero_suite.starlight.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import icu.dreamripples.aero_suite.starlight.block.StabilizerBlock;
+import icu.dreamripples.aero_suite.starlight.block.StabilizerBlockEntity;
+import icu.dreamripples.aero_suite.starlight.client.ModPartialModels;
+import icu.dreamripples.aero_suite.starlight.client.WorldAnchorRenderer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
-import icu.dreamripples.aero_suite.block.StabilizerBlock;
-import icu.dreamripples.aero_suite.block.StabilizerBlockEntity;
 import net.createmod.catnip.render.CachedBuffers;
 import net.createmod.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;

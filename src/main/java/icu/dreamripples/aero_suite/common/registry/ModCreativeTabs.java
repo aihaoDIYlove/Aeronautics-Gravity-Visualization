@@ -1,7 +1,9 @@
-package icu.dreamripples.aero_suite.item;
+package icu.dreamripples.aero_suite.common.registry;
 
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
-import icu.dreamripples.aero_suite.block.ModBlocks;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.common.registry.CreativeTabInjections;
+import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import icu.dreamripples.aero_suite.common.registry.ModItems;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;

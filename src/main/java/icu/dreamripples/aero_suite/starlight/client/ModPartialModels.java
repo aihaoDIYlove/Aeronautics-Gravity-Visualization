@@ -1,7 +1,7 @@
-package icu.dreamripples.aero_suite.client;
+package icu.dreamripples.aero_suite.starlight.client;
 
 import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.minecraft.resources.ResourceLocation;
 
 /**

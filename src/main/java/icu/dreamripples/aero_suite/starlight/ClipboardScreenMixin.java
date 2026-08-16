@@ -1,7 +1,7 @@
-package icu.dreamripples.aero_suite.mixin;
+package icu.dreamripples.aero_suite.starlight;
 
 import com.simibubi.create.content.equipment.clipboard.ClipboardScreen;
-import icu.dreamripples.aero_suite.block.AddressingSignBlock;
+import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;

@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.starlight.block;
 
 import com.simibubi.create.content.decoration.palettes.ConnectedGlassBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;

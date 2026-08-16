@@ -1,6 +1,7 @@
-package icu.dreamripples.aero_suite.client;
+package icu.dreamripples.aero_suite.simplification.client;
 
 import com.simibubi.create.AllPartialModels;
+import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmissionBlockEntity;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityVisual;
 import com.simibubi.create.content.kinetics.base.RotatingInstance;
@@ -11,7 +12,6 @@ import dev.engine_room.flywheel.api.visualization.VisualizationContext;
 import dev.engine_room.flywheel.lib.model.Models;
 import dev.engine_room.flywheel.lib.visual.SimpleTickableVisual;
 import dev.simulated_team.simulated.index.SimPartialModels;
-import icu.dreamripples.aero_suite.block.ConvenientAnalogTransmissionBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;

@@ -1,7 +1,14 @@
-package icu.dreamripples.aero_suite.item;
+package icu.dreamripples.aero_suite.common.registry;
 
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
-import icu.dreamripples.aero_suite.fluid.ModFluids;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.gravity.item.PortableDiagramItem;
+import icu.dreamripples.aero_suite.gravity.item.SparkWandItem;
+import icu.dreamripples.aero_suite.starlight.component.ModDataComponents;
+import icu.dreamripples.aero_suite.starlight.event.ActivatedEnderPearlHandler;
+import icu.dreamripples.aero_suite.starlight.event.StarlightBottleHandler;
+import icu.dreamripples.aero_suite.starlight.fluid.ModFluids;
+import icu.dreamripples.aero_suite.starlight.fluid.StarlightFluid;
+import icu.dreamripples.aero_suite.starlight.item.ActivatedEnderPearlItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;

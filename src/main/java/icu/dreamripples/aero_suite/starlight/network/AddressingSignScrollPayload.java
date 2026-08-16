@@ -1,6 +1,7 @@
-package icu.dreamripples.aero_suite.network;
+package icu.dreamripples.aero_suite.starlight.network;
 
 import io.netty.buffer.ByteBuf;
+import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

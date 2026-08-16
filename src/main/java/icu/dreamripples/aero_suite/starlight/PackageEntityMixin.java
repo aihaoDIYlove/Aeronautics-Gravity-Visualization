@@ -1,12 +1,13 @@
-package icu.dreamripples.aero_suite.mixin;
+package icu.dreamripples.aero_suite.starlight;
 
 import com.simibubi.create.AllDataComponents;
+import icu.dreamripples.aero_suite.common.registry.ModItems;
+import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
+import icu.dreamripples.aero_suite.starlight.block.WorldAnchorBlockEntity;
+import icu.dreamripples.aero_suite.starlight.item.ActivatedEnderPearlItem;
 import com.simibubi.create.content.logistics.box.PackageEntity;
 import com.simibubi.create.content.logistics.box.PackageItem;
 import com.simibubi.create.foundation.item.ItemHelper;
-import icu.dreamripples.aero_suite.advancement.ModTriggers;
-import icu.dreamripples.aero_suite.item.ActivatedEnderPearlItem;
-import icu.dreamripples.aero_suite.item.ModItems;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;

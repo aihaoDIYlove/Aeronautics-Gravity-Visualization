@@ -1,6 +1,9 @@
-package icu.dreamripples.aero_suite.component;
+package icu.dreamripples.aero_suite.starlight.component;
 
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.starlight.PackageEntityMixin;
+import icu.dreamripples.aero_suite.starlight.component.PearlOwner;
+import icu.dreamripples.aero_suite.starlight.event.ActivatedEnderPearlHandler;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.neoforge.registries.DeferredRegister;

@@ -1,9 +1,9 @@
-package icu.dreamripples.aero_suite.client;
+package icu.dreamripples.aero_suite.starlight.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;
+import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
 import com.mojang.math.Axis;
-import icu.dreamripples.aero_suite.block.AddressingSignBlock;
-import icu.dreamripples.aero_suite.block.AddressingSignBlockEntity;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;

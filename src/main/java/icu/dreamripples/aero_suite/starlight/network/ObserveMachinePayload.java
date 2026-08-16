@@ -1,6 +1,7 @@
-package icu.dreamripples.aero_suite.network;
+package icu.dreamripples.aero_suite.starlight.network;
 
 import io.netty.buffer.ByteBuf;
+import icu.dreamripples.aero_suite.gravity.GoggleOverlayRendererMixin;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;

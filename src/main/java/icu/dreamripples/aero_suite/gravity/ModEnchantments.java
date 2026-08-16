@@ -1,6 +1,6 @@
-package icu.dreamripples.aero_suite.enchantment;
+package icu.dreamripples.aero_suite.gravity;
 
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

@@ -1,9 +1,9 @@
-package icu.dreamripples.aero_suite.mixin;
+package icu.dreamripples.aero_suite.gravity;
 
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import icu.dreamripples.aero_suite.common.registry.ModItems;
+import icu.dreamripples.aero_suite.starlight.network.ObserveMachinePayload;
 import com.simibubi.create.content.equipment.goggles.GoggleOverlayRenderer;
-import icu.dreamripples.aero_suite.item.ModItems;
-import icu.dreamripples.aero_suite.network.ObserveMachinePayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.BlockPos;

@@ -1,9 +1,10 @@
-package icu.dreamripples.aero_suite.event;
+package icu.dreamripples.aero_suite.starlight.event;
 
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
-import icu.dreamripples.aero_suite.component.PearlOwner;
-import icu.dreamripples.aero_suite.item.ActivatedEnderPearlItem;
-import icu.dreamripples.aero_suite.item.ModItems;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.common.registry.ModItems;
+import icu.dreamripples.aero_suite.starlight.component.PearlOwner;
+import icu.dreamripples.aero_suite.starlight.event.StarlightBottleHandler;
+import icu.dreamripples.aero_suite.starlight.item.ActivatedEnderPearlItem;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;

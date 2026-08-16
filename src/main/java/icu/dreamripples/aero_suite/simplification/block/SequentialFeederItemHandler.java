@@ -1,6 +1,7 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.simplification.block;
 
 import net.minecraft.core.Direction;
+import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 

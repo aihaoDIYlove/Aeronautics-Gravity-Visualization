@@ -1,6 +1,9 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.gravity.block;
 
 import net.minecraft.core.BlockPos;
+import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import icu.dreamripples.aero_suite.gravity.block.RedstoneCounterweightLightBlockEntity;
+import icu.dreamripples.aero_suite.gravity.block.RedstoneTierBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;

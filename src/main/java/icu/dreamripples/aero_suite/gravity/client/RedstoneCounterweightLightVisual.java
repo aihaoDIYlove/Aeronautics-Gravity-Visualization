@@ -1,14 +1,15 @@
-package icu.dreamripples.aero_suite.client;
+package icu.dreamripples.aero_suite.gravity.client;
 
 import dev.engine_room.flywheel.api.instance.Instance;
+import icu.dreamripples.aero_suite.gravity.block.RedstoneCounterweightLightBlock;
+import icu.dreamripples.aero_suite.gravity.block.RedstoneCounterweightLightBlockEntity;
+import icu.dreamripples.aero_suite.starlight.client.ModPartialModels;
 import dev.engine_room.flywheel.api.visualization.VisualizationContext;
 import dev.engine_room.flywheel.lib.instance.InstanceTypes;
 import dev.engine_room.flywheel.lib.instance.TransformedInstance;
 import dev.engine_room.flywheel.lib.model.Models;
 import dev.engine_room.flywheel.lib.visual.AbstractBlockEntityVisual;
 import dev.engine_room.flywheel.lib.visual.SimpleDynamicVisual;
-import icu.dreamripples.aero_suite.block.RedstoneCounterweightLightBlock;
-import icu.dreamripples.aero_suite.block.RedstoneCounterweightLightBlockEntity;
 
 import java.util.function.Consumer;
 

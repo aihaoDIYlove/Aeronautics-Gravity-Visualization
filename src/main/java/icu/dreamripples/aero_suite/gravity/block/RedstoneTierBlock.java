@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.gravity.block;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import net.minecraft.core.BlockPos;

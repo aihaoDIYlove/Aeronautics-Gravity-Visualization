@@ -1,6 +1,6 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.starlight.block;
 
-import icu.dreamripples.aero_suite.event.StarlightGlowHandler;
+import icu.dreamripples.aero_suite.starlight.event.StarlightGlowHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;

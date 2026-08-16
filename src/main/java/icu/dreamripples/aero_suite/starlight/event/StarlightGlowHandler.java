@@ -1,8 +1,10 @@
-package icu.dreamripples.aero_suite.event;
+package icu.dreamripples.aero_suite.starlight.event;
 
 import dev.simulated_team.simulated.content.end_sea.EndSeaPhysics;
+import icu.dreamripples.aero_suite.starlight.block.StarlightLiquidBlock;
+import icu.dreamripples.aero_suite.starlight.event.StarlightBottleHandler;
 import dev.simulated_team.simulated.content.end_sea.EndSeaPhysicsData;
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;

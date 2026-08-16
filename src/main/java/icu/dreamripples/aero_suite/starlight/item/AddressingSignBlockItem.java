@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.item;
+package icu.dreamripples.aero_suite.starlight.item;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

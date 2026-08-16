@@ -1,6 +1,7 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.simplification.block;
 
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.simplification.block.SequentialFeederMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;

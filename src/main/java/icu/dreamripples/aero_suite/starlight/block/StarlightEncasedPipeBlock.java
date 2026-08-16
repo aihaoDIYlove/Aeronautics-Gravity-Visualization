@@ -1,6 +1,7 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.starlight.block;
 
 import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
+import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;

@@ -1,7 +1,10 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.common.registry;
 
 import com.simibubi.create.content.fluids.hosePulley.HosePulleyBlock;
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import icu.dreamripples.aero_suite.starlight.block.VoidHosePulleyBlockEntity;
+import icu.dreamripples.aero_suite.starlight.block.WorldAnchorBlockEntity;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;

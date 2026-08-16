@@ -1,6 +1,7 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.starlight.block;
 
 import com.google.common.collect.ImmutableList;
+import icu.dreamripples.aero_suite.starlight.block.StabilizerBlock;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BehaviourType;

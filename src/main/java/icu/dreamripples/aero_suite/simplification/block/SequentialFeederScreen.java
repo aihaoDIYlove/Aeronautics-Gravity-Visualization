@@ -1,9 +1,9 @@
-package icu.dreamripples.aero_suite.client;
+package icu.dreamripples.aero_suite.simplification.block;
 
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
-import icu.dreamripples.aero_suite.block.SequentialFeederBlockEntity;
-import icu.dreamripples.aero_suite.block.SequentialFeederMenu;
+import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
+import icu.dreamripples.aero_suite.simplification.block.SequentialFeederMenu;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;

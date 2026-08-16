@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.component;
+package icu.dreamripples.aero_suite.starlight.component;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

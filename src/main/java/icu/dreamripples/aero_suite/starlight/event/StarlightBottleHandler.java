@@ -1,9 +1,9 @@
-package icu.dreamripples.aero_suite.event;
+package icu.dreamripples.aero_suite.starlight.event;
 
 import dev.simulated_team.simulated.content.end_sea.EndSeaPhysics;
+import icu.dreamripples.aero_suite.common.registry.ModItems;
 import dev.simulated_team.simulated.content.end_sea.EndSeaPhysicsData;
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
-import icu.dreamripples.aero_suite.item.ModItems;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;

@@ -1,17 +1,17 @@
-package icu.dreamripples.aero_suite;
+package icu.dreamripples.aero_suite.common;
 
 import com.mojang.logging.LogUtils;
+import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import icu.dreamripples.aero_suite.common.registry.ModCreativeTabs;
+import icu.dreamripples.aero_suite.common.registry.ModItems;
+import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
+import icu.dreamripples.aero_suite.simplification.block.ModMenus;
+import icu.dreamripples.aero_suite.starlight.component.ModDataComponents;
+import icu.dreamripples.aero_suite.starlight.fluid.ModFluids;
+import icu.dreamripples.aero_suite.starlight.network.ModPayloads;
 import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.content.decoration.encasing.EncasingRegistry;
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlock;
-import icu.dreamripples.aero_suite.advancement.ModTriggers;
-import icu.dreamripples.aero_suite.network.ModPayloads;
-import icu.dreamripples.aero_suite.component.ModDataComponents;
-import icu.dreamripples.aero_suite.block.ModBlocks;
-import icu.dreamripples.aero_suite.block.ModMenus;
-import icu.dreamripples.aero_suite.fluid.ModFluids;
-import icu.dreamripples.aero_suite.item.ModCreativeTabs;
-import icu.dreamripples.aero_suite.item.ModItems;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;

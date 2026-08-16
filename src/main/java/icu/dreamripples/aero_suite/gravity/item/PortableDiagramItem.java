@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.item;
+package icu.dreamripples.aero_suite.gravity.item;
 
 import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;

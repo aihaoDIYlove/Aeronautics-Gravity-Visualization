@@ -1,6 +1,7 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.starlight.block;
 
-import icu.dreamripples.aero_suite.fluid.ModFluids;
+import icu.dreamripples.aero_suite.starlight.fluid.ModFluids;
+import icu.dreamripples.aero_suite.starlight.block.VoidHosePulleyBlockEntity;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 

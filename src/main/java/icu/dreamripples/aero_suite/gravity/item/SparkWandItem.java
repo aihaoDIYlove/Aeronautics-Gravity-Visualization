@@ -1,12 +1,12 @@
-package icu.dreamripples.aero_suite.item;
+package icu.dreamripples.aero_suite.gravity.item;
 
 import dev.ryanhcode.sable.Sable;
+import icu.dreamripples.aero_suite.gravity.ModEnchantments;
+import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
+import icu.dreamripples.aero_suite.gravity.client.MassVisualizer;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
-import icu.dreamripples.aero_suite.advancement.ModTriggers;
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
-import icu.dreamripples.aero_suite.client.MassVisualizer;
-import icu.dreamripples.aero_suite.enchantment.ModEnchantments;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;

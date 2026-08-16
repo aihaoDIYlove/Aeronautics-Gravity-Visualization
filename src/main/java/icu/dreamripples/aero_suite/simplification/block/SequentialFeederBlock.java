@@ -1,6 +1,8 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.simplification.block;
 
 import com.simibubi.create.foundation.block.IBE;
+import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;

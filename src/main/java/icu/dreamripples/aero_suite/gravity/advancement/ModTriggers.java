@@ -1,6 +1,8 @@
-package icu.dreamripples.aero_suite.advancement;
+package icu.dreamripples.aero_suite.gravity.advancement;
 
-import icu.dreamripples.aero_suite.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.common.AeronauticsGravityVisualization;
+import icu.dreamripples.aero_suite.gravity.advancement.SparkWandKillTrigger;
+import icu.dreamripples.aero_suite.starlight.PackageEntityMixin;
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.neoforge.registries.DeferredHolder;

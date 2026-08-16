@@ -1,6 +1,7 @@
-package icu.dreamripples.aero_suite.mixin;
+package icu.dreamripples.aero_suite.simplification;
 
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlockEntity;
+import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmissionBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 

@@ -1,9 +1,9 @@
-package icu.dreamripples.aero_suite.mixin;
+package icu.dreamripples.aero_suite.starlight;
 
 import com.simibubi.create.AllDataComponents;
+import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
 import com.simibubi.create.content.equipment.clipboard.ClipboardContent;
 import com.simibubi.create.content.equipment.clipboard.ClipboardEditPacket;
-import icu.dreamripples.aero_suite.block.AddressingSignBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.server.level.ServerPlayer;

@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.fluid;
+package icu.dreamripples.aero_suite.starlight.fluid;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.item.ItemEntity;

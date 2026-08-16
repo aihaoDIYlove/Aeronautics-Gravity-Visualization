@@ -1,6 +1,9 @@
-package icu.dreamripples.aero_suite.block;
+package icu.dreamripples.aero_suite.starlight.block;
 
 import com.mojang.serialization.MapCodec;
+import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
+import icu.dreamripples.aero_suite.starlight.client.AddressingSignRenderer;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.simibubi.create.content.equipment.clipboard.ClipboardScreen;
 import net.createmod.catnip.gui.ScreenOpener;
