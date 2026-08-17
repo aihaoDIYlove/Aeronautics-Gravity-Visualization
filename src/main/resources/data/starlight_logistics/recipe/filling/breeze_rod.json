@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "conversion_recipes"
+    }
+  ],
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "item": "minecraft:blaze_rod"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 1000,
+      "fluid": "starlight_logistics:starlight"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:breeze_rod"
+    }
+  ]
+}
