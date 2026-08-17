@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.simplification;
+package icu.dreamripples.aero_suite.mixin.simplification;
 
 import com.simibubi.create.content.kinetics.RotationPropagator;
 import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmissionBlockEntity;

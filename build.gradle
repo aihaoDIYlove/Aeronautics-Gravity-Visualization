@@ -34,8 +34,7 @@ repositories {
 }
 
 base {
-    // jar 名不再跟随单个 mod id（现在是三合一），用项目名
-    archivesName = 'Aeronautics_Suite'
+    archivesName = mod_id
 }
 
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
@@ -104,15 +103,11 @@ neoForge {
     }
 
     mods {
-        // define mod <-> source bindings
-        // 一个 jar 三个 mod，全部绑同一 sourceSet；注册拆分在 Java 侧按 @Mod 分流
+        // 三 mod 同 sourceSet: 用单 binding(主 modId)把整个 main sourceSet 绑给本 jar;
+        // 另两个 mod 由 mods.toml 里的 [[mods]] entry 自动发现, @Mod 类反射加载, 不需独行 binding.
+        // (多 binding 同 sourceSet 会让 ModDevGradle 把 build/classes/java/main 单独当 candidate, 而它无
+        //  META-INF -> "not a valid mod file" FATAL. 单 binding 时 moddev 合并 classes+resources 作 candidate.)
         "${mod_id}" {
-            sourceSet(sourceSets.main)
-        }
-        "${mod_id_2}" {
-            sourceSet(sourceSets.main)
-        }
-        "${mod_id_3}" {
             sourceSet(sourceSets.main)
         }
     }

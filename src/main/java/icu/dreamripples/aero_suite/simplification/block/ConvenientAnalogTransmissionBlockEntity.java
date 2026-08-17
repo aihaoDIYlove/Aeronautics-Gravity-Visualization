@@ -1,8 +1,8 @@
 package icu.dreamripples.aero_suite.simplification.block;
 
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
-import icu.dreamripples.aero_suite.simplification.AnalogTransmissionBlockEntityAccessor;
-import icu.dreamripples.aero_suite.simplification.RotationPropagatorMixin;
+import icu.dreamripples.aero_suite.mixin.simplification.AnalogTransmissionBlockEntityAccessor;
+import icu.dreamripples.aero_suite.mixin.simplification.RotationPropagatorMixin;
 import com.simibubi.create.foundation.utility.CreateLang;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlock;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlockEntity;

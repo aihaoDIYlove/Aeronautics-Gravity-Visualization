@@ -1,7 +1,7 @@
 package icu.dreamripples.aero_suite.starlight.network;
 
 import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
-import icu.dreamripples.aero_suite.gravity.GoggleOverlayRendererMixin;
+import icu.dreamripples.aero_suite.mixin.gravity.GoggleOverlayRendererMixin;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
 import icu.dreamripples.aero_suite.starlight.network.AddressingSignScrollPayload;
 import icu.dreamripples.aero_suite.starlight.network.ObserveMachinePayload;

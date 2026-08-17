@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.starlight;
+package icu.dreamripples.aero_suite.mixin.starlight;
 
 import com.simibubi.create.AllDataComponents;
 import icu.dreamripples.aero_suite.common.registry.ModItems;

@@ -1,7 +1,7 @@
 package icu.dreamripples.aero_suite.starlight.item;
 
 import icu.dreamripples.aero_suite.starlight.component.ModDataComponents;
-import icu.dreamripples.aero_suite.starlight.PackageEntityMixin;
+import icu.dreamripples.aero_suite.mixin.starlight.PackageEntityMixin;
 import icu.dreamripples.aero_suite.starlight.component.PearlOwner;
 import icu.dreamripples.aero_suite.starlight.event.ActivatedEnderPearlHandler;
 import net.minecraft.ChatFormatting;

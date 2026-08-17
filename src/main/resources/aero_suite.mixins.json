@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "icu.dreamripples.aero_suite",
+  "package": "icu.dreamripples.aero_suite.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "simplification.AnalogTransmissionBlockEntityAccessor",

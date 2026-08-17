@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.starlight;
+package icu.dreamripples.aero_suite.mixin.starlight;
 
 import com.simibubi.create.content.equipment.clipboard.ClipboardScreen;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;

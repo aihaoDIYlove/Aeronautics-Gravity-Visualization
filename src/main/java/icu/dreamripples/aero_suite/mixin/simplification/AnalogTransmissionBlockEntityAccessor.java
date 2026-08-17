@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.simplification;
+package icu.dreamripples.aero_suite.mixin.simplification;
 
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmissionBlockEntity;

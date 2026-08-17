@@ -1,4 +1,4 @@
-package icu.dreamripples.aero_suite.gravity;
+package icu.dreamripples.aero_suite.mixin.gravity;
 
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import icu.dreamripples.aero_suite.common.registry.ModItems;

@@ -1,6 +1,6 @@
 package icu.dreamripples.aero_suite.starlight.component;
 
-import icu.dreamripples.aero_suite.starlight.PackageEntityMixin;
+import icu.dreamripples.aero_suite.mixin.starlight.PackageEntityMixin;
 import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.starlight.component.PearlOwner;
 import icu.dreamripples.aero_suite.starlight.event.ActivatedEnderPearlHandler;

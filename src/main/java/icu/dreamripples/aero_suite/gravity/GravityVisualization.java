@@ -35,10 +35,11 @@ public class GravityVisualization {
     // CONDITION_CODECS registry 存 MapCodec<? extends ICondition>(serializer)。
     // DeferredRegister.create 的泛型推断在这里不通过, 改用 RegisterEvent 手动注入。
     private static void modBusCondition(IEventBus modEventBus) {
-        modEventBus.addListener(event -> {
-            if (event instanceof net.neoforged.neoforge.registries.RegisterEvent re
-                    && re.getRegistryKey() == net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.CONDITION_CODECS) {
-                re.register(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.CONDITION_CODECS,
+        // lambda 参数显式写成 RegisterEvent，避免编译器把签名擦除成基类 net.neoforged.bus.api.Event
+        // (mod event bus 只接受 IModBusEvent 子类，擦除后会在运行期被拒收并抛 IllegalArgumentException)。
+        modEventBus.addListener((net.neoforged.neoforge.registries.RegisterEvent event) -> {
+            if (event.getRegistryKey() == net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.CONDITION_CODECS) {
+                event.register(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.CONDITION_CODECS,
                         net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(MOD_ID, "feature_enabled"),
                         () -> FeatureEnabledCondition.CODEC);
             }
