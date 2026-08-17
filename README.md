@@ -2,11 +2,11 @@
   <img src=".github/banner.webp" alt="Aeronautics Gravity" width="640"/>
 </p>
 
-<h1 align="center">Aeronautics: Gravity Visualization</h1>
+<h1 align="center">Aeronautics Suite</h1>
 
 <p align="center">
-  A <b>Create Aeronautics</b> add-on for Minecraft 1.21.1 / NeoForge.<br/>
-  Tools and blocks for tuning Sable physics on contraptions — mass visualization, configurable counterweights, lightweight glass, a self-stabilizing block, and more.
+  A <b>Create Aeronautics</b> add-on pack for Minecraft 1.21.1 / NeoForge.<br/>
+  Three mods in one jar — gravity visualization, convenience tweaks, and starlight logistics — for tuning Sable physics on contraptions and beyond.
 </p>
 
 <p align="center">
@@ -14,6 +14,22 @@
 </p>
 
 ---
+
+## One jar, three mods
+
+The suite ships as a single jar that registers **three mods** — each is independently loadable/disablable but shares mixins and config:
+
+| Mod ID | Name | Features |
+|---|---|---|
+| `gravity_visualization` | Aeronautics: Gravity Visualization | Spark Wand, Portable Diagram, Counterweight / Counterweight-Light blocks |
+| `simplification_related` | Aeronautics: Simplification Related | Convenient Analog Transmission, Variable Speed Portable Engine, Sequential Feeder |
+| `starlight_logistics` | Aeronautics: Starlight Logistics | Starlight Fluid + Void Hose Pulley, Lightweight/Ultralight Glass, Starlight Casing, Stabilizer, World Anchor, Addressing Sign, Activated Ender Pearl |
+
+### In-game config
+
+A **config screen** (Create's Catnip UI) is attached to all three mods' mod-list buttons. Every feature and every starlight recipe group can be toggled on/off independently (all on by default). Disabling a feature:
+- Removes its **crafting recipes** (a custom `feature_enabled` recipe condition).
+- **Deletes the item the moment a player picks it up** (placed blocks keep working; only acquisition + crafting are gated). An actionbar message tells the player.
 
 ## Features
 

@@ -2,11 +2,11 @@
   <img src=".github/banner.webp" alt="Aeronautics Gravity" width="640"/>
 </p>
 
-<h1 align="center">Aeronautics: Gravity Visualization</h1>
+<h1 align="center">Aeronautics Suite</h1>
 
 <p align="center">
-  <b>Create Aeronautics</b> 附属模组,适用于 Minecraft 1.21.1 / NeoForge。<br/>
-  提供一系列工具与方块,用于调校 contraption 上的 Sable 物理 - 质量可视化、可配置配重块、轻质玻璃、自稳定方块等。
+  <b>Create Aeronautics</b> 附属模组包,适用于 Minecraft 1.21.1 / NeoForge。<br/>
+  一个 jar 三个 mod —— 重力可视化、方便物品、星空物流,用于调校 contraption 上的 Sable 物理乃至更多。
 </p>
 
 <p align="center">
@@ -14,6 +14,22 @@
 </p>
 
 ---
+
+## 一个 jar,三个 mod
+
+本套件以单个 jar 注册 **三个 mod** —— 各自可独立启用/停用,但共享 mixin 与配置:
+
+| mod id | 名称 | 功能 |
+|---|---|---|
+| `gravity_visualization` | 航空学:重力可视化 | 火花魔杖、便携图解、配重块 / 配"轻"块系列 |
+| `simplification_related` | 航空学:方便物品 | 更方便的模拟传动器、变速式便携引擎、顺序供料器 |
+| `starlight_logistics` | 航空学:星空物流 | 星空液体 + 虚空软管滑轮、轻质/超轻玻璃、星空机壳、自稳定方块、世界锚点、寻址牌、激活的末影珍珠 |
+
+### 游戏内配置
+
+三个 mod 的 mod 列表按钮都挂了**配置页**(Create 的 Catnip UI)。每个功能、每个星空液体配方组都可独立开关(默认全开)。停用某功能:
+- 去掉对应的**合成配方**(自定义 `feature_enabled` 配方条件)。
+- 玩家**获取到该物品的瞬间删除**(已放置的方块照常工作;只拦获取+合成)。删除时 actionbar 会给玩家提示。
 
 ## 功能
 
