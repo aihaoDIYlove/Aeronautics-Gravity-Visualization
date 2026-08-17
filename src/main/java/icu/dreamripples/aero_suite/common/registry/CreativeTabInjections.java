@@ -1,6 +1,6 @@
 package icu.dreamripples.aero_suite.common.registry;
 
-import icu.dreamripples.aero_suite.common.registry.ModItems;
+// import icu.dreamripples.aero_suite.common.registry.ModItems;
 import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;

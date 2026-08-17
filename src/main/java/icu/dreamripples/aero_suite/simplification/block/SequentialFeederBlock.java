@@ -3,7 +3,7 @@ package icu.dreamripples.aero_suite.simplification.block;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
-import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
+// import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
@@ -14,8 +14,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.MapColor;
-import net.minecraft.world.level.block.SoundType;
+// import net.minecraft.world.level.material.MapColor;
+// import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.phys.BlockHitResult;
 
 /**

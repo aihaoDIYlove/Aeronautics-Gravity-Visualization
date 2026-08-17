@@ -2,7 +2,7 @@ package icu.dreamripples.aero_suite.starlight.block;
 
 import com.simibubi.create.content.fluids.hosePulley.HosePulleyBlockEntity;
 import icu.dreamripples.aero_suite.common.registry.ModCapabilities;
-import icu.dreamripples.aero_suite.starlight.block.VoidHosePulleyFluidHandler;
+// import icu.dreamripples.aero_suite.starlight.block.VoidHosePulleyFluidHandler;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import com.simibubi.create.foundation.utility.CreateLang;
 import dev.simulated_team.simulated.content.end_sea.EndSeaPhysics;

@@ -2,8 +2,8 @@ package icu.dreamripples.aero_suite.starlight.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import icu.dreamripples.aero_suite.starlight.block.WorldAnchorBlockEntity;
-import icu.dreamripples.aero_suite.starlight.client.ModPartialModels;
-import icu.dreamripples.aero_suite.starlight.client.ModRenderTypes;
+// import icu.dreamripples.aero_suite.starlight.client.ModPartialModels;
+// import icu.dreamripples.aero_suite.starlight.client.ModRenderTypes;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
 import net.createmod.catnip.render.CachedBuffers;

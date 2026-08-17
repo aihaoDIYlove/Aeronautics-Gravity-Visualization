@@ -2,7 +2,7 @@ package icu.dreamripples.aero_suite.simplification.block;
 
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlock;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
-import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmissionBlockEntity;
+// import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmissionBlockEntity;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 

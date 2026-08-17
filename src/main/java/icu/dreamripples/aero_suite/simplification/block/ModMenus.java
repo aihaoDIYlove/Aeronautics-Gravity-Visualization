@@ -1,6 +1,6 @@
 package icu.dreamripples.aero_suite.simplification.block;
 
-import icu.dreamripples.aero_suite.simplification.block.SequentialFeederMenu;
+// import icu.dreamripples.aero_suite.simplification.block.SequentialFeederMenu;
 import icu.dreamripples.aero_suite.simplification.SimplificationRelated;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
@@ -19,7 +19,7 @@ public class ModMenus {
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(Registries.MENU, SimplificationRelated.MOD_ID);
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+//     @SuppressWarnings({"unchecked", "rawtypes"})
     public static final DeferredHolder<MenuType<?>, MenuType<SequentialFeederMenu>> SEQUENTIAL_FEEDER =
             MENUS.register("sequential_feeder", () ->
                     // 工厂不引用自身字段(javac 禁止字段初始化自引用);

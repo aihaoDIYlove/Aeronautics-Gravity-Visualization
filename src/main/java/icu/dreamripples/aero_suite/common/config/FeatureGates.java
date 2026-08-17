@@ -4,7 +4,7 @@ import icu.dreamripples.aero_suite.common.AeroSuite;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.DyeColor;
+// import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredHolder;
 

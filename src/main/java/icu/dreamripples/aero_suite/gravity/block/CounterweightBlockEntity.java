@@ -1,7 +1,7 @@
 package icu.dreamripples.aero_suite.gravity.block;
 
 import com.google.common.collect.ImmutableList;
-import icu.dreamripples.aero_suite.gravity.block.CounterweightBlock;
+// import icu.dreamripples.aero_suite.gravity.block.CounterweightBlock;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;

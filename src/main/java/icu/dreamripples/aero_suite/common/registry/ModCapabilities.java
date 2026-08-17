@@ -2,7 +2,7 @@ package icu.dreamripples.aero_suite.common.registry;
 
 import com.simibubi.create.content.fluids.hosePulley.HosePulleyBlock;
 import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
-import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+// import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.starlight.block.VoidHosePulleyBlockEntity;
 import icu.dreamripples.aero_suite.starlight.block.WorldAnchorBlockEntity;
 import net.neoforged.bus.api.SubscribeEvent;

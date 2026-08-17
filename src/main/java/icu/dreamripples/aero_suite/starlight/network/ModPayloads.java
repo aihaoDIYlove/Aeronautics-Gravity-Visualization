@@ -1,10 +1,10 @@
 package icu.dreamripples.aero_suite.starlight.network;
 
 import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
-import icu.dreamripples.aero_suite.mixin.gravity.GoggleOverlayRendererMixin;
+// import icu.dreamripples.aero_suite.mixin.gravity.GoggleOverlayRendererMixin;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
-import icu.dreamripples.aero_suite.starlight.network.AddressingSignScrollPayload;
-import icu.dreamripples.aero_suite.starlight.network.ObserveMachinePayload;
+// import icu.dreamripples.aero_suite.starlight.network.AddressingSignScrollPayload;
+// import icu.dreamripples.aero_suite.starlight.network.ObserveMachinePayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;

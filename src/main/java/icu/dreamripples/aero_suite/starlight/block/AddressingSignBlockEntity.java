@@ -1,7 +1,7 @@
 package icu.dreamripples.aero_suite.starlight.block;
 
 import com.simibubi.create.AllDataComponents;
-import icu.dreamripples.aero_suite.starlight.network.AddressingSignScrollPayload;
+// import icu.dreamripples.aero_suite.starlight.network.AddressingSignScrollPayload;
 import com.simibubi.create.content.equipment.clipboard.ClipboardContent;
 import com.simibubi.create.content.equipment.clipboard.ClipboardEntry;
 import net.minecraft.core.BlockPos;
