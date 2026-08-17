@@ -36,7 +36,6 @@ public class SparkWandItem extends Item {
         super(new Item.Properties().stacksTo(1).durability(MAX_DURABILITY));
     }
 
-    // @SuppressWarnings("deprecation")
     @Override
     public int getEnchantmentValue() {
         // 让火花魔杖可在附魔台附魔(默认 0 = 不可附魔)。返回 36。
@@ -45,7 +44,6 @@ public class SparkWandItem extends Item {
         return 36;
     }
 
-    // @SuppressWarnings("deprecation")
     @Override
     public boolean isEnchantable(ItemStack stack) {
         // 显式允许 durability 物品进附魔台(参考 BacktankItem#isEnchantable)。

@@ -1,8 +1,6 @@
 package icu.dreamripples.aero_suite.gravity.block;
 
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
-// import icu.dreamripples.aero_suite.gravity.block.RedstoneCounterweightLightBlock;
-// import icu.dreamripples.aero_suite.gravity.block.RedstoneTierBlock;
 import com.simibubi.create.foundation.utility.CreateLang;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

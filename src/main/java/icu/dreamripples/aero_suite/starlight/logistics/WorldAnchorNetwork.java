@@ -1,7 +1,6 @@
 package icu.dreamripples.aero_suite.starlight.logistics;
 
 import com.simibubi.create.content.logistics.box.PackageItem;
-// import icu.dreamripples.aero_suite.starlight.block.WorldAnchorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;

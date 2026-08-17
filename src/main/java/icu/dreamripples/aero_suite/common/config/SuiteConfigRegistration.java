@@ -1,6 +1,5 @@
 package icu.dreamripples.aero_suite.common.config;
 
-// import net.createmod.catnip.config.ConfigBase;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;

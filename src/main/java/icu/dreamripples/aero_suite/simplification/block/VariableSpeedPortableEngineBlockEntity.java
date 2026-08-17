@@ -1,7 +1,6 @@
 package icu.dreamripples.aero_suite.simplification.block;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-// import icu.dreamripples.aero_suite.simplification.block.SpeedTierScrollBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.utility.CreateLang;

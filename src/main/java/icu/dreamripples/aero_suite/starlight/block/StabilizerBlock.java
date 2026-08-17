@@ -2,7 +2,6 @@ package icu.dreamripples.aero_suite.starlight.block;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
-// import icu.dreamripples.aero_suite.starlight.block.StabilizerBlockEntity;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

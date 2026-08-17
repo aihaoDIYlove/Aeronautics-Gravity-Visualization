@@ -2,7 +2,6 @@ package icu.dreamripples.aero_suite.starlight.block;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
-// import icu.dreamripples.aero_suite.starlight.block.WorldAnchorBlockEntity;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

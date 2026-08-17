@@ -3,7 +3,6 @@ package icu.dreamripples.aero_suite.starlight.event;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.starlight.component.PearlOwner;
-// import icu.dreamripples.aero_suite.starlight.event.StarlightBottleHandler;
 import icu.dreamripples.aero_suite.starlight.item.ActivatedEnderPearlItem;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;

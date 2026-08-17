@@ -2,7 +2,6 @@ package icu.dreamripples.aero_suite.simplification.block;
 
 import com.simibubi.create.foundation.utility.BlockHelper;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
-// import icu.dreamripples.aero_suite.simplification.block.VariableSpeedPortableEngineBlockEntity;
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineBlock;
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineBlockEntity;
 import dev.simulated_team.simulated.service.SimItemService;

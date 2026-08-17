@@ -3,7 +3,6 @@ package icu.dreamripples.aero_suite.mixin.starlight;
 import com.simibubi.create.AllDataComponents;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
-// import icu.dreamripples.aero_suite.starlight.block.WorldAnchorBlockEntity;
 import icu.dreamripples.aero_suite.starlight.item.ActivatedEnderPearlItem;
 import com.simibubi.create.content.logistics.box.PackageEntity;
 import com.simibubi.create.content.logistics.box.PackageItem;

@@ -1,8 +1,6 @@
 package icu.dreamripples.aero_suite.simplification.block;
 
 import com.simibubi.create.foundation.gui.menu.MenuBase;
-// import icu.dreamripples.aero_suite.simplification.block.ModMenus;
-// import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;

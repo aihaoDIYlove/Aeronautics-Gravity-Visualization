@@ -1,7 +1,6 @@
 package icu.dreamripples.aero_suite.starlight.fluid;
 
 import net.minecraft.core.BlockPos;
-// import icu.dreamripples.aero_suite.starlight.fluid.ModFluids;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.fluids.BaseFlowingFluid;

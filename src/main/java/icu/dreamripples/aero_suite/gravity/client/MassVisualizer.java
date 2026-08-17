@@ -1,7 +1,6 @@
 package icu.dreamripples.aero_suite.gravity.client;
 
 import dev.ryanhcode.sable.companion.math.Pose3dc;
-// import icu.dreamripples.aero_suite.gravity.client.RedstoneCounterweightLightVisual;
 import dev.ryanhcode.sable.physics.config.block_properties.PhysicsBlockPropertyHelper;
 import dev.ryanhcode.sable.physics.floating_block.FloatingBlockMaterial;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;

@@ -3,8 +3,6 @@ package icu.dreamripples.aero_suite.starlight.fluid;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
-// import icu.dreamripples.aero_suite.starlight.fluid.StarlightFluid;
-// import icu.dreamripples.aero_suite.starlight.fluid.StarlightFluidType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.material.Fluid;

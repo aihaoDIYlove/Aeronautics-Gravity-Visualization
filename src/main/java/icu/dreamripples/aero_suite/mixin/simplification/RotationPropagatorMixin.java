@@ -2,7 +2,6 @@ package icu.dreamripples.aero_suite.mixin.simplification;
 
 import com.simibubi.create.content.kinetics.RotationPropagator;
 import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmissionBlockEntity;
-// import icu.dreamripples.aero_suite.simplification.client.ConvenientAnalogTransmissionVisual;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;

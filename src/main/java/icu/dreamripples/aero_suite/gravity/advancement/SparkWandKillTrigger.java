@@ -1,7 +1,6 @@
 package icu.dreamripples.aero_suite.gravity.advancement;
 
 import com.mojang.serialization.Codec;
-// import icu.dreamripples.aero_suite.gravity.item.SparkWandItem;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.advancements.critereon.ContextAwarePredicate;
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
