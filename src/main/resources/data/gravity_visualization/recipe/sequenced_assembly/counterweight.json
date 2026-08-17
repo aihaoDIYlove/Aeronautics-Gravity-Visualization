@@ -45,6 +45,22 @@
           "id": "gravity_visualization:incomplete_counterweight"
         }
       ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "gravity_visualization:incomplete_counterweight"
+        },
+        {
+          "item": "minecraft:heavy_core"
+        }
+      ],
+      "results": [
+        {
+          "id": "gravity_visualization:incomplete_counterweight"
+        }
+      ]
     }
   ],
   "results": [

@@ -1,0 +1,70 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "counterweight"
+    }
+  ],
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "minecraft:iron_block"
+  },
+  "loops": 6,
+  "transitional_item": {
+    "id": "minecraft:iron_block"
+  },
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_block"
+        },
+        {
+          "item": "minecraft:iron_nugget"
+        }
+      ],
+      "results": [
+        {
+          "id": "minecraft:iron_block"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_block"
+        }
+      ],
+      "results": [
+        {
+          "id": "minecraft:iron_block"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "minecraft:iron_block"
+        }
+      ],
+      "results": [
+        {
+          "id": "minecraft:iron_block"
+        }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "chance": 20.0,
+      "id": "minecraft:heavy_core"
+    },
+    {
+      "chance": 80.0,
+      "id": "minecraft:iron_block"
+    }
+  ]
+}
