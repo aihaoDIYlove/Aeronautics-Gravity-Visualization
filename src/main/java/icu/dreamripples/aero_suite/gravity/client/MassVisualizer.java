@@ -73,8 +73,8 @@ public class MassVisualizer {
 // 会副作用 endBatch 掉正在 building 的另一个自定义 RT)。
 private static final int COM_COLOR = 0xE0FF3030;          // 红=重心,⬇ 朝下(屏幕恒定,玩家转头跟着转)
 private static final int BUOYANCY_COLOR = 0xE087CEEB;     // 天蓝=浮心,⬆ 朝上,与 liftToColor 同色系
-private static final String COM_GLYPH = ".u2B07";          // ⬇ U+2B07 DOWNWARDS BLACK ARROW(BMP 内,vanilla Font 有字形)
-private static final String BUOYANCY_GLYPH = ".u2B06";    // ⬆ U+2B06 UPWARDS BLACK ARROW
+private static final String COM_GLYPH = "\u2B07";          // ⬇ U+2B07 DOWNWARDS BLACK ARROW(BMP 内,vanilla Font 有字形)
+private static final String BUOYANCY_GLYPH = "\u2B06";    // ⬆ U+2B06 UPWARDS BLACK ARROW
 // 近小远大:字号与厚度偏移都按相机距离线性插值,屏幕视大小近似恒定(远处有最小可读阈值)。
 // 复用旧 3 轴十字的距离常数语义:NEAR<=4格 用小值,FAR>=64格 用大值。
 private static final double MARKER_DIST_NEAR = 4.0;        // 近端距离(格)

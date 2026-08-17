@@ -35,10 +35,6 @@
   "aero_suite.group.gravity_visualization": "航空学:重力可视化",
   "aero_suite.group.simplification_related": "航空学:方便物品",
   "aero_suite.group.starlight_logistics": "航空学:星空物流",
-  "aero_suite.config.all_on": "本页全开",
-  "aero_suite.config.all_off": "本页全关",
-  "aero_suite.config.reset": "恢复默认",
-  "aero_suite.config.save": "保存",
   "aero_suite.config.on": "开",
   "aero_suite.config.off": "关",
   "aero_suite.config.item_gate": "物品开关:关闭后配方消失,且获取到该物品会被删除",
@@ -117,5 +113,11 @@
   "aero_suite.feature.conv_tuff": "转换:凝灰岩",
   "aero_suite.feature.conv_tuff.desc": "岩浆加星空液转换为凝灰岩。",
   "aero_suite.feature.conv_prismarine_shard": "转换:海晶碎片",
-  "aero_suite.feature.conv_prismarine_shard.desc": "燧石加星空液转换为海晶碎片。"
+  "aero_suite.feature.conv_prismarine_shard.desc": "燧石加星空液转换为海晶碎片。",
+  "aero_suite.config.back_to_mods": "返回至模组页",
+  "aero_suite.config.reset_all": "重置所有设置",
+  "aero_suite.config.toggle_all": "启用/禁用全部",
+  "aero_suite.config.back": "返回至上级菜单",
+  "advancements.gravity_visualization.goggle_observe.title": "谁还需要护目镜？",
+  "advancements.gravity_visualization.goggle_observe.description": "使用火花魔杖观察一次机器"
 }

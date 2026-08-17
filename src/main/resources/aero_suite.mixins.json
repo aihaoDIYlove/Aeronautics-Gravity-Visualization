@@ -3,6 +3,7 @@
   "package": "icu.dreamripples.aero_suite.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "common.FloatingClusterContainerGuardMixin",
     "simplification.AnalogTransmissionBlockEntityAccessor",
     "simplification.RotationPropagatorMixin",
     "starlight.PackageEntityMixin",

@@ -35,10 +35,6 @@
   "aero_suite.group.gravity_visualization": "Aeronautics: Gravity Visualization",
   "aero_suite.group.simplification_related": "Aeronautics: Conveniences",
   "aero_suite.group.starlight_logistics": "Aeronautics: Starlight Logistics",
-  "aero_suite.config.all_on": "Enable All (page)",
-  "aero_suite.config.all_off": "Disable All (page)",
-  "aero_suite.config.reset": "Reset Defaults",
-  "aero_suite.config.save": "Save",
   "aero_suite.config.on": "On",
   "aero_suite.config.off": "Off",
   "aero_suite.config.item_gate": "Item gate: recipes removed and item deleted on acquisition when off",
@@ -117,5 +113,11 @@
   "aero_suite.feature.conv_tuff": "Conversion: Tuff",
   "aero_suite.feature.conv_tuff.desc": "Convert lava into tuff with Starlight.",
   "aero_suite.feature.conv_prismarine_shard": "Conversion: Prismarine Shard",
-  "aero_suite.feature.conv_prismarine_shard.desc": "Convert flint into prismarine shards with Starlight."
+  "aero_suite.feature.conv_prismarine_shard.desc": "Convert flint into prismarine shards with Starlight.",
+  "aero_suite.config.back_to_mods": "Back to Mod List",
+  "aero_suite.config.reset_all": "Reset All Settings",
+  "aero_suite.config.toggle_all": "Enable/Disable All",
+  "aero_suite.config.back": "Back",
+  "advancements.gravity_visualization.goggle_observe.title": "Who Needs Goggles?",
+  "advancements.gravity_visualization.goggle_observe.description": "Observe a machine using the Spark Wand"
 }

@@ -37,8 +37,8 @@ public class SpeedTierScrollBehaviour extends KineticScrollValueBehaviour {
     @Override
     public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
         ImmutableList<Component> rows = ImmutableList.of(
-                Component.literal(".u27f3").withStyle(ChatFormatting.BOLD),
-                Component.literal(".u27f2").withStyle(ChatFormatting.BOLD));
+                Component.literal("\u27f3").withStyle(ChatFormatting.BOLD),
+                Component.literal("\u27f2").withStyle(ChatFormatting.BOLD));
         ValueSettingsFormatter formatter = new ValueSettingsFormatter(this::formatSettings);
         return new ValueSettingsBoard(label, 15, 1, rows, formatter);
     }
@@ -60,7 +60,7 @@ public class SpeedTierScrollBehaviour extends KineticScrollValueBehaviour {
     public MutableComponent formatSettings(ValueSettings settings) {
         int v = Math.max(1, Math.min(15, settings.value()));
         return CreateLang.number(RPM_TABLE[v - 1])
-                .add(CreateLang.text(settings.row() == 0 ? ".u27f3" : ".u27f2")
+                .add(CreateLang.text(settings.row() == 0 ? "\u27f3" : "\u27f2")
                         .style(ChatFormatting.BOLD))
                 .component();
     }
