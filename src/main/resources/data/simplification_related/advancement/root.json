@@ -1,0 +1,24 @@
+{
+  "display": {
+    "icon": {
+      "id": "simplification_related:convenient_analog_transmission"
+    },
+    "title": {
+      "translate": "advancements.simplification_related.root.title"
+    },
+    "description": {
+      "translate": "advancements.simplification_related.root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "minecraft:textures/block/copper_block.png"
+  },
+  "criteria": {
+    "root": {
+      "trigger": "minecraft:tick",
+      "conditions": {}
+    }
+  }
+}

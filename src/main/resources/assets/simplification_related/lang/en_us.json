@@ -1,4 +1,12 @@
 {
+  "advancements.simplification_related.obtain_convenient_analog_transmission.description": "Obtain a Convenient Analog Transmission",
+  "advancements.simplification_related.obtain_convenient_analog_transmission.title": "Redstone Means RPM",
+  "advancements.simplification_related.obtain_sequential_feeder.description": "Obtain a Sequential Feeder",
+  "advancements.simplification_related.obtain_sequential_feeder.title": "In Order, Please",
+  "advancements.simplification_related.obtain_variable_speed_engine.description": "Obtain a Variable Speed Portable Engine",
+  "advancements.simplification_related.obtain_variable_speed_engine.title": "Pedal to the Metal",
+  "advancements.simplification_related.root.description": "Little gadgets to make machines behave",
+  "advancements.simplification_related.root.title": "Aeronautics: Simplification Related",
   "block.simplification_related.black_variable_speed_portable_engine": "Black Variable-Speed Portable Engine",
   "block.simplification_related.blue_variable_speed_portable_engine": "Blue Variable-Speed Portable Engine",
   "block.simplification_related.brown_variable_speed_portable_engine": "Brown Variable-Speed Portable Engine",
