@@ -5,6 +5,8 @@
   "advancements.gravity_visualization.obtain_portable_diagram.title": "Pocket-Sized",
   "advancements.gravity_visualization.spark_wand_kill.description": "Kill an arthropod with the Spark Wand",
   "advancements.gravity_visualization.spark_wand_kill.title": "Bug Burner",
+  "advancements.gravity_visualization.root.title": "Aeronautics: Gravity Visualization",
+  "advancements.gravity_visualization.root.description": "Spark Wand, Portable Diagram and counterweight blocks",
   "block.gravity_visualization.counterweight": "Counterweight",
   "block.gravity_visualization.counterweight.mass_tier": "Mass Tier",
   "block.gravity_visualization.counterweight_light": "Buoyant Counterweight",

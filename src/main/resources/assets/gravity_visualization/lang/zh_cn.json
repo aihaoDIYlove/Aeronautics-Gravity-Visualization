@@ -5,6 +5,8 @@
   "advancements.gravity_visualization.obtain_portable_diagram.title": "随身便携",
   "advancements.gravity_visualization.spark_wand_kill.description": "使用火花魔杖击杀一只爬虫",
   "advancements.gravity_visualization.spark_wand_kill.title": "点燃爬虫",
+  "advancements.gravity_visualization.root.title": "航空学：重力可视化",
+  "advancements.gravity_visualization.root.description": "火花魔杖、便携图解与配重系列",
   "block.gravity_visualization.counterweight": "配重块",
   "block.gravity_visualization.counterweight.mass_tier": "质量档位",
   "block.gravity_visualization.counterweight_light": "配“轻”块",
