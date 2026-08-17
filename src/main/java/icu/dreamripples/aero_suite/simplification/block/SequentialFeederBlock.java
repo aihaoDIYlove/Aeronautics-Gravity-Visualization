@@ -1,5 +1,6 @@
 package icu.dreamripples.aero_suite.simplification.block;
 
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
@@ -20,8 +21,9 @@ import net.minecraft.world.phys.BlockHitResult;
 /**
  * 顺序供料器方块。右键开 UI(空手或持非交互物品)。破坏时掉落 9 物品槽内容
  * (Create IBE.onRemove 只清理 behaviours 不掉库存,见 SmartBlockEntity.destroy)。
+ * 实现 IWrenchable 以支持 Create 扳手拆除(Shift+右键)。
  */
-public class SequentialFeederBlock extends Block implements IBE<SequentialFeederBlockEntity> {
+public class SequentialFeederBlock extends Block implements IBE<SequentialFeederBlockEntity>, IWrenchable {
 
     public SequentialFeederBlock(BlockBehaviour.Properties properties) {
         super(properties);
