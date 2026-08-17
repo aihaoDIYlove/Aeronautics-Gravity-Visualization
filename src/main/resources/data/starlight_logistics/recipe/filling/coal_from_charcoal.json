@@ -1,0 +1,18 @@
+{
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "item": "minecraft:charcoal"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 250,
+      "fluid": "starlight_logistics:starlight"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:coal"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "textures": {
+    "0": "starlight_logistics:block/starlight_casing",
+    "particle": "starlight_logistics:block/starlight_casing"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 15],
+      "to": [16, 16, 16],
+      "faces": {
+        "south": {
+          "uv": [0, 0, 16, 16],
+          "texture": "#0"
+        }
+      }
+    }
+  ]
+}

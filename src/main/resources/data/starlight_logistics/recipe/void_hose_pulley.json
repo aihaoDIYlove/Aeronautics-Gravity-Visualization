@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "starlight_logistics:starlight_casing"
+    },
+    "C": {
+      "item": "minecraft:dried_kelp_block"
+    },
+    "I": {
+      "tag": "c:plates/copper"
+    }
+  },
+  "pattern": [
+    "B",
+    "C",
+    "I"
+  ],
+  "result": {
+    "count": 1,
+    "id": "starlight_logistics:void_hose_pulley"
+  }
+}

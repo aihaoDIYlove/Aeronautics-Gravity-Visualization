@@ -1,6 +1,6 @@
 {
   "replace": false,
   "values": [
-    "aeronautics_gravity:spark_wand"
+    "gravity_visualization:spark_wand"
   ]
 }

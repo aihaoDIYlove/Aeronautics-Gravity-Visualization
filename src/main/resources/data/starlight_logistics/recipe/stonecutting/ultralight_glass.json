@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "starlight_logistics:lightweight_glass"
+  },
+  "result": {
+    "id": "starlight_logistics:ultralight_glass",
+    "count": 2
+  }
+}

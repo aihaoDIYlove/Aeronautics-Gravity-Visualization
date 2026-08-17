@@ -1,0 +1,18 @@
+{
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "item": "minecraft:glass_bottle"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 250,
+      "fluid": "starlight_logistics:starlight"
+    }
+  ],
+  "results": [
+    {
+      "id": "starlight_logistics:starlight_bottle"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "minecraft:glow_ink_sac" },
+    { "item": "starlight_logistics:ultralight_glass" },
+    { "item": "create:clipboard" }
+  ],
+  "result": {
+    "count": 1,
+    "id": "starlight_logistics:addressing_sign"
+  }
+}

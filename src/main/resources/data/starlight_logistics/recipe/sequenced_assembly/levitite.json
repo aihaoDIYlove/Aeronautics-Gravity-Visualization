@@ -1,0 +1,38 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "starlight_logistics:ultralight_glass"
+  },
+  "loops": 1,
+  "transitional_item": {
+    "id": "starlight_logistics:incomplete_levitite"
+  },
+  "sequence": [
+    {
+      "type": "create:filling",
+      "ingredients": [
+        { "item": "starlight_logistics:incomplete_levitite" },
+        { "type": "neoforge:single", "amount": 500, "fluid": "aeronautics:levitite_blend" }
+      ],
+      "results": [
+        { "id": "starlight_logistics:incomplete_levitite" }
+      ]
+    },
+    {
+      "type": "create:filling",
+      "ingredients": [
+        { "item": "starlight_logistics:incomplete_levitite" },
+        { "type": "neoforge:single", "amount": 500, "fluid": "starlight_logistics:starlight" }
+      ],
+      "results": [
+        { "id": "starlight_logistics:incomplete_levitite" }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "chance": 100.0,
+      "id": "aeronautics:levitite"
+    }
+  ]
+}

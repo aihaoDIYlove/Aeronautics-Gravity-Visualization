@@ -1,0 +1,18 @@
+{
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "item": "minecraft:ink_sac"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 250,
+      "fluid": "starlight_logistics:starlight"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:glow_ink_sac"
+    }
+  ]
+}

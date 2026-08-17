@@ -1,0 +1,24 @@
+{
+  "display": {
+    "icon": {
+      "id": "starlight_logistics:activated_ender_pearl"
+    },
+    "title": {
+      "translate": "advancements.starlight_logistics.starlight_logistics_root.title"
+    },
+    "description": {
+      "translate": "advancements.starlight_logistics.starlight_logistics_root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "minecraft:textures/block/end_stone.png"
+  },
+  "criteria": {
+    "root": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "sends_telemetry_event": false
+}

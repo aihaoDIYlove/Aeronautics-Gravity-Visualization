@@ -21,6 +21,7 @@ license="${mod_license}"
 modId="${mod_id}" #mandatory
 version="${mod_version}" #mandatory
 displayName="${mod_name}" #mandatory
+logoFile="aero_suite.png"
 description='''
 Mass visualization tools for Create: Aeronautics contraptions.
 
@@ -38,6 +39,7 @@ Counterweight / Counterweight-Light blocks: per-block mass and buoyancy tuning v
 modId="${mod_id_2}" #mandatory
 version="${mod_version}" #mandatory
 displayName="${mod_name_2}" #mandatory
+logoFile="aero_suite.png"
 description='''
 Convenience additions for Create: Aeronautics machines.
 
@@ -55,6 +57,7 @@ Sequential Feeder: programmable dispensing tape with 9 ghost marker slots and 9 
 modId="${mod_id_3}" #mandatory
 version="${mod_version}" #mandatory
 displayName="${mod_name_3}" #mandatory
+logoFile="aero_suite.png"
 description='''
 Starlight logistics built on the End Sea.
 

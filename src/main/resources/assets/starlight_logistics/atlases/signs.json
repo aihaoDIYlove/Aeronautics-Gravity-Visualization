@@ -1,0 +1,8 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "starlight_logistics:entity/signs/addressing_sign"
+    }
+  ]
+}

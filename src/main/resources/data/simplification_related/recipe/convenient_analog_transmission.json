@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "simulated:analog_transmission"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "simplification_related:convenient_analog_transmission"
+  }
+}

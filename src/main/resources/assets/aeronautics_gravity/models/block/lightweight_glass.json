@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "render_type": "minecraft:cutout",
-  "textures": {
-    "all": "aeronautics_gravity:block/lightweight_glass"
-  }
-}

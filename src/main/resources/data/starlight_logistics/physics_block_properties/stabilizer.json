@@ -1,0 +1,42 @@
+{
+  "selector": "starlight_logistics:stabilizer",
+
+  "properties": {
+    "sable:mass": 1,
+    "sable:floating_material": "gravity_visualization:counterweight_light_mat_1",
+    "sable:floating_scale": 1
+  },
+
+  "overrides": {
+    "mass_tier=2":  { "sable:mass": 2 },
+    "mass_tier=3":  { "sable:mass": 3 },
+    "mass_tier=4":  { "sable:mass": 4 },
+    "mass_tier=5":  { "sable:mass": 5 },
+    "mass_tier=6":  { "sable:mass": 6 },
+    "mass_tier=7":  { "sable:mass": 7 },
+    "mass_tier=8":  { "sable:mass": 8 },
+    "mass_tier=9":  { "sable:mass": 9 },
+    "mass_tier=10": { "sable:mass": 10 },
+    "mass_tier=11": { "sable:mass": 11 },
+    "mass_tier=12": { "sable:mass": 12 },
+    "mass_tier=13": { "sable:mass": 13 },
+    "mass_tier=14": { "sable:mass": 14 },
+    "mass_tier=15": { "sable:mass": 15 },
+    "mass_tier=16": { "sable:mass": 16 },
+    "lift_tier=2":  { "sable:floating_material": "gravity_visualization:counterweight_light_mat_2" },
+    "lift_tier=3":  { "sable:floating_material": "gravity_visualization:counterweight_light_mat_3" },
+    "lift_tier=4":  { "sable:floating_material": "gravity_visualization:counterweight_light_mat_4" },
+    "lift_tier=5":  { "sable:floating_material": "gravity_visualization:counterweight_light_mat_5" },
+    "lift_tier=6":  { "sable:floating_material": "gravity_visualization:counterweight_light_mat_6" },
+    "lift_tier=7":  { "sable:floating_material": "gravity_visualization:counterweight_light_mat_7" },
+    "lift_tier=8":  { "sable:floating_material": "gravity_visualization:counterweight_light_mat_8" },
+    "lift_tier=9":  { "sable:floating_material": "gravity_visualization:counterweight_light_mat_9" },
+    "lift_tier=10": { "sable:floating_material": "gravity_visualization:counterweight_light_mat_10" },
+    "lift_tier=11": { "sable:floating_material": "gravity_visualization:counterweight_light_mat_11" },
+    "lift_tier=12": { "sable:floating_material": "gravity_visualization:counterweight_light_mat_12" },
+    "lift_tier=13": { "sable:floating_material": "gravity_visualization:counterweight_light_mat_13" },
+    "lift_tier=14": { "sable:floating_material": "gravity_visualization:counterweight_light_mat_14" },
+    "lift_tier=15": { "sable:floating_material": "gravity_visualization:counterweight_light_mat_15" },
+    "lift_tier=16": { "sable:floating_material": "gravity_visualization:counterweight_light_mat_16" }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "item": "starlight_logistics:zinc_lump"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 1000,
+      "fluid": "starlight_logistics:starlight"
+    }
+  ],
+  "results": [
+    {
+      "id": "minecraft:prismarine_crystals"
+    }
+  ]
+}

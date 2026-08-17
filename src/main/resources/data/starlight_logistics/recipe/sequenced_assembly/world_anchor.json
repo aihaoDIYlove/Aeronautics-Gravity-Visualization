@@ -1,0 +1,28 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "starlight_logistics:incomplete_world_anchor"
+  },
+  "loops": 6,
+  "transitional_item": {
+    "id": "starlight_logistics:incomplete_world_anchor"
+  },
+  "sequence": [
+    {
+      "type": "create:filling",
+      "ingredients": [
+        { "item": "starlight_logistics:incomplete_world_anchor" },
+        { "type": "neoforge:single", "amount": 1000, "fluid": "starlight_logistics:starlight" }
+      ],
+      "results": [
+        { "id": "starlight_logistics:incomplete_world_anchor" }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "chance": 100.0,
+      "id": "starlight_logistics:world_anchor"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "type": "create:haunting",
+  "ingredients": [
+    { "item": "gravity_visualization:counterweight_light_redstone" }
+  ],
+  "results": [
+    { "id": "gravity_visualization:counterweight_light_pearl_redstone" }
+  ]
+}

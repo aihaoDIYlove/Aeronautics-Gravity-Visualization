@@ -1,0 +1,25 @@
+{
+  "display": {
+    "icon": {
+      "id": "gravity_visualization:spark_wand"
+    },
+    "title": {
+      "translate": "advancements.gravity_visualization.goggle_observe.title"
+    },
+    "description": {
+      "translate": "advancements.gravity_visualization.goggle_observe.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "parent": "gravity_visualization:root",
+  "criteria": {
+    "observe": {
+      "trigger": "gravity_visualization:goggle_observe",
+      "conditions": {}
+    }
+  },
+  "sends_telemetry_event": false
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "simplification_related:red_variable_speed_portable_engine" },
+    { "item": "minecraft:cyan_dye" }
+  ],
+  "result": {
+    "id": "simplification_related:cyan_variable_speed_portable_engine",
+    "count": 1
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "starlight_logistics:lightweight_glass"
+  },
+  "loops": 1,
+  "transitional_item": {
+    "id": "starlight_logistics:incomplete_world_anchor"
+  },
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "starlight_logistics:incomplete_world_anchor" },
+        { "item": "starlight_logistics:stabilizer" }
+      ],
+      "results": [
+        { "id": "starlight_logistics:incomplete_world_anchor" }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "starlight_logistics:incomplete_world_anchor" },
+        { "item": "create:packager" }
+      ],
+      "results": [
+        { "id": "starlight_logistics:incomplete_world_anchor" }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "starlight_logistics:incomplete_world_anchor" },
+        { "item": "create:fluid_tank" }
+      ],
+      "results": [
+        { "id": "starlight_logistics:incomplete_world_anchor" }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "chance": 100.0,
+      "id": "starlight_logistics:incomplete_world_anchor"
+    }
+  ]
+}

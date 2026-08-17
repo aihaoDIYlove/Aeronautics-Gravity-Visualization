@@ -1,0 +1,15 @@
+{
+  "type": "create:cutting",
+  "ingredients": [
+    {
+      "item": "starlight_logistics:lightweight_glass"
+    }
+  ],
+  "processing_time": 50,
+  "results": [
+    {
+      "count": 2,
+      "id": "starlight_logistics:ultralight_glass"
+    }
+  ]
+}

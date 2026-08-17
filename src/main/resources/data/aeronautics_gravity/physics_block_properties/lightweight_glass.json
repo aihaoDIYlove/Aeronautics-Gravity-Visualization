@@ -1,7 +1,0 @@
-{
-  "selector": "aeronautics_gravity:lightweight_glass",
-
-  "properties": {
-    "sable:mass": 0.25
-  }
-}

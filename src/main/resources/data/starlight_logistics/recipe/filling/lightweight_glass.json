@@ -1,0 +1,18 @@
+{
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "tag": "c:glass_blocks"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 250,
+      "fluid": "starlight_logistics:starlight"
+    }
+  ],
+  "results": [
+    {
+      "id": "starlight_logistics:lightweight_glass"
+    }
+  ]
+}

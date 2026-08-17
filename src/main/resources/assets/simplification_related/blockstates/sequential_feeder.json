@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "simplification_related:block/sequential_feeder" }
+  }
+}

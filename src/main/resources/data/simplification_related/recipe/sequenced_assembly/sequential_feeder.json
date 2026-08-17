@@ -1,0 +1,58 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "create:andesite_casing"
+  },
+  "loops": 1,
+  "transitional_item": {
+    "id": "simplification_related:incomplete_sequential_feeder"
+  },
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "simplification_related:incomplete_sequential_feeder" },
+        { "item": "create:filter" }
+      ],
+      "results": [
+        { "id": "simplification_related:incomplete_sequential_feeder" }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "simplification_related:incomplete_sequential_feeder" },
+        { "item": "minecraft:redstone" }
+      ],
+      "results": [
+        { "id": "simplification_related:incomplete_sequential_feeder" }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "simplification_related:incomplete_sequential_feeder" },
+        { "item": "create:andesite_funnel" }
+      ],
+      "results": [
+        { "id": "simplification_related:incomplete_sequential_feeder" }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "simplification_related:incomplete_sequential_feeder" },
+        { "item": "minecraft:barrel" }
+      ],
+      "results": [
+        { "id": "simplification_related:incomplete_sequential_feeder" }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "chance": 100.0,
+      "id": "simplification_related:sequential_feeder"
+    }
+  ]
+}

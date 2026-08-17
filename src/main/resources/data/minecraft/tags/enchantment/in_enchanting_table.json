@@ -1,6 +1,6 @@
 {
   "replace": false,
   "values": [
-    "aeronautics_gravity:creeper_buster"
+    "gravity_visualization:creeper_buster"
   ]
 }

@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "id": "starlight_logistics:addressing_sign"
+    },
+    "title": {
+      "translate": "advancements.starlight_logistics.obtain_addressing_sign.title"
+    },
+    "description": {
+      "translate": "advancements.starlight_logistics.obtain_addressing_sign.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "starlight_logistics:starlight_logistics_root",
+  "criteria": {
+    "get_addressing_sign": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "starlight_logistics:addressing_sign"
+          }
+        ]
+      }
+    }
+  },
+  "sends_telemetry_event": false
+}

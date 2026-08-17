@@ -1,0 +1,5 @@
+{
+  "multipart": [
+    { "apply": { "model": "gravity_visualization:block/counterweight" } }
+  ]
+}

@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/handheld",
-  "textures": {
-    "layer0": "aeronautics_gravity:item/spark_wand"
-  }
-}

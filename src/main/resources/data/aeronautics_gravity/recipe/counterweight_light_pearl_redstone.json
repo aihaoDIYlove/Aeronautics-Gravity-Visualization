@@ -1,9 +1,0 @@
-{
-  "type": "create:haunting",
-  "ingredients": [
-    { "item": "aeronautics_gravity:counterweight_light_redstone" }
-  ],
-  "results": [
-    { "id": "aeronautics_gravity:counterweight_light_pearl_redstone" }
-  ]
-}

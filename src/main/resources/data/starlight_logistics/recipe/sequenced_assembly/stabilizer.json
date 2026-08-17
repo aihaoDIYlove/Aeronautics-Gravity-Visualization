@@ -1,0 +1,48 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "starlight_logistics:starlight_casing"
+  },
+  "loops": 1,
+  "transitional_item": {
+    "id": "starlight_logistics:incomplete_stabilizer"
+  },
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "starlight_logistics:incomplete_stabilizer" },
+        { "item": "gravity_visualization:counterweight_redstone" }
+      ],
+      "results": [
+        { "id": "starlight_logistics:incomplete_stabilizer" }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "starlight_logistics:incomplete_stabilizer" },
+        { "item": "simulated:gimbal_sensor" }
+      ],
+      "results": [
+        { "id": "starlight_logistics:incomplete_stabilizer" }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        { "item": "starlight_logistics:incomplete_stabilizer" },
+        { "item": "gravity_visualization:counterweight_light_redstone" }
+      ],
+      "results": [
+        { "id": "starlight_logistics:incomplete_stabilizer" }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "chance": 100.0,
+      "id": "starlight_logistics:stabilizer"
+    }
+  ]
+}

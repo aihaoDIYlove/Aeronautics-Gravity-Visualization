@@ -1,0 +1,25 @@
+{
+  "display": {
+    "icon": {
+      "id": "starlight_logistics:activated_ender_pearl"
+    },
+    "title": {
+      "translate": "advancements.starlight_logistics.pearl_package_teleport.title"
+    },
+    "description": {
+      "translate": "advancements.starlight_logistics.pearl_package_teleport.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "parent": "starlight_logistics:starlight_logistics_root",
+  "criteria": {
+    "teleport": {
+      "trigger": "starlight_logistics:pearl_package_teleport",
+      "conditions": {}
+    }
+  },
+  "sends_telemetry_event": false
+}
