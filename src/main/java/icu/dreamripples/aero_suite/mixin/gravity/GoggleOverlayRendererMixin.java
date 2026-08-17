@@ -29,14 +29,14 @@ import java.util.List;
 @Mixin(GoggleOverlayRenderer.class)
 public abstract class GoggleOverlayRendererMixin {
 
-    private static BlockPos aeronautics_gravity$lastObservePos = null;
+    private static BlockPos aero_suite$lastObservePos = null;
 
     @Redirect(
             method = "renderOverlay",
             at = @At(value = "INVOKE",
                     target = "Lcom/simibubi/create/api/equipment/goggles/IHaveGoggleInformation;addToGoggleTooltip(Ljava/util/List;Z)Z")
     )
-    private static boolean aeronautics_gravity$captureGoggleInfo(IHaveGoggleInformation gte,
+    private static boolean aero_suite$captureGoggleInfo(IHaveGoggleInformation gte,
                                                                  List<Component> tooltip, boolean isShifting) {
         boolean result = gte.addToGoggleTooltip(tooltip, isShifting);
         if (result) {
@@ -46,8 +46,8 @@ public abstract class GoggleOverlayRendererMixin {
                 ItemStack offHand = mc.player.getOffhandItem();
                 if (mainHand.is(ModItems.SPARK_WAND.get()) || offHand.is(ModItems.SPARK_WAND.get())) {
                     BlockPos currentPos = GoggleOverlayRenderer.lastHovered;
-                    if (currentPos != null && !currentPos.equals(aeronautics_gravity$lastObservePos)) {
-                        aeronautics_gravity$lastObservePos = currentPos;
+                    if (currentPos != null && !currentPos.equals(aero_suite$lastObservePos)) {
+                        aero_suite$lastObservePos = currentPos;
                         ClientPacketListener conn = mc.getConnection();
                         if (conn != null) {
                             conn.send(new ObserveMachinePayload());

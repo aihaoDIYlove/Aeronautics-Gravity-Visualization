@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 /**
  * 星空液体的 FluidType。
  * <p>
- * 贴图为本 mod 自制的 {@code aeronautics_gravity:fluid/starlight_still} / {@code starlight_flow}
+ * 贴图为本 mod 自制的 {@code starlight_logistics:fluid/starlight_still} / {@code starlight_flow}
  * (末地之海色调星海动画, 由 tools/gen_starlight.py 生成); 雾色/着色走 {@link IClientFluidTypeExtensions} 默认实现。
  * <p>
  * NeoForge 1.21.1：{@link FluidType} 默认 {@code initializeClient} 是空实现, 直接 implements

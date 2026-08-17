@@ -28,7 +28,7 @@ public abstract class ClipboardScreenMixin {
     @Redirect(method = "tick",
         at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
-    private void aeronautics_gravity$skipCloseForAddressingSign(Minecraft mc, Screen screen) {
+    private void aero_suite$skipCloseForAddressingSign(Minecraft mc, Screen screen) {
         ClipboardScreen self = (ClipboardScreen) (Object) this;
         BlockPos pos = self.targetedBlock;
         // 仅 CLIPBOARD 检查处跳过:玩家在范围内(距离检查已过)+ 方块是 AddressingSign

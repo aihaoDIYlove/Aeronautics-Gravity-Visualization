@@ -71,7 +71,7 @@ public abstract class PackageEntityMixin {
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private void aeronautics_gravity$ruptureTick(CallbackInfo ci) {
+    private void aero_suite$ruptureTick(CallbackInfo ci) {
         PackageEntity self = (PackageEntity) (Object) this;
         if (!self.isAlive()) return;
         Level level = self.level();
@@ -81,7 +81,7 @@ public abstract class PackageEntityMixin {
         if (!PackageItem.isPackage(box)) return;
 
         ItemStackHandler contents = PackageItem.getContents(box);
-        int slot = aeronautics_gravity$findFirstActivatedPearl(contents);
+        int slot = aero_suite$findFirstActivatedPearl(contents);
         if (slot < 0) return; // 普通包裹, 不处理
 
         // === 含激活珍珠: 保持自身区块加载, 确保计时能持续到破裂 ===
@@ -135,7 +135,7 @@ public abstract class PackageEntityMixin {
     }
 
     @Unique
-    private static int aeronautics_gravity$findFirstActivatedPearl(ItemStackHandler contents) {
+    private static int aero_suite$findFirstActivatedPearl(ItemStackHandler contents) {
         for (int i = 0; i < contents.getSlots(); i++) {
             ItemStack s = contents.getStackInSlot(i);
             if (s.is(ModItems.ACTIVATED_ENDER_PEARL.get())) {

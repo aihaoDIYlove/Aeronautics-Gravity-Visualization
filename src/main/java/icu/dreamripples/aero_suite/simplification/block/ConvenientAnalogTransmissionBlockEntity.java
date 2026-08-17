@@ -82,7 +82,7 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
         if (!getLevel().isClientSide) {
             // 复用父类持久化的 signal 字段检测变化（signal 从 NBT 恢复，重进后与 bestNeighborSignal 一致，
             // 避免自维护 lastSignal 重进后重置为 0 误判信号变化，触发不必要的 detach/reattach）
-            int currentSignal = ((AnalogTransmissionBlockEntityAccessor) this).aeronautics_gravity$getSignal();
+            int currentSignal = ((AnalogTransmissionBlockEntityAccessor) this).aero_suite$getSignal();
             if (bestNeighborSignal != currentSignal) {
                 KineticBlockEntity extraWheel = getExtraKinetics();
 
@@ -95,7 +95,7 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
                 // 同步父类 signal 字段，防止 super.tick() 重复进入信号变化分支
                 // （否则 super.tick 会再次 attachKinetics -> propagateNewSource，触发第二次
                 // destroyBlock，且 setBlockAndUpdate 会用 BlockEntity 内部 state 重新放回方块，掉落第二个物品）
-                ((AnalogTransmissionBlockEntityAccessor) this).aeronautics_gravity$setSignal(bestNeighborSignal);
+                ((AnalogTransmissionBlockEntityAccessor) this).aero_suite$setSignal(bestNeighborSignal);
                 getLevel().setBlockAndUpdate(getBlockPos(),
                         getBlockState().setValue(AnalogTransmissionBlock.POWERED, bestNeighborSignal > 0));
 

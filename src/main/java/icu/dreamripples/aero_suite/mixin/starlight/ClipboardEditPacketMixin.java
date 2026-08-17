@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ClipboardEditPacketMixin {
 
     @Inject(method = "handle", at = @At("HEAD"), cancellable = true)
-    private void aeronautics_gravity$handleAddressingSign(ServerPlayer sender, CallbackInfo ci) {
+    private void aero_suite$handleAddressingSign(ServerPlayer sender, CallbackInfo ci) {
         ClipboardEditPacket self = (ClipboardEditPacket) (Object) this;
         BlockPos targetedBlock = self.targetedBlock();
         if (targetedBlock == null) return;  // 物品编辑分支,走原逻辑

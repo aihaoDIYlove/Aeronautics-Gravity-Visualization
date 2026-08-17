@@ -48,7 +48,7 @@ public class RotationPropagatorMixin {
             at = @At("RETURN"),
             cancellable = true
     )
-    private static void aeronautics_gravity$getConveyedSpeed(
+    private static void aero_suite$getConveyedSpeed(
             KineticBlockEntity fromBE, KineticBlockEntity toBE,
             CallbackInfoReturnable<Float> cir) {
 

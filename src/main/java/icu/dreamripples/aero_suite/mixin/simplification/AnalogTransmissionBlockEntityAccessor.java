@@ -19,8 +19,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AnalogTransmissionBlockEntityAccessor {
 
     @Accessor("signal")
-    int aeronautics_gravity$getSignal();
+    int aero_suite$getSignal();
 
     @Accessor("signal")
-    void aeronautics_gravity$setSignal(int value);
+    void aero_suite$setSignal(int value);
 }
