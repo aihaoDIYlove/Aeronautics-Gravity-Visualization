@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "counterweight_light"
+    }
+  ],
   "type": "create:sequenced_assembly",
   "ingredient": {
     "item": "gravity_visualization:counterweight"
@@ -11,11 +17,19 @@
     {
       "type": "create:filling",
       "ingredients": [
-        { "item": "gravity_visualization:incomplete_counterweight_light" },
-        { "type": "neoforge:single", "amount": 1000, "fluid": "aeronautics:levitite_blend" }
+        {
+          "item": "gravity_visualization:incomplete_counterweight_light"
+        },
+        {
+          "type": "neoforge:single",
+          "amount": 1000,
+          "fluid": "aeronautics:levitite_blend"
+        }
       ],
       "results": [
-        { "id": "gravity_visualization:incomplete_counterweight_light" }
+        {
+          "id": "gravity_visualization:incomplete_counterweight_light"
+        }
       ]
     }
   ],

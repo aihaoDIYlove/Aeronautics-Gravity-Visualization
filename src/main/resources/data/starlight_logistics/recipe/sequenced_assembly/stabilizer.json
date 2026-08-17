@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "stabilizer"
+    }
+  ],
   "type": "create:sequenced_assembly",
   "ingredient": {
     "item": "starlight_logistics:starlight_casing"
@@ -11,31 +17,49 @@
     {
       "type": "create:deploying",
       "ingredients": [
-        { "item": "starlight_logistics:incomplete_stabilizer" },
-        { "item": "gravity_visualization:counterweight_redstone" }
+        {
+          "item": "starlight_logistics:incomplete_stabilizer"
+        },
+        {
+          "item": "gravity_visualization:counterweight_redstone"
+        }
       ],
       "results": [
-        { "id": "starlight_logistics:incomplete_stabilizer" }
+        {
+          "id": "starlight_logistics:incomplete_stabilizer"
+        }
       ]
     },
     {
       "type": "create:deploying",
       "ingredients": [
-        { "item": "starlight_logistics:incomplete_stabilizer" },
-        { "item": "simulated:gimbal_sensor" }
+        {
+          "item": "starlight_logistics:incomplete_stabilizer"
+        },
+        {
+          "item": "simulated:gimbal_sensor"
+        }
       ],
       "results": [
-        { "id": "starlight_logistics:incomplete_stabilizer" }
+        {
+          "id": "starlight_logistics:incomplete_stabilizer"
+        }
       ]
     },
     {
       "type": "create:deploying",
       "ingredients": [
-        { "item": "starlight_logistics:incomplete_stabilizer" },
-        { "item": "gravity_visualization:counterweight_light_redstone" }
+        {
+          "item": "starlight_logistics:incomplete_stabilizer"
+        },
+        {
+          "item": "gravity_visualization:counterweight_light_redstone"
+        }
       ],
       "results": [
-        { "id": "starlight_logistics:incomplete_stabilizer" }
+        {
+          "id": "starlight_logistics:incomplete_stabilizer"
+        }
       ]
     }
   ],

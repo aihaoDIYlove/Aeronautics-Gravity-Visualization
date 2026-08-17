@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "spark_wand"
+    }
+  ],
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "  G",
@@ -6,8 +12,12 @@
     "S  "
   ],
   "key": {
-    "G": { "item": "minecraft:gunpowder" },
-    "S": { "item": "minecraft:stick" }
+    "G": {
+      "item": "minecraft:gunpowder"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
   },
   "result": {
     "id": "gravity_visualization:spark_wand",

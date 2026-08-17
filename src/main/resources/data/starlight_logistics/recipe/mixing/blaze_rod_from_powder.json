@@ -1,9 +1,21 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "multiplication_recipes"
+    }
+  ],
   "type": "create:mixing",
   "ingredients": [
-    { "item": "minecraft:blaze_powder" },
-    { "item": "minecraft:gunpowder" },
-    { "item": "minecraft:stick" },
+    {
+      "item": "minecraft:blaze_powder"
+    },
+    {
+      "item": "minecraft:gunpowder"
+    },
+    {
+      "item": "minecraft:stick"
+    },
     {
       "type": "neoforge:single",
       "amount": 1000,

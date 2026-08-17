@@ -21,6 +21,7 @@
   "item.gravity_visualization.portable_diagram": "便携图解",
   "item.gravity_visualization.spark_wand": "火花魔杖",
   "itemGroup.gravity_visualization.main": "航空学：重力可视化",
+  "message.gravity_visualization.item_disabled": "该物品已被配置停用",
   "tooltip.gravity_visualization.current_lift": "当前浮力",
   "tooltip.gravity_visualization.current_mass": "当前质量",
   "tooltip.gravity_visualization.portable_diagram": "右键载具：打开其图纸视图（视角由命中的方块面决定）",

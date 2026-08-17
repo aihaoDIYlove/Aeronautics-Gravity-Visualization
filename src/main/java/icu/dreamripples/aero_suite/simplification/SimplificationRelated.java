@@ -18,7 +18,8 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 public class SimplificationRelated {
     public static final String MOD_ID = AeroSuiteIds.SIMPLIFICATION_ID;
 
-    public SimplificationRelated(IEventBus modEventBus) {
+    public SimplificationRelated(IEventBus modEventBus, net.neoforged.fml.ModContainer container) {
+        registerConfigScreen(container);
         ModItems.SIMPLIFICATION_ITEMS.register(modEventBus);
         ModBlocks.SIMPLIFICATION_BLOCKS.register(modEventBus);
         ModBlocks.SIMPLIFICATION_BLOCK_ENTITIES.register(modEventBus);
@@ -34,5 +35,12 @@ public class SimplificationRelated {
                 BlockStressValues.CAPACITIES.register(holder.get(), () -> 64.0);
             }
         });
+    }
+
+    // 三个 mod 的配置按钮都指向同一份配置屏(catnip BaseConfigScreen, 读 gravity_visualization 的 COMMON 配置)
+    private static void registerConfigScreen(net.neoforged.fml.ModContainer container) {
+        container.registerExtensionPoint(
+                net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
+                (c, last) -> new net.createmod.catnip.config.ui.BaseConfigScreen(last, "gravity_visualization"));
     }
 }

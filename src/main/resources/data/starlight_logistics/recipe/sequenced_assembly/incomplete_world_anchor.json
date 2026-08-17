@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "world_anchor"
+    }
+  ],
   "type": "create:sequenced_assembly",
   "ingredient": {
     "item": "starlight_logistics:lightweight_glass"
@@ -11,31 +17,49 @@
     {
       "type": "create:deploying",
       "ingredients": [
-        { "item": "starlight_logistics:incomplete_world_anchor" },
-        { "item": "starlight_logistics:stabilizer" }
+        {
+          "item": "starlight_logistics:incomplete_world_anchor"
+        },
+        {
+          "item": "starlight_logistics:stabilizer"
+        }
       ],
       "results": [
-        { "id": "starlight_logistics:incomplete_world_anchor" }
+        {
+          "id": "starlight_logistics:incomplete_world_anchor"
+        }
       ]
     },
     {
       "type": "create:deploying",
       "ingredients": [
-        { "item": "starlight_logistics:incomplete_world_anchor" },
-        { "item": "create:packager" }
+        {
+          "item": "starlight_logistics:incomplete_world_anchor"
+        },
+        {
+          "item": "create:packager"
+        }
       ],
       "results": [
-        { "id": "starlight_logistics:incomplete_world_anchor" }
+        {
+          "id": "starlight_logistics:incomplete_world_anchor"
+        }
       ]
     },
     {
       "type": "create:deploying",
       "ingredients": [
-        { "item": "starlight_logistics:incomplete_world_anchor" },
-        { "item": "create:fluid_tank" }
+        {
+          "item": "starlight_logistics:incomplete_world_anchor"
+        },
+        {
+          "item": "create:fluid_tank"
+        }
       ],
       "results": [
-        { "id": "starlight_logistics:incomplete_world_anchor" }
+        {
+          "id": "starlight_logistics:incomplete_world_anchor"
+        }
       ]
     }
   ],

@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "counterweight_light"
+    }
+  ],
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
@@ -7,8 +13,12 @@
     "RRR"
   ],
   "key": {
-    "R": { "item": "minecraft:redstone" },
-    "C": { "item": "gravity_visualization:counterweight_light_pearl" }
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "C": {
+      "item": "gravity_visualization:counterweight_light_pearl"
+    }
   },
   "result": {
     "count": 1,

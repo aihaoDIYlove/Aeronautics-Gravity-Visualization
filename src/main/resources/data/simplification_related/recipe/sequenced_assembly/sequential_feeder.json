@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "sequential_feeder"
+    }
+  ],
   "type": "create:sequenced_assembly",
   "ingredient": {
     "item": "create:andesite_casing"
@@ -11,41 +17,65 @@
     {
       "type": "create:deploying",
       "ingredients": [
-        { "item": "simplification_related:incomplete_sequential_feeder" },
-        { "item": "create:filter" }
+        {
+          "item": "simplification_related:incomplete_sequential_feeder"
+        },
+        {
+          "item": "create:filter"
+        }
       ],
       "results": [
-        { "id": "simplification_related:incomplete_sequential_feeder" }
+        {
+          "id": "simplification_related:incomplete_sequential_feeder"
+        }
       ]
     },
     {
       "type": "create:deploying",
       "ingredients": [
-        { "item": "simplification_related:incomplete_sequential_feeder" },
-        { "item": "minecraft:redstone" }
+        {
+          "item": "simplification_related:incomplete_sequential_feeder"
+        },
+        {
+          "item": "minecraft:redstone"
+        }
       ],
       "results": [
-        { "id": "simplification_related:incomplete_sequential_feeder" }
+        {
+          "id": "simplification_related:incomplete_sequential_feeder"
+        }
       ]
     },
     {
       "type": "create:deploying",
       "ingredients": [
-        { "item": "simplification_related:incomplete_sequential_feeder" },
-        { "item": "create:andesite_funnel" }
+        {
+          "item": "simplification_related:incomplete_sequential_feeder"
+        },
+        {
+          "item": "create:andesite_funnel"
+        }
       ],
       "results": [
-        { "id": "simplification_related:incomplete_sequential_feeder" }
+        {
+          "id": "simplification_related:incomplete_sequential_feeder"
+        }
       ]
     },
     {
       "type": "create:deploying",
       "ingredients": [
-        { "item": "simplification_related:incomplete_sequential_feeder" },
-        { "item": "minecraft:barrel" }
+        {
+          "item": "simplification_related:incomplete_sequential_feeder"
+        },
+        {
+          "item": "minecraft:barrel"
+        }
       ],
       "results": [
-        { "id": "simplification_related:incomplete_sequential_feeder" }
+        {
+          "id": "simplification_related:incomplete_sequential_feeder"
+        }
       ]
     }
   ],

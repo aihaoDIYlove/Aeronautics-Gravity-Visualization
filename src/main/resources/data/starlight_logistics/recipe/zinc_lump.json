@@ -1,9 +1,21 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "conversion_recipes"
+    }
+  ],
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    { "item": "create:zinc_nugget" },
-    { "item": "create:zinc_nugget" },
-    { "item": "create:zinc_nugget" }
+    {
+      "item": "create:zinc_nugget"
+    },
+    {
+      "item": "create:zinc_nugget"
+    },
+    {
+      "item": "create:zinc_nugget"
+    }
   ],
   "result": {
     "id": "starlight_logistics:zinc_lump",

@@ -21,6 +21,7 @@
   "item.gravity_visualization.portable_diagram": "Portable Contraption Diagram",
   "item.gravity_visualization.spark_wand": "Spark Wand",
   "itemGroup.gravity_visualization.main": "Aeronautics Gravity",
+  "message.gravity_visualization.item_disabled": "This item has been disabled in the config",
   "tooltip.gravity_visualization.current_lift": "Current Buoyancy",
   "tooltip.gravity_visualization.current_mass": "Current Mass",
   "tooltip.gravity_visualization.portable_diagram": "Right-click a contraption: open its diagram view (camera set by the clicked face)",

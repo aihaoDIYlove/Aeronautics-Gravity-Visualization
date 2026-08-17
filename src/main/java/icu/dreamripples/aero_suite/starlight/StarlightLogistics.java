@@ -42,7 +42,8 @@ public class StarlightLogistics {
             SoundEvents.FENCE_GATE_CLOSE, SoundEvents.FENCE_GATE_OPEN));
     }
 
-    public StarlightLogistics(IEventBus modEventBus) {
+    public StarlightLogistics(IEventBus modEventBus, net.neoforged.fml.ModContainer container) {
+        registerConfigScreen(container);
         ModDataComponents.DATA_COMPONENTS.register(modEventBus);
         ModItems.STARLIGHT_ITEMS.register(modEventBus);
         ModBlocks.STARLIGHT_BLOCKS.register(modEventBus);
@@ -65,5 +66,12 @@ public class StarlightLogistics {
                     ResourceLocation.fromNamespaceAndPath("create", "fluid_pipe"));
             EncasingRegistry.addVariant(pipe, ModBlocks.STARLIGHT_ENCASED_FLUID_PIPE_BLOCK.get());
         });
+    }
+
+    // 三个 mod 的配置按钮都指向同一份配置屏(catnip BaseConfigScreen, 读 gravity_visualization 的 COMMON 配置)
+    private static void registerConfigScreen(net.neoforged.fml.ModContainer container) {
+        container.registerExtensionPoint(
+                net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
+                (c, last) -> new net.createmod.catnip.config.ui.BaseConfigScreen(last, "gravity_visualization"));
     }
 }

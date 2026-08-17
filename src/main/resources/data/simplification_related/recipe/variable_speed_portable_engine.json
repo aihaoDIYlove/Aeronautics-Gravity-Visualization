@@ -1,9 +1,21 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "variable_speed_engine"
+    }
+  ],
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    { "item": "simulated:red_portable_engine" },
-    { "item": "simplification_related:convenient_analog_transmission" },
-    { "item": "simulated:throttle_lever" }
+    {
+      "item": "simulated:red_portable_engine"
+    },
+    {
+      "item": "simplification_related:convenient_analog_transmission"
+    },
+    {
+      "item": "simulated:throttle_lever"
+    }
   ],
   "result": {
     "id": "simplification_related:red_variable_speed_portable_engine",

@@ -30,6 +30,8 @@ public class ActivatedEnderPearlHandler {
 
     @SubscribeEvent
     public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        // 配置停用时禁止激活(合成途径的事件等价物; 获取到的激活珍珠本身会被 DisabledItemCollector 删除)
+        if (!icu.dreamripples.aero_suite.common.config.FeatureGates.isEnabled("activated_pearl")) return;
         if (event.getHand() != InteractionHand.MAIN_HAND) return;
         ItemStack main = event.getItemStack();
         if (!main.is(Items.ENDER_PEARL)) return;

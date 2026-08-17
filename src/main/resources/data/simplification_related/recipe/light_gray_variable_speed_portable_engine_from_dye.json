@@ -1,8 +1,18 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "variable_speed_engine"
+    }
+  ],
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    { "item": "simplification_related:red_variable_speed_portable_engine" },
-    { "item": "minecraft:light_gray_dye" }
+    {
+      "item": "simplification_related:red_variable_speed_portable_engine"
+    },
+    {
+      "item": "minecraft:light_gray_dye"
+    }
   ],
   "result": {
     "id": "simplification_related:light_gray_variable_speed_portable_engine",

@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "world_anchor"
+    }
+  ],
   "type": "create:sequenced_assembly",
   "ingredient": {
     "item": "starlight_logistics:incomplete_world_anchor"
@@ -11,11 +17,19 @@
     {
       "type": "create:filling",
       "ingredients": [
-        { "item": "starlight_logistics:incomplete_world_anchor" },
-        { "type": "neoforge:single", "amount": 1000, "fluid": "starlight_logistics:starlight" }
+        {
+          "item": "starlight_logistics:incomplete_world_anchor"
+        },
+        {
+          "type": "neoforge:single",
+          "amount": 1000,
+          "fluid": "starlight_logistics:starlight"
+        }
       ],
       "results": [
-        { "id": "starlight_logistics:incomplete_world_anchor" }
+        {
+          "id": "starlight_logistics:incomplete_world_anchor"
+        }
       ]
     }
   ],
