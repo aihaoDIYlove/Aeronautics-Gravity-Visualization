@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "void_hose_pulley"
+    }
+  ],
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {

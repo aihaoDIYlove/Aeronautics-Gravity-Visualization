@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "recipe_levitite"
+    }
+  ],
   "type": "create:sequenced_assembly",
   "ingredient": {
     "item": "starlight_logistics:ultralight_glass"
@@ -11,21 +17,37 @@
     {
       "type": "create:filling",
       "ingredients": [
-        { "item": "starlight_logistics:incomplete_levitite" },
-        { "type": "neoforge:single", "amount": 500, "fluid": "aeronautics:levitite_blend" }
+        {
+          "item": "starlight_logistics:incomplete_levitite"
+        },
+        {
+          "type": "neoforge:single",
+          "amount": 500,
+          "fluid": "aeronautics:levitite_blend"
+        }
       ],
       "results": [
-        { "id": "starlight_logistics:incomplete_levitite" }
+        {
+          "id": "starlight_logistics:incomplete_levitite"
+        }
       ]
     },
     {
       "type": "create:filling",
       "ingredients": [
-        { "item": "starlight_logistics:incomplete_levitite" },
-        { "type": "neoforge:single", "amount": 500, "fluid": "starlight_logistics:starlight" }
+        {
+          "item": "starlight_logistics:incomplete_levitite"
+        },
+        {
+          "type": "neoforge:single",
+          "amount": 500,
+          "fluid": "starlight_logistics:starlight"
+        }
       ],
       "results": [
-        { "id": "starlight_logistics:incomplete_levitite" }
+        {
+          "id": "starlight_logistics:incomplete_levitite"
+        }
       ]
     }
   ],

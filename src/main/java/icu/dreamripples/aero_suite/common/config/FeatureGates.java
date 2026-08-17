@@ -1,26 +1,23 @@
 package icu.dreamripples.aero_suite.common.config;
 
 import icu.dreamripples.aero_suite.common.AeroSuite;
-import icu.dreamripples.aero_suite.common.registry.ModBlocks;
-import icu.dreamripples.aero_suite.common.registry.ModItems;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 功能门控中枢: 配置开关 key 查询 + 开关 -> 受控物品集合。
+ * 功能门控中枢: 开关 key 查询 + 开关 -> 受控物品集合, 全部由 {@link AeroSuiteFeatures#ALL}
+ * 元数据表驱动(UI / 配方条件 / 获取即删共用一份定义)。
  *
  * <ul>
- *   <li>{@link #isEnabled(String)} 给 {@link FeatureEnabledCondition}(配方层)用。</li>
+ *   <li>{@link #isEnabled(String)} 给 {@link FeatureEnabledCondition}(配方层)与各处早期返回用。</li>
  *   <li>{@link #disabledItems()} 给物品删除执行器(玩家获取即删)用 -- 返回所有被停用
  *       开关覆盖的 Item 集合, 服务端 tick 扫描在线玩家背包/光标, 命中即清空 + actionbar 提示。</li>
  * </ul>
  *
- * <p>注册项(DeferredHolder)在注册完成后才可 get(), disabledItems() 惰性构建并缓存,
- * 配置 reload 时 {@link #invalidate()} 失效。
+ * <p>注册项(Supplier)在注册完成后才可 get(), disabledItems() 惰性构建并缓存,
+ * 配置 load/reload 时 {@link #invalidate()} 失效。
  */
 public final class FeatureGates {
 
@@ -30,36 +27,19 @@ public final class FeatureGates {
     private static volatile Set<Item> cachedDisabled = Set.of();
     private static volatile boolean anyDisabled;
 
-    /** 全部开关 key(按配置树顺序)。 */
-    public static final String[] ALL_KEYS = {
-            "spark_wand", "portable_diagram", "counterweight", "counterweight_light",
-            "analog_transmission", "variable_speed_engine", "sequential_feeder",
-            "stabilizer", "world_anchor", "activated_pearl", "addressing_sign",
-            "multiplication_recipes", "conversion_recipes",
-    };
+    /** 全部开关 key(按元数据表顺序)。 */
+    public static final String[] ALL_KEYS =
+            AeroSuiteFeatures.ALL.stream().map(AeroSuiteFeatures.Feature::key).toArray(String[]::new);
 
     public static boolean isEnabled(String key) {
         AeroSuiteConfig c = CONFIG;
         if (c == null) return true; // 配置未加载前按全开处理(默认值全 true, 一致)
-        return switch (key) {
-            case "spark_wand" -> c.gravity.sparkWand.get();
-            case "portable_diagram" -> c.gravity.portableDiagram.get();
-            case "counterweight" -> c.gravity.counterweight.get();
-            case "counterweight_light" -> c.gravity.counterweightLight.get();
-            case "analog_transmission" -> c.simplification.analogTransmission.get();
-            case "variable_speed_engine" -> c.simplification.variableSpeedEngine.get();
-            case "sequential_feeder" -> c.simplification.sequentialFeeder.get();
-            case "stabilizer" -> c.starlight.stabilizer.get();
-            case "world_anchor" -> c.starlight.worldAnchor.get();
-            case "activated_pearl" -> c.starlight.activatedPearl.get();
-            case "addressing_sign" -> c.starlight.addressingSign.get();
-            case "multiplication_recipes" -> c.starlight.multiplicationRecipes.get();
-            case "conversion_recipes" -> c.starlight.conversionRecipes.get();
-            default -> {
-                AeroSuite.LOGGER.warn("Unknown feature gate key: {}", key);
-                yield true;
-            }
-        };
+        var value = c.byKey.get(key);
+        if (value == null) {
+            AeroSuite.LOGGER.warn("Unknown feature gate key: {}", key);
+            return true;
+        }
+        return value.get();
     }
 
     /** 配置 load/reload 后调用: 重建缓存。 */
@@ -83,42 +63,12 @@ public final class FeatureGates {
 
     private static Set<Item> buildDisabled() {
         Set<Item> items = new HashSet<>();
-        if (!isEnabled("spark_wand")) items.add(ModItems.SPARK_WAND.get());
-        if (!isEnabled("portable_diagram")) items.add(ModItems.PORTABLE_DIAGRAM.get());
-        if (!isEnabled("counterweight")) {
-            items.add(ModBlocks.COUNTERWEIGHT_ITEM.get());
-            items.add(ModBlocks.COUNTERWEIGHT_REDSTONE_ITEM.get());
-            items.add(ModItems.INCOMPLETE_COUNTERWEIGHT.get());
+        for (AeroSuiteFeatures.Feature f : AeroSuiteFeatures.ALL) {
+            if (isEnabled(f.key()))
+                continue;
+            for (var supplier : f.items())
+                items.add(supplier.get());
         }
-        if (!isEnabled("counterweight_light")) {
-            items.add(ModBlocks.COUNTERWEIGHT_LIGHT_ITEM.get());
-            items.add(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_ITEM.get());
-            items.add(ModBlocks.COUNTERWEIGHT_LIGHT_REDSTONE_ITEM.get());
-            items.add(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_ITEM.get());
-            items.add(ModItems.INCOMPLETE_COUNTERWEIGHT_LIGHT.get());
-        }
-        if (!isEnabled("analog_transmission")) items.add(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_ITEM.get());
-        if (!isEnabled("variable_speed_engine")) {
-            for (DeferredHolder<Item, BlockItem> h : ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINE_ITEMS.values()) {
-                items.add(h.get());
-            }
-        }
-        if (!isEnabled("sequential_feeder")) {
-            items.add(ModBlocks.SEQUENTIAL_FEEDER_ITEM.get());
-            items.add(ModItems.INCOMPLETE_SEQUENTIAL_FEEDER.get());
-        }
-        if (!isEnabled("stabilizer")) {
-            items.add(ModBlocks.STABILIZER_ITEM.get());
-            items.add(ModItems.INCOMPLETE_STABILIZER.get());
-        }
-        if (!isEnabled("world_anchor")) {
-            items.add(ModBlocks.WORLD_ANCHOR_ITEM.get());
-            items.add(ModItems.INCOMPLETE_WORLD_ANCHOR.get());
-        }
-        if (!isEnabled("activated_pearl")) items.add(ModItems.ACTIVATED_ENDER_PEARL.get());
-        if (!isEnabled("addressing_sign")) items.add(ModBlocks.ADDRESSING_SIGN_ITEM.get());
-        // 增产/转换组唯一 mod 物品: zinc_lump(合成+转换+删除三绑定同开关)
-        if (!isEnabled("conversion_recipes")) items.add(ModItems.ZINC_LUMP.get());
         return Set.copyOf(items);
     }
 

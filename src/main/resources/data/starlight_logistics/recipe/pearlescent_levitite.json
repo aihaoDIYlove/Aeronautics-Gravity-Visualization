@@ -1,9 +1,19 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "recipe_pearlescent_levitite"
+    }
+  ],
   "type": "create:haunting",
   "ingredients": [
-    { "item": "aeronautics:levitite" }
+    {
+      "item": "aeronautics:levitite"
+    }
   ],
   "results": [
-    { "id": "aeronautics:pearlescent_levitite" }
+    {
+      "id": "aeronautics:pearlescent_levitite"
+    }
   ]
 }

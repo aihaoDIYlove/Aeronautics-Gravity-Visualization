@@ -2,7 +2,7 @@
   "neoforge:conditions": [
     {
       "type": "gravity_visualization:feature_enabled",
-      "key": "conversion_recipes"
+      "key": "zinc_lump"
     }
   ],
   "type": "minecraft:crafting_shapeless",

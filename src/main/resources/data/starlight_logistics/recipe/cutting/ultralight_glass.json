@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "ultralight_glass"
+    }
+  ],
   "type": "create:cutting",
   "ingredients": [
     {

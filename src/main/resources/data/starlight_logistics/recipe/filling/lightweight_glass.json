@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "lightweight_glass"
+    }
+  ],
   "type": "create:filling",
   "ingredients": [
     {

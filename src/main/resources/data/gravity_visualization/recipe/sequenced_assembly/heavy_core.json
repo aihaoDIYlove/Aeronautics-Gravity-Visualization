@@ -2,7 +2,7 @@
   "neoforge:conditions": [
     {
       "type": "gravity_visualization:feature_enabled",
-      "key": "counterweight"
+      "key": "recipe_heavy_core"
     }
   ],
   "type": "create:sequenced_assembly",

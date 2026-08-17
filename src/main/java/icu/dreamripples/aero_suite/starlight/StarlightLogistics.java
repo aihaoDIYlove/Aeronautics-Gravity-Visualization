@@ -68,10 +68,10 @@ public class StarlightLogistics {
         });
     }
 
-    // 三个 mod 的配置按钮都指向同一份配置屏(catnip BaseConfigScreen, 读 gravity_visualization 的 COMMON 配置)
+    // 三个 mod 的配置按钮都指向同一份自绘配置屏(读 gravity_visualization 的 COMMON 配置, 本地化见 AeroSuiteConfigScreen)
     private static void registerConfigScreen(net.neoforged.fml.ModContainer container) {
         container.registerExtensionPoint(
                 net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
-                (c, last) -> new net.createmod.catnip.config.ui.BaseConfigScreen(last, "gravity_visualization"));
+                (c, last) -> new icu.dreamripples.aero_suite.common.config.AeroSuiteConfigScreen(last));
     }
 }
