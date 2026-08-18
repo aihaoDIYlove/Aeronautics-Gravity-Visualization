@@ -70,6 +70,7 @@
   "aero_suite.feature.world_anchor.desc": "Cross-dimensional logistics block using package delivery; includes intermediate deletion.",
   "aero_suite.feature.addressing_sign": "Addressing Sign",
   "aero_suite.feature.addressing_sign.desc": "Transparent wall sign holding an address list for machines to read.",
+  "aero_suite.addressing_sign.hint": "Shift+Right-click",
   "aero_suite.feature.activated_pearl": "Activated Ender Pearl",
   "aero_suite.feature.activated_pearl.desc": "Player-bound ender pearl shipped in a package; teleports the player after 3s, cross-dimensional.",
   "aero_suite.feature.lightweight_glass": "Lightweight Glass",

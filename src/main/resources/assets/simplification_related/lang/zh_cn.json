@@ -30,6 +30,7 @@
   "gui.simplification_related.sequential_feeder.marker_slots": "标记槽：",
   "item.simplification_related.incomplete_sequential_feeder": "顺序供料器（半成品）",
   "tooltip.simplification_related.current_output_speed": "当前输出转速",
+  "tooltip.simplification_related.superheated_stress_boost": "超级加热：应力翻倍",
   "tooltip.simplification_related.sequential_feeder.mode": "控制模式",
   "tooltip.simplification_related.sequential_feeder.mode.ignore_redstone": "忽略红石",
   "tooltip.simplification_related.sequential_feeder.mode.redstone_pulse": "红石脉冲控制"

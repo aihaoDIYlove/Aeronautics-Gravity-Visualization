@@ -30,6 +30,7 @@
   "gui.simplification_related.sequential_feeder.marker_slots": "Marker Slots:",
   "item.simplification_related.incomplete_sequential_feeder": "Incomplete Sequential Feeder",
   "tooltip.simplification_related.current_output_speed": "Current Output Speed",
+  "tooltip.simplification_related.superheated_stress_boost": "Superheated: Stress x2",
   "tooltip.simplification_related.sequential_feeder.mode": "Control Mode",
   "tooltip.simplification_related.sequential_feeder.mode.ignore_redstone": "Ignore Redstone",
   "tooltip.simplification_related.sequential_feeder.mode.redstone_pulse": "Redstone Pulse"

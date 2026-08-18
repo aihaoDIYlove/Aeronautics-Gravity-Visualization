@@ -74,18 +74,18 @@ public class AddressingSignRenderer implements BlockEntityRenderer<AddressingSig
         boolean empty = addresses.isEmpty();
 
         for (int line = 0; line < 4; line++) {
-            String text;
+            Component text;
             boolean isHighlight;
             if (empty) {
-                text = (line == 1) ? "shift+右键" : "";
+                text = (line == 1) ? Component.translatable("aero_suite.addressing_sign.hint") : Component.empty();
                 isHighlight = false;
             } else {
                 int idx = selected - 1 + line;  // 窗口 [sel-1, sel, sel+1, sel+2]
-                text = (idx >= 0 && idx < addresses.size()) ? addresses.get(idx) : "";
+                text = (idx >= 0 && idx < addresses.size()) ? Component.literal(addresses.get(idx)) : Component.empty();
                 isHighlight = (line == 1);  // 第 2 行高亮
             }
 
-            List<FormattedCharSequence> split = font.split(Component.literal(text), MAX_TEXT_WIDTH);
+            List<FormattedCharSequence> split = font.split(text, MAX_TEXT_WIDTH);
             FormattedCharSequence fcs = split.isEmpty() ? FormattedCharSequence.EMPTY : split.get(0);
             float x = -font.width(fcs) / 2.0F;
             float y = line * LINE_HEIGHT - VERTICAL_CENTER;

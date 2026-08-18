@@ -13,6 +13,7 @@ import dev.engine_room.flywheel.lib.model.Models;
 import dev.engine_room.flywheel.lib.visual.SimpleTickableVisual;
 import dev.simulated_team.simulated.index.SimPartialModels;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -174,7 +175,9 @@ public class ConvenientAnalogTransmissionVisual extends KineticBlockEntityVisual
     }
 
     private float getNeighborSpeed(Direction dir) {
-        BlockEntity be = blockEntity.getLevel().getBlockEntity(blockEntity.getBlockPos().relative(dir));
+        Level level = blockEntity.getLevel();
+        if (level == null) return 0f;  // 世界卸载/BE 移除边缘,链式调用会 NPE
+        BlockEntity be = level.getBlockEntity(blockEntity.getBlockPos().relative(dir));
         if (be instanceof KineticBlockEntity kbe) {
             return kbe.getSpeed();
         }

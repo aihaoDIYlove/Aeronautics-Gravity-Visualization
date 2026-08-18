@@ -12,9 +12,10 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 世界锚点跨维度物流网络 - 服务端全局注册表。
@@ -36,14 +37,15 @@ public class WorldAnchorNetwork {
 
     public enum SendResult { SUCCESS, NO_RECEIVER, CONFLICT, TARGET_UNLOADED, TARGET_FULL }
 
-    private static final Map<String, List<ReceiverEntry>> RECEIVERS = new HashMap<>();
+    /** 并发容器:跨维度全局注册表,防御非主线程路径触碰导致的 CME/脏状态 */
+    private static final Map<String, List<ReceiverEntry>> RECEIVERS = new ConcurrentHashMap<>();
 
     public record ReceiverEntry(ResourceKey<Level> dim, BlockPos pos) {}
 
     /** 接收端注册:addressFilter 为告示牌配置的地址(可为 glob 模式如 "factory_*") */
     public static void register(String address, ResourceKey<Level> dim, BlockPos pos) {
         if (address == null || address.isBlank()) return;
-        RECEIVERS.computeIfAbsent(address, k -> new ArrayList<>()).add(new ReceiverEntry(dim, pos));
+        RECEIVERS.computeIfAbsent(address, k -> new CopyOnWriteArrayList<>()).add(new ReceiverEntry(dim, pos));
     }
 
     /** 接收端注销:模式切换/移除时调用 */
@@ -52,7 +54,8 @@ public class WorldAnchorNetwork {
         List<ReceiverEntry> list = RECEIVERS.get(address);
         if (list == null) return;
         list.removeIf(e -> e.dim().equals(dim) && e.pos().equals(pos));
-        if (list.isEmpty()) RECEIVERS.remove(address);
+        // 用双参 remove:仅当 map 里还是这个空 list 才移除,避免误删并发 register 刚建的新 list
+        RECEIVERS.remove(address, list);
     }
 
     /** 接收端冲突检测:同 addressFilter 多个接收端 -> true(白灯) */
@@ -67,7 +70,7 @@ public class WorldAnchorNetwork {
      *
      * @param server    MinecraftServer(用于跨维度取 Level)
      * @param boxAddress 包裹自身标注的收货地址({@link PackageItem#getAddress})
-     * @param box       包裹物品(将被插入接收端物品栏)
+     * @param box       包裹物品(将被插入接收端物品栏;**消费语义**--插入成功时 stack 会被就地缩减,调用方不得复用)
      * @return 发送结果:SUCCESS / NO_RECEIVER / CONFLICT / TARGET_UNLOADED / TARGET_FULL
      */
     public static SendResult send(MinecraftServer server, String boxAddress, ItemStack box) {

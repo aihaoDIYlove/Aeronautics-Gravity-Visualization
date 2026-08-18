@@ -17,7 +17,7 @@
   "parent": "starlight_logistics:starlight_logistics_root",
   "criteria": {
     "teleport": {
-      "trigger": "starlight_logistics:pearl_package_teleport",
+      "trigger": "gravity_visualization:pearl_package_teleport",
       "conditions": {}
     }
   },

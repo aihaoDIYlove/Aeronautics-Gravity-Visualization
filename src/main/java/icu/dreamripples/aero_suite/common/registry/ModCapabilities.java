@@ -15,8 +15,8 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
  * <p>
  * 参考 Create {@code HosePulleyBlockEntity.registerCapabilities}: 只在管道面
  * ({@link HosePulleyBlock#hasPipeTowards})暴露 handler, 其他方向返回 null。
- * 1.21.1 NeoForge 的 @EventBusSubscriber 自动路由事件到 MOD/GAME bus(无需 bus 参数,
- * 见 Simulated ModBusEvents), RegisterCapabilitiesEvent 自动走 MOD bus。
+ * 不写 bus 参数: 1.21.1 的 @EventBusSubscriber 自动路由 MOD/GAME bus,
+ * 显式 bus = Bus.MOD 在 NeoForge 21.1.235 已是 deprecation-for-removal(编译警告)。
  */
 @EventBusSubscriber(modid = StarlightLogistics.MOD_ID)
 public class ModCapabilities {
