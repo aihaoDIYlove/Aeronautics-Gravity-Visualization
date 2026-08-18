@@ -243,7 +243,11 @@ public class AeroSuiteConfigScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (scrollY != 0 && mode == Mode.FEATURES) {
-            scrollOffset = Math.max(0, scrollOffset - scrollY);
+            List<AeroSuiteFeatures.Feature> features = pageFeatures();
+            int visibleRows = (this.height - BOTTOM_MARGIN - TOP_MARGIN) / ROW_HEIGHT;
+            // 双向钳制(短列表上界为 0),并吸附到整数防止小数 offset 让渲染行/点击判定错位
+            int maxOffset = Math.max(0, features.size() - visibleRows);
+            scrollOffset = Math.round(Mth.clamp(scrollOffset - scrollY, 0, maxOffset));
             return true;
         }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);

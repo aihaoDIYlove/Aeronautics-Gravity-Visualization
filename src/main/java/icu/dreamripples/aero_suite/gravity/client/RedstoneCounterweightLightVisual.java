@@ -59,16 +59,7 @@ public class RedstoneCounterweightLightVisual
 
     private static int colorForSignal(int signal) {
         float frac = Math.max(0, Math.min(1, signal / 15F));
-        return mixArgb(OFF, ON, frac);
-    }
-
-    private static int mixArgb(int a, int b, float t) {
-        int ar = (a >> 16) & 0xFF, ag = (a >> 8) & 0xFF, ab = a & 0xFF;
-        int br = (b >> 16) & 0xFF, bg = (b >> 8) & 0xFF, bb = b & 0xFF;
-        int r = (int) (ar + (br - ar) * t);
-        int g = (int) (ag + (bg - ag) * t);
-        int bl = (int) (ab + (bb - ab) * t);
-        return 0xFF000000 | (r << 16) | (g << 8) | bl;
+        return icu.dreamripples.aero_suite.common.client.AeroSuiteColors.mixArgb(OFF, ON, frac);
     }
 
     @Override

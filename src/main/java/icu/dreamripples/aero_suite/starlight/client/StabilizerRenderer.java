@@ -46,19 +46,10 @@ public class StabilizerRenderer extends SafeBlockEntityRenderer<StabilizerBlockE
         int massTier = state.getValue(StabilizerBlock.MASS_TIER);
         int liftTier = state.getValue(StabilizerBlock.LIFT_TIER);
         if (massTier > 1) {
-            return mixArgb(MASS_OFF, MASS_ON, (massTier - 1) / 15F);
+            return icu.dreamripples.aero_suite.common.client.AeroSuiteColors.mixArgb(MASS_OFF, MASS_ON, (massTier - 1) / 15F);
         } else if (liftTier > 1) {
-            return mixArgb(LIFT_OFF, LIFT_ON, (liftTier - 1) / 15F);
+            return icu.dreamripples.aero_suite.common.client.AeroSuiteColors.mixArgb(LIFT_OFF, LIFT_ON, (liftTier - 1) / 15F);
         }
         return IDLE;
-    }
-
-    private static int mixArgb(int a, int b, float t) {
-        int ar = (a >> 16) & 0xFF, ag = (a >> 8) & 0xFF, ab = a & 0xFF;
-        int br = (b >> 16) & 0xFF, bg = (b >> 8) & 0xFF, bb = b & 0xFF;
-        int r = (int) (ar + (br - ar) * t);
-        int g = (int) (ag + (bg - ag) * t);
-        int bl = (int) (ab + (bb - ab) * t);
-        return 0xFF000000 | (r << 16) | (g << 8) | bl;
     }
 }

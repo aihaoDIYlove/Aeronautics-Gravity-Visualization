@@ -45,7 +45,11 @@ public class CreativeTabInjections {
 
         Item zincNugget = BuiltInRegistries.ITEM.get(
                 ResourceLocation.fromNamespaceAndPath("create", "zinc_nugget"));
-        if (zincNugget == Items.AIR) return; // Create 未加载/名称变更,安全跳过
+        if (zincNugget == Items.AIR) { // Create 是硬依赖,走到这说明 Create 改了名
+            icu.dreamripples.aero_suite.common.AeroSuite.LOGGER.warn(
+                    "[AeroSuite] 找不到 create:zinc_nugget 锚点(Create 改名?), 小堆锌粒跳过创造页注入");
+            return;
+        }
 
         ItemStack lump = new ItemStack(ModItems.ZINC_LUMP.get());
 

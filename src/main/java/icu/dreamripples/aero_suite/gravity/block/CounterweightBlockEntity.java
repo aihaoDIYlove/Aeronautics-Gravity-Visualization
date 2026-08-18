@@ -80,14 +80,28 @@ public class CounterweightBlockEntity extends SmartBlockEntity {
 
         @Override
         public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
-            return new ValueSettingsBoard(label, MAX_TIER, 1,
+            // Create 弹板列为 0..maxValue 含端点:传 MAX_TIER-1 得 0..19 共 20 格,formatter +1 显示为 1..20
+            return new ValueSettingsBoard(label, MAX_TIER - 1, 1,
                     ImmutableList.of(Component.translatable("gravity_visualization.unit.mass_kpg")),
                     new ValueSettingsFormatter(this::formatSettings));
         }
 
         public MutableComponent formatSettings(ValueSettings settings) {
-            int value = Math.max(MIN_TIER, Math.min(MAX_TIER, settings.value()));
-            return Component.literal(value + " kpg");
+            return Component.literal((settings.value() + 1) + " kpg");
+        }
+
+        @Override
+        public void setValueSettings(Player player, ValueSettings valueSetting, boolean ctrlHeld) {
+            int tier = Math.max(MIN_TIER, Math.min(MAX_TIER, valueSetting.value() + 1));
+            if (new ValueSettings(0, tier - 1).equals(getValueSettings()))
+                return;
+            setValue(tier);
+            playFeedbackSound(this);
+        }
+
+        @Override
+        public ValueSettings getValueSettings() {
+            return new ValueSettings(0, value - 1);
         }
     }
 

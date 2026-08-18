@@ -40,12 +40,13 @@ public class SpeedTierScrollBehaviour extends KineticScrollValueBehaviour {
                 Component.literal("\u27f3").withStyle(ChatFormatting.BOLD),
                 Component.literal("\u27f2").withStyle(ChatFormatting.BOLD));
         ValueSettingsFormatter formatter = new ValueSettingsFormatter(this::formatSettings);
-        return new ValueSettingsBoard(label, 15, 1, rows, formatter);
+        // Create 弹板列为 0..maxValue 含端点:传 14 得 0..14 共 15 格,列值+1 = 档位 1..15
+        return new ValueSettingsBoard(label, 14, 1, rows, formatter);
     }
 
     @Override
     public void setValueSettings(Player player, ValueSettings valueSetting, boolean ctrlHeld) {
-        int value = Math.max(1, Math.min(15, valueSetting.value()));
+        int value = Math.max(1, Math.min(15, valueSetting.value() + 1));
         if (!valueSetting.equals(getValueSettings()))
             playFeedbackSound(this);
         setValue(valueSetting.row() == 0 ? -value : value);
@@ -53,12 +54,12 @@ public class SpeedTierScrollBehaviour extends KineticScrollValueBehaviour {
 
     @Override
     public ValueSettings getValueSettings() {
-        return new ValueSettings(value < 0 ? 0 : 1, Math.max(1, Math.abs(value)));
+        return new ValueSettings(value < 0 ? 0 : 1, Math.max(0, Math.abs(value) - 1));
     }
 
     @Override
     public MutableComponent formatSettings(ValueSettings settings) {
-        int v = Math.max(1, Math.min(15, settings.value()));
+        int v = Math.max(1, Math.min(15, settings.value() + 1));
         return CreateLang.number(RPM_TABLE[v - 1])
                 .add(CreateLang.text(settings.row() == 0 ? "\u27f3" : "\u27f2")
                         .style(ChatFormatting.BOLD))

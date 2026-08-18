@@ -129,7 +129,8 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
 
         AnchorMode mode = getMode();
         if (mode == AnchorMode.SEND) {
-            deregisterFromNetwork();
+            // 发送端不注册网络;守卫避免每 tick 空跑 deregister 的字段重置
+            if (registered) deregisterFromNetwork();
             ItemStack box = inventory.getStackInSlot(0);
             if (!box.isEmpty()) {
                 String addr = PackageItem.getAddress(box);
