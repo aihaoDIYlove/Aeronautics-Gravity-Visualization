@@ -64,6 +64,8 @@
   "aero_suite.feature.variable_speed_engine.desc": "弹板调转速(32-256,15 档),含全部 16 色染色变种。",
   "aero_suite.feature.sequential_feeder": "顺序供料器",
   "aero_suite.feature.sequential_feeder.desc": "可编程投料磁带:9 标记槽 + 9 物品槽,红石脉冲控制;含半成品删除。",
+  "aero_suite.feature.single_slot_hopper": "纸板漏斗",
+  "aero_suite.feature.single_slot_hopper.desc": "原版漏斗行为,但只有 1 格且每格恒 1 个物品(不堆叠);搭配顺序供料器防重复物品被合并。",
   "aero_suite.feature.stabilizer": "自稳定方块",
   "aero_suite.feature.stabilizer.desc": "PD 控制器维持载具水平,质量/浮力双模式;含半成品删除。",
   "aero_suite.feature.world_anchor": "世界锚点",

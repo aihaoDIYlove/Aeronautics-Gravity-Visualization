@@ -64,6 +64,8 @@
   "aero_suite.feature.variable_speed_engine.desc": "Scroll-adjustable speed (32-256, 15 steps); covers all 16 dyed variants.",
   "aero_suite.feature.sequential_feeder": "Sequential Feeder",
   "aero_suite.feature.sequential_feeder.desc": "Programmable feed tape: 9 ghost slots + 9 inventory slots, redstone-pulsed; includes intermediate deletion.",
+  "aero_suite.feature.single_slot_hopper": "Cardboard Hopper",
+  "aero_suite.feature.single_slot_hopper.desc": "Vanilla hopper behaviour, but 1 slot holding exactly 1 item (no stacking); keeps repeated items separate for the Sequential Feeder.",
   "aero_suite.feature.stabilizer": "Stabilizer Block",
   "aero_suite.feature.stabilizer.desc": "PD controller keeping contraptions level, mass/buoyancy modes; includes intermediate deletion.",
   "aero_suite.feature.world_anchor": "World Anchor",

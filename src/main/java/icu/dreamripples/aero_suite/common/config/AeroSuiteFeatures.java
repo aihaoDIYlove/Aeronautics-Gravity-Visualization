@@ -95,6 +95,8 @@ public final class AeroSuiteFeatures {
             new Feature("sequential_feeder", Group.SIMPLIFICATION, true,
                     List.of(ModBlocks.SEQUENTIAL_FEEDER_ITEM, ModItems.INCOMPLETE_SEQUENTIAL_FEEDER),
                     ModBlocks.SEQUENTIAL_FEEDER_ITEM),
+            new Feature("single_slot_hopper", Group.SIMPLIFICATION, true,
+                    List.of(ModBlocks.SINGLE_SLOT_HOPPER_ITEM), ModBlocks.SINGLE_SLOT_HOPPER_ITEM),
             // ── 航空学: 星空物流 ───────────────────────────────────
             new Feature("stabilizer", Group.STARLIGHT, true,
                     List.of(ModBlocks.STABILIZER_ITEM, ModItems.INCOMPLETE_STABILIZER), ModBlocks.STABILIZER_ITEM),

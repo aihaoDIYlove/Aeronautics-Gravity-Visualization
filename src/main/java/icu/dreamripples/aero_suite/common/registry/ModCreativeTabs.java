@@ -32,6 +32,7 @@ public class ModCreativeTabs {
                         output.accept(ModBlocks.STABILIZER_ITEM.get());
                         output.accept(ModBlocks.WORLD_ANCHOR_ITEM.get());
                         output.accept(ModBlocks.SEQUENTIAL_FEEDER_ITEM.get());
+                        output.accept(ModBlocks.SINGLE_SLOT_HOPPER_ITEM.get());
                         output.accept(ModItems.STARLIGHT_BUCKET.get());
                         output.accept(ModItems.STARLIGHT_BOTTLE.get());
                         output.accept(ModItems.ACTIVATED_ENDER_PEARL.get());

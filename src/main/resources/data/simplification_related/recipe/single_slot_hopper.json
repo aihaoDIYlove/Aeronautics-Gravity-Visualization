@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "single_slot_hopper"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C C",
+    "CBC",
+    " C "
+  ],
+  "key": {
+    "C": { "item": "create:cardboard" },
+    "B": { "item": "create:cardboard_block" }
+  },
+  "result": {
+    "id": "simplification_related:single_slot_hopper",
+    "count": 1
+  }
+}

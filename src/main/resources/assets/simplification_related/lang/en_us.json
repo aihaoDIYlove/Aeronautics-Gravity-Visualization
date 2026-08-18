@@ -23,6 +23,8 @@
   "block.simplification_related.purple_variable_speed_portable_engine": "Purple Variable-Speed Portable Engine",
   "block.simplification_related.red_variable_speed_portable_engine": "Red Variable-Speed Portable Engine",
   "block.simplification_related.sequential_feeder": "Sequential Feeder",
+  "block.simplification_related.single_slot_hopper": "Cardboard Hopper",
+  "container.simplification_related.single_slot_hopper": "Cardboard Hopper",
   "block.simplification_related.variable_speed_portable_engine.speed": "Rotation Speed",
   "block.simplification_related.white_variable_speed_portable_engine": "White Variable-Speed Portable Engine",
   "block.simplification_related.yellow_variable_speed_portable_engine": "Yellow Variable-Speed Portable Engine",

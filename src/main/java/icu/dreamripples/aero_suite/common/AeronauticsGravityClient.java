@@ -11,6 +11,7 @@ import icu.dreamripples.aero_suite.gravity.client.RedstoneCounterweightVisual;
 import icu.dreamripples.aero_suite.simplification.block.ModMenus;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederScreen;
 import icu.dreamripples.aero_suite.simplification.client.ConvenientAnalogTransmissionVisual;
+import icu.dreamripples.aero_suite.simplification.client.SingleSlotHopperScreen;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
 import icu.dreamripples.aero_suite.starlight.client.AddressingSignRenderer;
@@ -70,6 +71,7 @@ public class AeronauticsGravityClient {
 
     private static void onRegisterMenuScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
         event.register(ModMenus.SEQUENTIAL_FEEDER.get(), SequentialFeederScreen::new);
+        event.register(ModMenus.SINGLE_SLOT_HOPPER.get(), SingleSlotHopperScreen::new);
     }
 
     @SubscribeEvent

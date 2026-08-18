@@ -13,6 +13,8 @@ import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmis
 import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmissionBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlock;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
+import icu.dreamripples.aero_suite.simplification.block.SingleSlotHopperBlock;
+import icu.dreamripples.aero_suite.simplification.block.SingleSlotHopperBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.VariableSpeedPortableEngineBlock;
 import icu.dreamripples.aero_suite.simplification.block.VariableSpeedPortableEngineBlockEntity;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;
@@ -493,6 +495,29 @@ public class ModBlocks {
     private static SequentialFeederBlockEntity createSequentialFeederBlockEntity(BlockPos pos, BlockState state) {
         return new SequentialFeederBlockEntity(SEQUENTIAL_FEEDER_BE.get(), pos, state);
     }
+
+    // 单格漏斗: 原版漏斗行为, 1 格且每格恒 1 个(防止重复物品被堆叠, 搭配顺序供料器)。
+    // 见 SingleSlotHopperBlockEntity(继承要点)。
+    public static final DeferredHolder<Block, SingleSlotHopperBlock> SINGLE_SLOT_HOPPER_BLOCK =
+            SIMPLIFICATION_BLOCKS.register("single_slot_hopper",
+                    () -> new SingleSlotHopperBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SingleSlotHopperBlockEntity>> SINGLE_SLOT_HOPPER_BE =
+            SIMPLIFICATION_BLOCK_ENTITIES.register("single_slot_hopper",
+                    () -> BlockEntityType.Builder
+                            .of(SingleSlotHopperBlockEntity::new,
+                                    SINGLE_SLOT_HOPPER_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> SINGLE_SLOT_HOPPER_ITEM =
+            ModItems.SIMPLIFICATION_ITEMS.register("single_slot_hopper",
+                    () -> new BlockItem(SINGLE_SLOT_HOPPER_BLOCK.get(), new Item.Properties()));
 
     private static AddressingSignBlockEntity createAddressingSignBlockEntity(BlockPos pos, BlockState state) {
         return new AddressingSignBlockEntity(ADDRESSING_SIGN_BE.get(), pos, state);

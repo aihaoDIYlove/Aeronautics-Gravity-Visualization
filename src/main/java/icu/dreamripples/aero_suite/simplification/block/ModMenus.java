@@ -2,6 +2,7 @@ package icu.dreamripples.aero_suite.simplification.block;
 
 import icu.dreamripples.aero_suite.simplification.SimplificationRelated;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -24,5 +25,10 @@ public class ModMenus {
                     // createMenu 调用方直接用 SEQUENTIAL_FEEDER.get() 传入 MenuType。
                     IMenuTypeExtension.create((windowId, inv, buf) ->
                             new SequentialFeederMenu(null, windowId, inv, buf)));
+
+    // 单格漏斗: 普通 MenuType(无 extraData), 客户端用 (id, inv) 构造器 + 空容器占位
+    public static final DeferredHolder<MenuType<?>, MenuType<SingleSlotHopperMenu>> SINGLE_SLOT_HOPPER =
+            MENUS.register("single_slot_hopper", () ->
+                    new MenuType<>(SingleSlotHopperMenu::new, FeatureFlags.VANILLA_SET));
 
 }
