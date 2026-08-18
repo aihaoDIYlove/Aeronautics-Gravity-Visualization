@@ -51,6 +51,7 @@ import java.util.List;
 public class AddressingSignBlockEntity extends SignBlockEntity {
 
     private int selected = 0;
+    private int selfHealCounter = 0;
 
     public AddressingSignBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -116,6 +117,25 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
             }
         }
         return result;
+    }
+
+    /**
+     * 自愈兜底(由 {@link AddressingSignBlock#getTicker} 的静态 ticker 每 tick 调用):
+     * 服务端每 5 秒核对 SignText front 第 0 行与选中地址,不一致则重写。
+     * 防御 SignText 意外丢失(存档加载时序/未知覆盖路径):components(地址列表)是权威数据源,
+     * 一旦两者脱节,机器(世界锚点/Packager)读到空地址 -> 接收端"消失"且无任何报错。
+     * 触发时打一次 WARN 便于追查根因。
+     */
+    void selfHealTick() {
+        if (level == null || level.isClientSide) return;
+        if (++selfHealCounter % 100 != 0) return;
+        List<String> addrs = getAddresses();
+        String expected = addrs.isEmpty() ? "" : addrs.get(Mth.clamp(selected, 0, addrs.size() - 1));
+        if (!getText(true).getMessage(0, false).getString().equals(expected)) {
+            com.mojang.logging.LogUtils.getLogger().warn("[AeroSuite] 寻址牌 SignText 与选中地址脱节,自愈重写 pos={} 期望='{}'",
+                    getBlockPos().toShortString(), expected);
+            updateSignTextFromSelected();
+        }
     }
 
     // 激活地址写进 SignText front 第 0 行(server only!markUpdated 不检查 isClientSide)

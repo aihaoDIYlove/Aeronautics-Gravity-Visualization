@@ -116,6 +116,11 @@ public class AddressingSignBlock extends WallSignBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
                                                                   BlockEntityType<T> blockEntityType) {
-        return createTickerHelper(blockEntityType, ModBlocks.ADDRESSING_SIGN_BE.get(), SignBlockEntity::tick);
+        // vanilla SignBlockEntity::tick + 自愈兜底(SignText 与选中地址脱节时 5 秒内自动重写)
+        return createTickerHelper(blockEntityType, ModBlocks.ADDRESSING_SIGN_BE.get(),
+                (lvl, pos, st, be) -> {
+                    SignBlockEntity.tick(lvl, pos, st, be);
+                    be.selfHealTick();
+                });
     }
 }

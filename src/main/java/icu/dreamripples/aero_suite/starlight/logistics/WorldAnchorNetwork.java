@@ -54,8 +54,10 @@ public class WorldAnchorNetwork {
         List<ReceiverEntry> list = RECEIVERS.get(address);
         if (list == null) return;
         list.removeIf(e -> e.dim().equals(dim) && e.pos().equals(pos));
-        // 用双参 remove:仅当 map 里还是这个空 list 才移除,避免误删并发 register 刚建的新 list
-        RECEIVERS.remove(address, list);
+        // 仅当已空才删 key,且用双参 remove(值相等才删)防误删并发 register 刚建的新 list。
+        // 注意:不能无条件 remove(address, list) -- map 里就是这同一个 list 对象,equals 恒成立,
+        // 会把仍持有其他接收端的整个地址条目连根删掉(两锚点同地址后切走其一 -> 另一锚点幽灵失联)。
+        if (list.isEmpty()) RECEIVERS.remove(address, list);
     }
 
     /** 接收端冲突检测:同 addressFilter 多个接收端 -> true(白灯) */
