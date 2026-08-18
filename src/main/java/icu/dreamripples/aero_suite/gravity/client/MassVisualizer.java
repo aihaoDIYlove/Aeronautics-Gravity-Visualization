@@ -435,6 +435,9 @@ private static final float MARKER_SCALE_FAR = 0.24f;       // 远端字号;FAR/N
      * 圆柱 billboard 字面恒竖直,侧看时屏幕上箭头恒指 上/下,俯视/仰视是单层贴片(平面固有限制,
      * 玩家稍偏一点视角就能看到箭头,接受此限制)。
      */
+    /** renderGlyphMarker 复用(每帧多标记,避免 new 的 GC 压力);rotationYXZ 是覆写语义,无跨帧残留状态。 */
+    private static final Quaternionf REUSABLE_QUATERNION = new Quaternionf();
+
     private static void renderGlyphMarker(PoseStack poseStack, MultiBufferSource.BufferSource buffer,
                                           Font font, Vec3 camera,
                                           Vector3dc worldPos, String glyph, int color, int light) {
@@ -448,7 +451,7 @@ private static final float MARKER_SCALE_FAR = 0.24f;       // 远端字号;FAR/N
 
         poseStack.pushPose();
         poseStack.translate(worldPos.x() - camera.x, worldPos.y() - camera.y, worldPos.z() - camera.z);
-        poseStack.mulPose(new Quaternionf().rotationYXZ((float) yawRad, 0f, 0f));
+        poseStack.mulPose(REUSABLE_QUATERNION.rotationYXZ((float) yawRad, 0f, 0f));
         // scale Y 取负翻转(同 renderMassNumbers),让文字正立而非上下颠倒。
         poseStack.scale(scale, -scale, scale);
         Matrix4f matrix = poseStack.last().pose();

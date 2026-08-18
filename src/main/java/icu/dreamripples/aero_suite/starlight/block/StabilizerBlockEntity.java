@@ -88,6 +88,8 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     // ScrollValueBehaviour.TYPE,会与 deadbandBehaviour 在 SmartBlockEntity 的 behaviours map 里冲突覆盖。
     private RedstoneModeBehaviour redstoneModeBehaviour;
     // sable$physicsTick 写,tick 读(最新物理 tick 的本地角速度)。初始 0。
+    // 线程安全说明: Sable 物理同步跑在服务端主线程(SubLevelPhysicsSystem.tick -> prePhysicsTick
+    // -> sable$physicsTick,全链路无 Thread/Executor,_research 源码已核实),故无需 volatile/快照。
     private final Vector3d angVelLocalCache = new Vector3d();
 
     public StabilizerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

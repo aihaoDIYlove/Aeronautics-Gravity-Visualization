@@ -3,7 +3,9 @@ package icu.dreamripples.aero_suite.common.config;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
@@ -55,6 +57,11 @@ public final class AeroSuiteFeatures {
         public boolean deletesItems() { return !items.isEmpty(); }
     }
 
+    // ── WARNING ────────────────────────────────────────────────
+    // 本表是内容门控的唯一事实源: 新增可门控物品/配方**必须**在此登记,
+    // 否则该内容无开关、不会被获取即删扫描、配方不被门控 -- 全程无任何报错
+    // (仅有 verifyCoverage() 的 WARN 兜底)。
+    // ────────────────────────────────────────────────────────────
     public static final List<Feature> ALL = List.of(
             // ── 航空学: 重力可视化 ─────────────────────────────────
             new Feature("spark_wand", Group.GRAVITY, true,
@@ -132,4 +139,29 @@ public final class AeroSuiteFeatures {
             new Feature("conv_tuff", Group.STARLIGHT, true, List.of(), () -> Items.TUFF));
 
     private AeroSuiteFeatures() {}
+
+    /**
+     * 覆盖性自检: 扫描三个 mod namespace 下所有已注册物品, 未被任何 Feature 的 items 覆盖则 WARN。
+     * 防止"新增物品/配方忘记登记进 ALL 表"的静默失效(忘记登记 = 无开关/不删除/配方不门控, 且无任何报错)。
+     * 仅在 config load/reload 时调用一次, 零运行时开销。
+     */
+    public static void verifyCoverage() {
+        Set<Item> covered = new HashSet<>();
+        for (Feature f : ALL) {
+            for (Supplier<? extends Item> s : f.items()) {
+                covered.add(s.get());
+            }
+        }
+        for (var entry : net.minecraft.core.registries.BuiltInRegistries.ITEM.entrySet()) {
+            String ns = entry.getKey().location().getNamespace();
+            if (!ns.equals(icu.dreamripples.aero_suite.common.AeroSuiteIds.GRAVITY_ID)
+                    && !ns.equals(icu.dreamripples.aero_suite.common.AeroSuiteIds.SIMPLIFICATION_ID)
+                    && !ns.equals(icu.dreamripples.aero_suite.common.AeroSuiteIds.STARLIGHT_ID)) continue;
+            if (!covered.contains(entry.getValue())) {
+                com.mojang.logging.LogUtils.getLogger().warn(
+                        "[AeroSuite] 物品 {} 未登记进 AeroSuiteFeatures.ALL -- 将无配置开关/不被删除扫描/配方不门控。若有意不门控请显式忽略此 WARN。",
+                        entry.getKey().location());
+            }
+        }
+    }
 }

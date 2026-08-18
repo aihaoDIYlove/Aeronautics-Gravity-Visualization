@@ -27,10 +27,6 @@ public final class FeatureGates {
     private static volatile Set<Item> cachedDisabled = Set.of();
     private static volatile boolean anyDisabled;
 
-    /** 全部开关 key(按元数据表顺序)。 */
-    public static final String[] ALL_KEYS =
-            AeroSuiteFeatures.ALL.stream().map(AeroSuiteFeatures.Feature::key).toArray(String[]::new);
-
     public static boolean isEnabled(String key) {
         AeroSuiteConfig c = CONFIG;
         if (c == null) return true; // 配置未加载前按全开处理(默认值全 true, 一致)
@@ -42,13 +38,17 @@ public final class FeatureGates {
         return value.get();
     }
 
-    /** 配置 load/reload 后调用: 重建缓存。 */
+    /** 配置 load/reload 后调用: 重建缓存(单遍扫描), 并做 ALL 表覆盖性自检。 */
     public static void invalidate() {
-        anyDisabled = false;
-        for (String key : ALL_KEYS) {
-            if (!isEnabled(key)) { anyDisabled = true; break; }
+        Set<Item> items = new HashSet<>();
+        for (AeroSuiteFeatures.Feature f : AeroSuiteFeatures.ALL) {
+            if (isEnabled(f.key())) continue;
+            for (var supplier : f.items())
+                items.add(supplier.get());
         }
-        cachedDisabled = anyDisabled ? buildDisabled() : Set.of();
+        anyDisabled = !items.isEmpty();
+        cachedDisabled = anyDisabled ? Set.copyOf(items) : Set.of();
+        AeroSuiteFeatures.verifyCoverage();
     }
 
     /** 当前是否有任何开关处于关闭状态(全开时扫描器直接短路, 零开销)。 */
@@ -59,17 +59,6 @@ public final class FeatureGates {
     /** 停用开关覆盖的物品集合(含 BlockItem 与 incomplete_* 半成品、zinc_lump)。 */
     public static Set<Item> disabledItems() {
         return cachedDisabled;
-    }
-
-    private static Set<Item> buildDisabled() {
-        Set<Item> items = new HashSet<>();
-        for (AeroSuiteFeatures.Feature f : AeroSuiteFeatures.ALL) {
-            if (isEnabled(f.key()))
-                continue;
-            for (var supplier : f.items())
-                items.add(supplier.get());
-        }
-        return Set.copyOf(items);
     }
 
     private FeatureGates() {}
