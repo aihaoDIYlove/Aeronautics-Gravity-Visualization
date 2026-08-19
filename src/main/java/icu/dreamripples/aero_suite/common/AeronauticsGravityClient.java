@@ -16,6 +16,7 @@ import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
 import icu.dreamripples.aero_suite.starlight.client.AddressingSignRenderer;
 import icu.dreamripples.aero_suite.starlight.client.ModPartialModels;
+import icu.dreamripples.aero_suite.starlight.client.PearlStasisRenderer;
 import icu.dreamripples.aero_suite.starlight.client.StabilizerRenderer;
 import icu.dreamripples.aero_suite.starlight.client.WorldAnchorRenderer;
 import icu.dreamripples.aero_suite.starlight.fluid.ModFluids;
@@ -86,6 +87,8 @@ public class AeronauticsGravityClient {
         BlockEntityRenderers.register(ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINE_BE.get(), PortableEngineRenderer::new);
         // 寻址牌:自定义 BER(歌词式 4 行,不画木牌,只画文字)
         BlockEntityRenderers.register(ModBlocks.ADDRESSING_SIGN_BE.get(), AddressingSignRenderer::new);
+        // 珍珠滞留台:内部物品平铺渲染在 4px 高处
+        BlockEntityRenderers.register(ModBlocks.PEARL_STASIS_BE.get(), PearlStasisRenderer::new);
         event.enqueueWork(() -> {
             // 注册自定义 WoodType 到 Sheets(SIGN_MATERIALS 是静态收集,后注册的 WoodType 需手动补登记)
             Sheets.addWoodType(StarlightLogistics.ADDRESSING_SIGN_WOOD_TYPE);

@@ -39,6 +39,7 @@ public class ModCreativeTabs {
                         output.accept(ModBlocks.VOID_HOSE_PULLEY_ITEM.get());
                         output.accept(ModBlocks.STARLIGHT_CASING_ITEM.get());
                         output.accept(ModBlocks.ADDRESSING_SIGN_ITEM.get());
+                        output.accept(ModBlocks.PEARL_STASIS_ITEM.get());
                         // zinc_lump 改放在 Create 的 base 创造页(zinc_nugget 旁),
                         // 见 event/CreativeTabInjections.java
                     })

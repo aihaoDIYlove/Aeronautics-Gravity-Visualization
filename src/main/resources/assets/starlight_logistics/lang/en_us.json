@@ -54,5 +54,7 @@
   "tooltip.starlight_logistics.world_anchor.mode.send": "Send",
   "tooltip.starlight_logistics.world_anchor.no_address": "No address configured",
   "tooltip.starlight_logistics.world_anchor.pending_export": "Pending export package",
-  "tooltip.starlight_logistics.world_anchor.pending_send": "Pending outbound package"
+  "tooltip.starlight_logistics.world_anchor.pending_send": "Pending outbound package",
+  "block.starlight_logistics.pearl_stasis": "Pearl Stasis Pedestal",
+  "tooltip.starlight_logistics.pearl_stasis": "Right-click to store/retrieve 1 item; a redstone pulse teleports the bound player of an activated pearl above the pedestal and consumes it."
 }

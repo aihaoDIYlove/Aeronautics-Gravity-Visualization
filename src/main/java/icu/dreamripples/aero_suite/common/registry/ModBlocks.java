@@ -20,6 +20,8 @@ import icu.dreamripples.aero_suite.simplification.block.VariableSpeedPortableEng
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
 import icu.dreamripples.aero_suite.starlight.block.LightweightGlassBlock;
+import icu.dreamripples.aero_suite.starlight.block.PearlStasisBlock;
+import icu.dreamripples.aero_suite.starlight.block.PearlStasisBlockEntity;
 import icu.dreamripples.aero_suite.starlight.block.StabilizerBlock;
 import icu.dreamripples.aero_suite.starlight.block.StabilizerBlockEntity;
 import icu.dreamripples.aero_suite.starlight.block.StarlightEncasedPipeBlock;
@@ -518,6 +520,30 @@ public class ModBlocks {
     public static final DeferredHolder<Item, BlockItem> SINGLE_SLOT_HOPPER_ITEM =
             ModItems.SIMPLIFICATION_ITEMS.register("single_slot_hopper",
                     () -> new BlockItem(SINGLE_SLOT_HOPPER_BLOCK.get(), new Item.Properties()));
+
+    // 珍珠滞留台: 单槽物品台(恒 1 个, 无 GUI, 右键存取), 物品渲染在方块内 4px 高处。
+    // 红石上升沿触发: 内部是已绑定玩家的激活末影珍珠时把该玩家传送到台上方并消耗珍珠。
+    // 详见 PearlStasisBlockEntity Javadoc。
+    public static final DeferredHolder<Block, PearlStasisBlock> PEARL_STASIS_BLOCK =
+            STARLIGHT_BLOCKS.register("pearl_stasis",
+                    () -> new PearlStasisBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .isRedstoneConductor((state, level, pos) -> false)
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PearlStasisBlockEntity>> PEARL_STASIS_BE =
+            STARLIGHT_BLOCK_ENTITIES.register("pearl_stasis",
+                    () -> BlockEntityType.Builder
+                            .of(PearlStasisBlockEntity::new, PEARL_STASIS_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> PEARL_STASIS_ITEM =
+            ModItems.STARLIGHT_ITEMS.register("pearl_stasis",
+                    () -> new BlockItem(PEARL_STASIS_BLOCK.get(), new Item.Properties()));
 
     private static AddressingSignBlockEntity createAddressingSignBlockEntity(BlockPos pos, BlockState state) {
         return new AddressingSignBlockEntity(ADDRESSING_SIGN_BE.get(), pos, state);

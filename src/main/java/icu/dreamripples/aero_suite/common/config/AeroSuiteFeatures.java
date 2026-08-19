@@ -104,6 +104,8 @@ public final class AeroSuiteFeatures {
                     List.of(ModBlocks.WORLD_ANCHOR_ITEM, ModItems.INCOMPLETE_WORLD_ANCHOR), ModBlocks.WORLD_ANCHOR_ITEM),
             new Feature("addressing_sign", Group.STARLIGHT, true,
                     List.of(ModBlocks.ADDRESSING_SIGN_ITEM), ModBlocks.ADDRESSING_SIGN_ITEM),
+            new Feature("pearl_stasis", Group.STARLIGHT, true,
+                    List.of(ModBlocks.PEARL_STASIS_ITEM), ModBlocks.PEARL_STASIS_ITEM),
             new Feature("activated_pearl", Group.STARLIGHT, true,
                     List.of(ModItems.ACTIVATED_ENDER_PEARL), ModItems.ACTIVATED_ENDER_PEARL),
             new Feature("lightweight_glass", Group.STARLIGHT, true,

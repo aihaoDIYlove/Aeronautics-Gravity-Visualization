@@ -122,5 +122,7 @@
   "aero_suite.config.back_to_mods": "返回至模组页",
   "aero_suite.config.reset_all": "重置所有设置",
   "aero_suite.config.toggle_all": "启用/禁用全部",
-  "aero_suite.config.back": "返回至上级菜单"
+  "aero_suite.config.back": "返回至上级菜单",
+  "aero_suite.feature.pearl_stasis": "珍珠滞留台",
+  "aero_suite.feature.pearl_stasis.desc": "单槽物品台(恒 1 个,右键存取),红石触发已绑定激活珍珠传送玩家。"
 }

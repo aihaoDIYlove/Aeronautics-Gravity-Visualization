@@ -39,5 +39,10 @@ public class ModCapabilities {
                 Capabilities.ItemHandler.BLOCK,
                 ModBlocks.SEQUENTIAL_FEEDER_BE.get(),
                 (be, context) -> be.getItemHandler());
+        // 珍珠滞留台:双向 1 格(插入恒收 1 个, 抽取整件)
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlocks.PEARL_STASIS_BE.get(),
+                (be, context) -> be.getItemHandler());
     }
 }

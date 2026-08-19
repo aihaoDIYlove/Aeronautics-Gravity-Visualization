@@ -122,5 +122,7 @@
   "aero_suite.config.toggle_all": "Enable/Disable All",
   "aero_suite.config.back": "Back",
   "advancements.gravity_visualization.goggle_observe.title": "Who Needs Goggles?",
-  "advancements.gravity_visualization.goggle_observe.description": "Observe a machine using the Spark Wand"
+  "advancements.gravity_visualization.goggle_observe.description": "Observe a machine using the Spark Wand",
+  "aero_suite.feature.pearl_stasis": "Pearl Stasis Pedestal",
+  "aero_suite.feature.pearl_stasis.desc": "Single-slot pedestal (always 1 item, right-click access); redstone pulse teleports the bound player of an activated pearl."
 }

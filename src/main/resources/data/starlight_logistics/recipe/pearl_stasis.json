@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "pearl_stasis"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "starlight_logistics:ultralight_glass"
+    },
+    {
+      "item": "create:depot"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "starlight_logistics:pearl_stasis"
+  }
+}

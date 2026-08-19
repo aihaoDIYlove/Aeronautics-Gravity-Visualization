@@ -13,9 +13,10 @@ import javax.annotation.Nonnull;
  *       的槽,任意时刻可给任意已标记槽补货,不影响 currentStep 与 stepState。</li>
  *   <li>{@link #extractItem}: 取料。只放行当前步槽且要求 ARMED(见 BE 状态机),至多 1 个
  *       (1/步闸门),非模拟取走后 onStepOutputTaken 转移状态。</li>
- *   <li>{@link #getStackInSlot(int)}: 装箱视角只暴露当前步槽 -- 漏斗/机械手只看得见
- *       "现在对外供的料";insert 视角仍是 9 槽。getSlots 报 9 但 extract 只对
- *       currentStep 生效:insert 语义是"容器整体",extract 语义是"当前步"。</li>
+ *   <li>{@link #getStackInSlot(int)}: 9 槽全量透传 -- Create 打包机/工厂仪表
+ *       (PackagerBlockEntity.getAvailableItems)与库存管家只靠本方法盘点库存,
+ *       必须看到全部槽位,否则仪表读数为 0 会疯狂请求包裹。取料门控完全由
+ *       {@link #extractItem} 承担,漏斗/机械手依然只取得走当前步的料。</li>
  * </ul>
  */
 public class SequentialFeederItemHandler implements IItemHandler {
@@ -34,10 +35,8 @@ public class SequentialFeederItemHandler implements IItemHandler {
     @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
-        // 装箱视角: 只暴露当前步槽,其余槽对外"不存在"
-        if (slot == be.getCurrentStep())
-            return be.inventory.getStackInSlot(slot);
-        return ItemStack.EMPTY;
+        // 统计视角: 9 槽全量透传(打包机/工厂仪表/库存管家靠此盘点),取料门控在 extractItem
+        return be.inventory.getStackInSlot(slot);
     }
 
     @Override
