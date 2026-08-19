@@ -18,7 +18,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 /**
- * 珍珠滞留台 BER: 把内部物品渲染在方块内 8px(8/16)高处, 模仿 Create
+ * 珍珠滞留台 BER: 把内部物品渲染在方块内 8px(6/16)高处, 模仿 Create
  * {@code DepotRenderer} 的物品变换:
  * <ul>
  *   <li><b>平放</b>(默认): 非方块物品 rotateX 90 + -3/16 y 偏移, 方块物品缩放 0.5 直立;</li>
@@ -26,12 +26,11 @@ import net.neoforged.api.distmarker.OnlyIn;
  *       {@link BeltHelper#isItemUpright}): billboard 朝向相机 + 3/32 y 抬升,
  *       方块物品额外缩 0.755 防底部穿模 -- 与传送带/置物台上的蛋糕、激活珍珠姿态一致。</li>
  * </ul>
- * 角度固定(单槽不做旋转动画)。
  */
 @OnlyIn(Dist.CLIENT)
 public class PearlStasisRenderer implements BlockEntityRenderer<PearlStasisBlockEntity> {
 
-    private static final float ITEM_Y = 8 / 16f;
+    private static final float ITEM_Y = 6 / 16f;
 
     public PearlStasisRenderer(BlockEntityRendererProvider.Context context) {}
 
