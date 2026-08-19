@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "starlight_logistics:activated_ender_pearl"
+    "starlight_logistics:activated_ender_pearl",
+    "starlight_logistics:starlight_bottle"
   ]
 }

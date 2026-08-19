@@ -56,5 +56,9 @@
   "tooltip.starlight_logistics.world_anchor.mode.send": "发送",
   "tooltip.starlight_logistics.world_anchor.no_address": "未配置地址",
   "tooltip.starlight_logistics.world_anchor.pending_export": "存在待导出包裹",
-  "tooltip.starlight_logistics.world_anchor.pending_send": "存在待发送包裹"
+  "tooltip.starlight_logistics.world_anchor.pending_send": "存在待发送包裹",
+  "tooltip.starlight_logistics.pearl_stasis.mode": "红石触发模式",
+  "tooltip.starlight_logistics.pearl_stasis.mode.pulse": "红石上升沿触发",
+  "tooltip.starlight_logistics.pearl_stasis.mode.continuous_on": "有红石时持续触发",
+  "tooltip.starlight_logistics.pearl_stasis.mode.continuous_off": "无红石时持续触发"
 }

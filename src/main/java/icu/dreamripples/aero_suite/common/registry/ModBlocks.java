@@ -538,7 +538,7 @@ public class ModBlocks {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PearlStasisBlockEntity>> PEARL_STASIS_BE =
             STARLIGHT_BLOCK_ENTITIES.register("pearl_stasis",
                     () -> BlockEntityType.Builder
-                            .of(PearlStasisBlockEntity::new, PEARL_STASIS_BLOCK.get())
+                            .of(ModBlocks::createPearlStasisBlockEntity, PEARL_STASIS_BLOCK.get())
                             .build(null));
 
     public static final DeferredHolder<Item, BlockItem> PEARL_STASIS_ITEM =
@@ -547,5 +547,9 @@ public class ModBlocks {
 
     private static AddressingSignBlockEntity createAddressingSignBlockEntity(BlockPos pos, BlockState state) {
         return new AddressingSignBlockEntity(ADDRESSING_SIGN_BE.get(), pos, state);
+    }
+
+    private static PearlStasisBlockEntity createPearlStasisBlockEntity(BlockPos pos, BlockState state) {
+        return new PearlStasisBlockEntity(PEARL_STASIS_BE.get(), pos, state);
     }
 }
