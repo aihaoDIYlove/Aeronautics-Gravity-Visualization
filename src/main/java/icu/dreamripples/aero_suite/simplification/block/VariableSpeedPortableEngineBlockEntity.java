@@ -41,8 +41,24 @@ public class VariableSpeedPortableEngineBlockEntity extends PortableEngineBlockE
 
     public SpeedTierScrollBehaviour speedSetting;
 
+    /**
+     * 上游 tick() 中 previousSuperHeated 被硬编码为 false,导致超热 true->false 转换
+     * (超热燃料无缝衔接普通燃料,引擎不熄火)不触发 updateGeneratedRotation,
+     * KineticNetwork.sources 缓存的 ×2 容量残留(未超热仍输出 4096)。
+     * 此处自行跟踪补上缺失的转换沿。
+     */
+    private boolean wasSuperHeated = false;
+
     public VariableSpeedPortableEngineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (wasSuperHeated && !isSuperHeated())
+            updateGeneratedRotation();
+        wasSuperHeated = isSuperHeated();
     }
 
     @Override
@@ -72,9 +88,16 @@ public class VariableSpeedPortableEngineBlockEntity extends PortableEngineBlockE
         // 故 capacity = baseSU / speed 使 SU 不随转速变;超热 capacity ×2 -> SU ×2(转速不翻倍)。
         // baseSU 2048 = 原版便携引擎 32 RPM 时的输出(capacity 64 × speed 32)。
         float speed = Math.abs(getGeneratedSpeed());
-        if (speed == 0) return 0;
+        if (speed == 0) {
+            this.lastCapacityProvided = 0;
+            return 0;
+        }
         float capacity = 2048f / speed;
-        return isSuperHeated() ? capacity * 2 : capacity;
+        capacity = isSuperHeated() ? capacity * 2 : capacity;
+        // vanilla 契约:计算结果须同步写入 lastCapacityProvided(chunk 卸载/重载时
+        // addSilently 依赖它从 unloadedCapacity 中扣除旧值,漏写会累积幻影容量)。
+        this.lastCapacityProvided = capacity;
+        return capacity;
     }
 
     @Override
