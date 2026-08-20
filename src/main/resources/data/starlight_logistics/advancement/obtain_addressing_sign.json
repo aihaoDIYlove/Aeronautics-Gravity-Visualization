@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "starlight_logistics:starlight_logistics_root",
+  "parent": "starlight_logistics:pearl_package_teleport",
   "criteria": {
     "get_addressing_sign": {
       "trigger": "minecraft:inventory_changed",
