@@ -20,7 +20,7 @@ public class ModDataComponents {
     /**
      * 激活的末影珍珠:记录拥有者玩家 UUID + 玩家名. 玩家主手 ender_pearl + 副手 echo_shard
      * 右键时由 {@code ActivatedEnderPearlHandler} 写入;读取发生在 {@code PackageEntityMixin}
-     * 中检测包裹静止 3 秒后破裂传送.
+     * 中检测包裹存在 3 秒后自动破裂传送.
      * <p>
      * 使用 {@link PearlOwner} record 而非裸 UUID 的目的: 客户端 tooltip 可直接展示 name,
      * 不需要通过 UUID 反查玩家列表(客户端反查只在当前维度有效, 且离线玩家无记录).

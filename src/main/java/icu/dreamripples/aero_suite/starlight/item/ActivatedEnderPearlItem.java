@@ -19,7 +19,7 @@ import java.util.UUID;
 
 /**
  * 被激活的末影珍珠: 携带拥有者玩家 {@link PearlOwner}(UUID + 玩家名), 装入 Create
- * Package 后, 当包裹作为实体静止 3 秒破裂时, 由 {@code PackageEntityMixin} 读取 UUID,
+ * Package 后, 当包裹作为实体存在 3 秒自动破裂时, 由 {@code PackageEntityMixin} 读取 UUID,
  * 生成一颗向下飞行的 {@code ThrownEnderpearl}(owner=该 UUID), 落地由 vanilla
  * {@code onHit} 跨维度传送拥有者到落点 + 5 血 + 音效/粒子.
  * <p>

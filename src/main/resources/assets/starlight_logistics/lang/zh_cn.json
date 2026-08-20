@@ -29,7 +29,7 @@
   "item.starlight_logistics.starlight_bucket": "星空液体桶",
   "item.starlight_logistics.zinc_lump": "小堆锌粒",
   "starlight_logistics.unit.deadband_deg": "度",
-  "tooltip.starlight_logistics.activated_ender_pearl": "装入包裹派送至远方，包裹静置 3 秒后将你传送到落点",
+  "tooltip.starlight_logistics.activated_ender_pearl": "装入包裹派送至远方，包裹存在 3 秒后自动破裂，将你传送到落点",
   "tooltip.starlight_logistics.activated_ender_pearl.bound": "已绑定",
   "tooltip.starlight_logistics.activated_ender_pearl.unbound": "未绑定：右键绑定当前玩家",
   "tooltip.starlight_logistics.addressing_sign.edit": "Shift+右键：编辑地址列表",

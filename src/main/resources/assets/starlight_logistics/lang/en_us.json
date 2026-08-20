@@ -28,7 +28,7 @@
   "item.starlight_logistics.starlight_bucket": "Starlight Bucket",
   "item.starlight_logistics.zinc_lump": "Zinc Lump",
   "starlight_logistics.unit.deadband_deg": "degrees",
-  "tooltip.starlight_logistics.activated_ender_pearl": "Mail in a package; after the package settles for 3 seconds, teleports you to its rupture point",
+  "tooltip.starlight_logistics.activated_ender_pearl": "Mail in a package; after existing for 3 seconds it ruptures, teleporting you to its rupture point",
   "tooltip.starlight_logistics.activated_ender_pearl.bound": "Bound",
   "tooltip.starlight_logistics.activated_ender_pearl.unbound": "Unbound: right-click to bind to yourself",
   "tooltip.starlight_logistics.addressing_sign.edit": "Shift+Right-click: Edit address list",

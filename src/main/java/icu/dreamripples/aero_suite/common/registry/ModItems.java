@@ -87,7 +87,7 @@ public final class ModItems {
 
     // 被激活的末影珍珠: 玩家主手 ender_pearl + 副手 echo_shard 右键合成(见 ActivatedEnderPearlHandler),
     // 携带玩家 UUID(见 ModDataComponents.ACTIVATED_PEARL_OWNER). 装入 Create Package 待物流派送,
-    // 包裹作为实体静止 3 秒后破裂 -> 生成一颗末影珍珠实体 -> 落地传送玩家到落点(跨维度由 vanilla
+    // 包裹作为实体存在 3 秒后自动破裂 -> 生成一颗末影珍珠实体 -> 落地传送玩家到落点(跨维度由 vanilla
     // ThrownEnderpearl.onHit 自带). stacksTo(16) 与 vanilla ender_pearl 一致.
     public static final Supplier<Item> ACTIVATED_ENDER_PEARL =
             STARLIGHT_ITEMS.register("activated_ender_pearl",
