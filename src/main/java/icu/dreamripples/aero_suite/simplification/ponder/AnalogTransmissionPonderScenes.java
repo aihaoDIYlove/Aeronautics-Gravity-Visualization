@@ -1,5 +1,6 @@
 package icu.dreamripples.aero_suite.simplification.ponder;
 
+import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.redstone.analogLever.AnalogLeverBlockEntity;
 import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
 
@@ -9,6 +10,7 @@ import net.createmod.ponder.api.scene.SceneBuilder;
 import net.createmod.ponder.api.scene.SceneBuildingUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 
 // 更方便的模拟传动器 - 思索场景(四幕)
 
@@ -21,6 +23,18 @@ public class AnalogTransmissionPonderScenes {
 		scene.idle(5);
 		scene.world().showSection(util.select().layersFrom(1), Direction.DOWN);
 		scene.idle(10);
+	}
+
+	// AnalogTransmission 是 ExtraKinetics 双网络:主 BE(传动杆面)走 Speed 键,
+	// 齿轮面(extraWheel)走 ExtraCogwheel.Speed 子标签。setKineticSpeed 只改主 BE,
+	// 要让齿轮面与输入齿轮啮合反向,必须显式写 ExtraCogwheel.Speed。
+	private static void setExtraCogSpeed(CreateSceneBuilder scene, SceneBuildingUtil util, BlockPos pos, float speed) {
+		scene.world().modifyBlockEntityNBT(util.select().position(pos), KineticBlockEntity.class,
+			nbt -> {
+				CompoundTag extra = nbt.getCompound("ExtraCogwheel");
+				extra.putFloat("Speed", speed);
+				nbt.put("ExtraCogwheel", extra);
+			});
 	}
 
 	// ------------------------------------------------------------------
@@ -42,13 +56,15 @@ public class AnalogTransmissionPonderScenes {
 
 		showAll(scene, util);
 
-		// 先清空 schematic 残留的转速,再明确分配
+		// 先清空 schematic 残留的主 BE 转速(setKineticSpeed 不触碰 ExtraCogwheel 子标签),再明确分配
 		scene.world().setKineticSpeed(util.select().everywhere(), 0);
-		// 输入侧:马达+东南小齿轮=32;西侧小齿轮反向=-32;输入侧转速表跟随西侧齿轮=-32
-		scene.world().setKineticSpeed(util.select().position(motorPos).add(util.select().position(inputCog)), 32);
+		// 输入侧:马达+东侧小齿轮=-32(与 schematic 的 motor facing=north 一致);
+		// 齿轮面(extraWheel)啮合反向=+32;西侧小齿轮再啮合反向=-32;输入转速表跟随西侧齿轮=-32
+		scene.world().setKineticSpeed(util.select().position(motorPos).add(util.select().position(inputCog)), -32);
+		setExtraCogSpeed(scene, util, t, 32);
 		scene.world().setKineticSpeed(util.select().position(westCog), -32);
 		scene.world().setKineticSpeed(util.select().position(inputGauge), -32);
-		// 输出侧(传动器/传动杆/齿轮箱)因无红石=0
+		// 输出侧(传动器主 BE/传动杆/齿轮箱)因无红石=0
 		scene.world().setKineticSpeed(util.select().fromTo(t, outputGearbox), 0);
 		scene.world().setKineticSpeed(util.select().position(outputGauge), 0);
 		scene.effects().rotationDirectionIndicator(inputCog);
@@ -91,9 +107,10 @@ public class AnalogTransmissionPonderScenes {
 
 		showAll(scene, util);
 
-		// 先保持无红石:输入侧 32,输出侧 0
+		// 先保持无红石:输入侧 -32(齿轮面 +32 反向啮合),输出侧 0
 		scene.world().setKineticSpeed(util.select().everywhere(), 0);
-		scene.world().setKineticSpeed(util.select().position(motorPos).add(util.select().position(inputCog)), 32);
+		scene.world().setKineticSpeed(util.select().position(motorPos).add(util.select().position(inputCog)), -32);
+		setExtraCogSpeed(scene, util, t, 32);
 		scene.world().setKineticSpeed(util.select().position(westCog), -32);
 		scene.world().setKineticSpeed(util.select().position(inputGauge), -32);
 		scene.world().setKineticSpeed(util.select().fromTo(t, outputGearbox), 0);
@@ -109,10 +126,11 @@ public class AnalogTransmissionPonderScenes {
 		scene.effects().indicateRedstone(lever);
 		scene.idle(15);
 
-		// 输出轴/西北 gearbox/输出转速表 -> 128;输入侧保持 32/西侧齿轮保持 -32/输入转速表保持 -32(与第一幕一致)
+		// 输出轴/西北 gearbox/输出转速表 -> 128;输入侧保持 -32/齿轮面保持 +32(啮合反向)/西侧齿轮 -32/输入转速表 -32(与第一幕一致)
 		scene.world().setKineticSpeed(util.select().fromTo(t, outputGearbox), SPEED_AT_7);
 		scene.world().setKineticSpeed(util.select().position(outputGauge), SPEED_AT_7);
-		scene.world().setKineticSpeed(util.select().position(motorPos).add(util.select().position(inputCog)), 32);
+		scene.world().setKineticSpeed(util.select().position(motorPos).add(util.select().position(inputCog)), -32);
+		setExtraCogSpeed(scene, util, t, 32);
 		scene.world().setKineticSpeed(util.select().position(westCog), -32);
 		scene.world().setKineticSpeed(util.select().position(inputGauge), -32);
 		scene.effects().rotationSpeedIndicator(outputGauge);
