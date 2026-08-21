@@ -33,6 +33,7 @@ import com.simibubi.create.foundation.block.connected.CTSpriteShiftEntry;
 import com.simibubi.create.foundation.block.connected.ConnectedTextureBehaviour;
 import com.simibubi.create.foundation.block.connected.SimpleCTBehaviour;
 import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
+import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTransmissionRenderer;
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -93,6 +94,9 @@ public class AeronauticsGravityClient {
         BlockEntityRenderers.register(ModBlocks.ADDRESSING_SIGN_BE.get(), AddressingSignRenderer::new);
         // 珍珠滞留台:内部物品平铺渲染在 4px 高处
         BlockEntityRenderers.register(ModBlocks.PEARL_STASIS_BE.get(), PearlStasisRenderer::new);
+        // 更方便的模拟传动器:复用 Simulated 的 AnalogTransmissionRenderer(BE 继承 AnalogTransmissionBlockEntity,多态成立)
+        // 正常游戏 Flywheel Visual 接管,renderSafe 早 return;思索场景无 Flywheel,BER 画齿轮+传动杆
+        BlockEntityRenderers.register(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_BE.get(), AnalogTransmissionRenderer::new);
         event.enqueueWork(() -> {
             // 注册自定义 WoodType 到 Sheets(SIGN_MATERIALS 是静态收集,后注册的 WoodType 需手动补登记)
             Sheets.addWoodType(StarlightLogistics.ADDRESSING_SIGN_WOOD_TYPE);
