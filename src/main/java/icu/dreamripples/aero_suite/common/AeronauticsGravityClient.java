@@ -77,6 +77,10 @@ public class AeronauticsGravityClient {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
+        // 思索场景注册: Ponder 插件需在 PonderIndex.registerAll() 前 addPlugin(client setup 时机与 Create 相同)
+        net.createmod.ponder.foundation.PonderIndex.addPlugin(
+                new icu.dreamripples.aero_suite.simplification.ponder.AeroSuitePonderPlugin());
+
         // StabilizerRenderer 画灯带(染色,换皮后用 72 突出 REDSTONE_INDICATOR)。不用 Flywheel Visual:
         // Flywheel SectionCompilerMixin 对有 Visualizer 的 BE cancel renderable,BER.render 不被调。
         // BER 同步注册(不 enqueueWork),确保在 BlockEntityRenderDispatcher 构造前注册到 BY_TYPE map。

@@ -35,5 +35,16 @@
   "tooltip.simplification_related.superheated_stress_boost": "超级加热：应力翻倍",
   "tooltip.simplification_related.sequential_feeder.mode": "控制模式",
   "tooltip.simplification_related.sequential_feeder.mode.ignore_redstone": "忽略红石",
-  "tooltip.simplification_related.sequential_feeder.mode.redstone_pulse": "红石脉冲控制"
+  "tooltip.simplification_related.sequential_feeder.mode.redstone_pulse": "红石脉冲控制",
+  "simplification_related.ponder.convenient_analog_transmission_clutch.header": "无红石信号时的更方便的模拟传动器",
+  "simplification_related.ponder.convenient_analog_transmission_clutch.text_1": "无红石信号时,该传动器等效于离合器,不输出任何转速",
+  "simplification_related.ponder.convenient_analog_transmission_lookup.header": "用红石信号查表控制输出转速",
+  "simplification_related.ponder.convenient_analog_transmission_lookup.text_1": "该传动器的输出应力根据红石信号查表获得,无论从任何面输入,最终输出都由红石信号强度决定",
+  "simplification_related.ponder.convenient_analog_transmission_lookup.text_2": "红石信号 1 档对应 32 转速,此后每 +1 档红石信号对应 +16 转速,15 档时到达 256 转速",
+  "simplification_related.ponder.convenient_analog_transmission_shaft_in.header": "从传动杆面输入",
+  "simplification_related.ponder.convenient_analog_transmission_pass_through.header": "传动杆面直通输出",
+  "simplification_related.ponder.convenient_analog_transmission_clutch.text_2": "但侧面齿轮面可像正常齿轮一样传播应力",
+  "simplification_related.ponder.convenient_analog_transmission_lookup.text_3": "由齿轮面输入时,两个传动杆面为输出面",
+  "simplification_related.ponder.convenient_analog_transmission_shaft_in.text_1": "当由传动杆面输入时,齿轮面和另一个传动杆面均为输出面",
+  "simplification_related.ponder.convenient_analog_transmission_pass_through.text_1": "传动杆面输入时,其对面的传动杆面也可输出。这极其方便"
 }

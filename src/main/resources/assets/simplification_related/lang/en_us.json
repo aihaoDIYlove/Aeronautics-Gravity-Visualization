@@ -35,5 +35,16 @@
   "tooltip.simplification_related.superheated_stress_boost": "Superheated: Stress x2",
   "tooltip.simplification_related.sequential_feeder.mode": "Control Mode",
   "tooltip.simplification_related.sequential_feeder.mode.ignore_redstone": "Ignore Redstone",
-  "tooltip.simplification_related.sequential_feeder.mode.redstone_pulse": "Redstone Pulse"
+  "tooltip.simplification_related.sequential_feeder.mode.redstone_pulse": "Redstone Pulse",
+  "simplification_related.ponder.convenient_analog_transmission_clutch.header": "Unpowered, acting as a Clutch",
+  "simplification_related.ponder.convenient_analog_transmission_clutch.text_1": "Without a Redstone Signal, it behaves like a Clutch and outputs no rotation",
+  "simplification_related.ponder.convenient_analog_transmission_lookup.header": "Speed Lookup via Redstone Signal",
+  "simplification_related.ponder.convenient_analog_transmission_lookup.text_1": "Its output is looked up from the Redstone Signal strength, regardless of which face receives input",
+  "simplification_related.ponder.convenient_analog_transmission_lookup.text_2": "Signal level 1 equals 32 RPM, +16 RPM per level, up to 256 RPM at level 15",
+  "simplification_related.ponder.convenient_analog_transmission_shaft_in.header": "Input through a Shaft Face",
+  "simplification_related.ponder.convenient_analog_transmission_pass_through.header": "Pass-through Shaft Output",
+  "simplification_related.ponder.convenient_analog_transmission_clutch.text_2": "When input through its cogwheel faces only, they relay stress like ordinary cogwheels",
+  "simplification_related.ponder.convenient_analog_transmission_lookup.text_3": "With cogwheel-face input, both shaft faces act as outputs",
+  "simplification_related.ponder.convenient_analog_transmission_shaft_in.text_1": "When input through a shaft face, the other 5 faces all act as outputs",
+  "simplification_related.ponder.convenient_analog_transmission_pass_through.text_1": "With shaft-face input, the opposite shaft face can output as well. Extremely convenient"
 }
