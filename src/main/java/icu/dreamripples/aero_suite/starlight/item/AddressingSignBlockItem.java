@@ -27,6 +27,8 @@ public class AddressingSignBlockItem extends BlockItem {
                 .withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(Component.translatable("tooltip.starlight_logistics.addressing_sign.scroll")
                 .withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("tooltip.starlight_logistics.addressing_sign.clipboard")
+                .withStyle(ChatFormatting.GRAY));
         tooltipComponents.add(Component.translatable("tooltip.starlight_logistics.addressing_sign.use")
                 .withStyle(ChatFormatting.GOLD));
     }
