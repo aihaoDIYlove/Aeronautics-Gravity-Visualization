@@ -5,7 +5,6 @@ import com.simibubi.create.content.equipment.clipboard.ClipboardContent;
 import com.simibubi.create.content.equipment.clipboard.ClipboardEntry;
 import com.simibubi.create.content.equipment.clipboard.ClipboardOverrides;
 import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
-// import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.PatchedDataComponentMap;
