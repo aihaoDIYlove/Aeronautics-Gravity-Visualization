@@ -28,6 +28,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
@@ -421,6 +422,20 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
 
         @Override
         public BehaviourType<?> getType() { return TYPE; }
+
+        // 禁用 Create 剪贴板复制/粘贴(ValueSettingsBehaviour 默认实现会导出 Value/Row,
+        // 粘贴易产生 bug)。返回 false 后
+        // ClipboardValueSettingsHandler 的 copy/paste/hover 三条路径全部跳过本方块。
+        @Override
+        public boolean writeToClipboard(HolderLookup.Provider registries, CompoundTag tag, Direction side) {
+            return false;
+        }
+
+        @Override
+        public boolean readFromClipboard(HolderLookup.Provider registries, CompoundTag tag, Player player,
+                                         Direction side, boolean simulate) {
+            return false;
+        }
 
         @Override
         public void write(CompoundTag nbt, HolderLookup.Provider registries, boolean clientPacket) {
