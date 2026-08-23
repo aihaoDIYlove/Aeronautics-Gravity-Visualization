@@ -87,6 +87,8 @@
   "aero_suite.feature.starlight_bucket.desc": "Bucket form of Starlight fluid; poured fluid does not spread.",
   "aero_suite.feature.starlight_bottle": "Starlight Bottle",
   "aero_suite.feature.starlight_bottle.desc": "Filled with a glass bottle at the End Sea; crafting/brewing ingredient.",
+  "aero_suite.feature.recipe_starlight_brewing": "Starlight Brewing Base",
+  "aero_suite.feature.recipe_starlight_brewing.desc": "A Starlight Bottle can replace the Awkward Potion as a brewing base in the brewing stand - add a main ingredient directly to brew potions, skipping nether wart farming.",
   "aero_suite.feature.zinc_lump": "Zinc Lump",
   "aero_suite.feature.zinc_lump.desc": "Crafted from 3 zinc nuggets; converts into prismarine products with Starlight.",
   "aero_suite.feature.recipe_levitite": "Recipe: Levitite Assembly",

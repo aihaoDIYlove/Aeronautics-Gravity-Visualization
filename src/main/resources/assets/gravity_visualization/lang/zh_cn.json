@@ -89,6 +89,8 @@
   "aero_suite.feature.starlight_bucket.desc": "星空液体的桶装形态,倒出后不蔓延。",
   "aero_suite.feature.starlight_bottle": "瓶装星空液体",
   "aero_suite.feature.starlight_bottle.desc": "末地之海用玻璃瓶取液获得,合成/酿造材料。",
+  "aero_suite.feature.recipe_starlight_brewing": "星空酿造基底",
+  "aero_suite.feature.recipe_starlight_brewing.desc": "瓶装星空液体可在酿造台替代粗制药水",
   "aero_suite.feature.zinc_lump": "小堆锌粒",
   "aero_suite.feature.zinc_lump.desc": "3 锌粒合成,加星空液体转换为海晶类产物。",
   "aero_suite.feature.recipe_levitite": "配方:浮空水晶装配",

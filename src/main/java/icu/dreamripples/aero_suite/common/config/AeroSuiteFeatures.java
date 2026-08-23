@@ -120,6 +120,9 @@ public final class AeroSuiteFeatures {
                     List.of(ModItems.STARLIGHT_BUCKET), ModItems.STARLIGHT_BUCKET),
             new Feature("starlight_bottle", Group.STARLIGHT, true,
                     List.of(ModItems.STARLIGHT_BOTTLE), ModItems.STARLIGHT_BOTTLE),
+            // 星空瓶替代粗制药水作酿造基底(产物 vanilla 药水, 纯配方开关)
+            new Feature("recipe_starlight_brewing", Group.STARLIGHT, true,
+                    List.of(), () -> Items.POTION),
             new Feature("zinc_lump", Group.STARLIGHT, true,
                     List.of(ModItems.ZINC_LUMP), ModItems.ZINC_LUMP),
             // levitite SA: 产物 aeronautics:levitite, 中间体 incomplete_levitite 绑进删除集
