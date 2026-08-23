@@ -11,6 +11,8 @@ import icu.dreamripples.aero_suite.gravity.client.RedstoneCounterweightVisual;
 import icu.dreamripples.aero_suite.simplification.block.ModMenus;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederScreen;
 import icu.dreamripples.aero_suite.simplification.client.ConvenientAnalogTransmissionVisual;
+import icu.dreamripples.aero_suite.simplification.client.FilteredHopperOutline;
+import icu.dreamripples.aero_suite.simplification.client.FilteredHopperRenderer;
 import icu.dreamripples.aero_suite.simplification.client.SingleSlotHopperScreen;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
@@ -94,6 +96,8 @@ public class AeronauticsGravityClient {
         BlockEntityRenderers.register(ModBlocks.ADDRESSING_SIGN_BE.get(), AddressingSignRenderer::new);
         // 珍珠滞留台:内部物品平铺渲染在 4px 高处
         BlockEntityRenderers.register(ModBlocks.PEARL_STASIS_BE.get(), PearlStasisRenderer::new);
+        // 带过滤的单格漏斗:4 横向面常驻渲染过滤标记物(白框由 FilteredHopperOutline 经 Outliner 画)
+        BlockEntityRenderers.register(ModBlocks.FILTERED_SINGLE_SLOT_HOPPER_BE.get(), FilteredHopperRenderer::new);
         // 更方便的模拟传动器:复用 Simulated 的 AnalogTransmissionRenderer(BE 继承 AnalogTransmissionBlockEntity,多态成立)
         // 正常游戏 Flywheel Visual 接管,renderSafe 早 return;思索场景无 Flywheel,BER 画齿轮+传动杆
         BlockEntityRenderers.register(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_BE.get(), AnalogTransmissionRenderer::new);
@@ -212,6 +216,8 @@ public class AeronauticsGravityClient {
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         MassVisualizer.clientTick();
+        // 过滤漏斗侧面标记白框(准星命中时画)
+        FilteredHopperOutline.clientTick();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

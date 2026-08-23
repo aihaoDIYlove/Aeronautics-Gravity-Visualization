@@ -25,6 +25,8 @@
   "block.simplification_related.sequential_feeder": "顺序供料器",
   "block.simplification_related.single_slot_hopper": "纸板漏斗",
   "container.simplification_related.single_slot_hopper": "纸板漏斗",
+  "block.simplification_related.filtered_single_slot_hopper": "带过滤的纸板漏斗",
+  "container.simplification_related.filtered_single_slot_hopper": "带过滤的纸板漏斗",
   "block.simplification_related.variable_speed_portable_engine.speed": "转速",
   "block.simplification_related.white_variable_speed_portable_engine": "白色变速式便携引擎",
   "block.simplification_related.yellow_variable_speed_portable_engine": "黄色变速式便携引擎",

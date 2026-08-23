@@ -25,6 +25,8 @@
   "block.simplification_related.sequential_feeder": "Sequential Feeder",
   "block.simplification_related.single_slot_hopper": "Cardboard Hopper",
   "container.simplification_related.single_slot_hopper": "Cardboard Hopper",
+  "block.simplification_related.filtered_single_slot_hopper": "Filtered Cardboard Hopper",
+  "container.simplification_related.filtered_single_slot_hopper": "Filtered Cardboard Hopper",
   "block.simplification_related.variable_speed_portable_engine.speed": "Rotation Speed",
   "block.simplification_related.white_variable_speed_portable_engine": "White Variable-Speed Portable Engine",
   "block.simplification_related.yellow_variable_speed_portable_engine": "Yellow Variable-Speed Portable Engine",

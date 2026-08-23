@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "filtered_single_slot_hopper"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "simplification_related:single_slot_hopper" },
+    { "item": "create:andesite_alloy" },
+    { "item": "create:filter" }
+  ],
+  "result": {
+    "id": "simplification_related:filtered_single_slot_hopper",
+    "count": 1
+  }
+}

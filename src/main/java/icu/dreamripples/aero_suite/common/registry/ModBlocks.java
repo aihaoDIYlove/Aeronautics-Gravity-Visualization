@@ -13,6 +13,8 @@ import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmis
 import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmissionBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlock;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
+import icu.dreamripples.aero_suite.simplification.block.FilteredSingleSlotHopperBlock;
+import icu.dreamripples.aero_suite.simplification.block.FilteredSingleSlotHopperBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.SingleSlotHopperBlock;
 import icu.dreamripples.aero_suite.simplification.block.SingleSlotHopperBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.VariableSpeedPortableEngineBlock;
@@ -520,6 +522,30 @@ public class ModBlocks {
     public static final DeferredHolder<Item, BlockItem> SINGLE_SLOT_HOPPER_ITEM =
             ModItems.SIMPLIFICATION_ITEMS.register("single_slot_hopper",
                     () -> new BlockItem(SINGLE_SLOT_HOPPER_BLOCK.get(), new Item.Properties()));
+
+    // 带过滤的单格漏斗: 单格漏斗 + 智能溜槽式侧面标记(4 横向面白框, 右键框区设/清过滤;
+    // 支持 Create 过滤卡与普通物品标记)。外观/漏斗行为继承原版漏斗, 贴图复用 single_slot_hopper。
+    // 见 FilteredSingleSlotHopperBlock(交互) / FilteredSingleSlotHopperBlockEntity(过滤咽喉+同步)。
+    public static final DeferredHolder<Block, FilteredSingleSlotHopperBlock> FILTERED_SINGLE_SLOT_HOPPER_BLOCK =
+            SIMPLIFICATION_BLOCKS.register("filtered_single_slot_hopper",
+                    () -> new FilteredSingleSlotHopperBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FilteredSingleSlotHopperBlockEntity>> FILTERED_SINGLE_SLOT_HOPPER_BE =
+            SIMPLIFICATION_BLOCK_ENTITIES.register("filtered_single_slot_hopper",
+                    () -> BlockEntityType.Builder
+                            .of(FilteredSingleSlotHopperBlockEntity::new,
+                                    FILTERED_SINGLE_SLOT_HOPPER_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> FILTERED_SINGLE_SLOT_HOPPER_ITEM =
+            ModItems.SIMPLIFICATION_ITEMS.register("filtered_single_slot_hopper",
+                    () -> new BlockItem(FILTERED_SINGLE_SLOT_HOPPER_BLOCK.get(), new Item.Properties()));
 
     // 珍珠滞留台: 单槽物品台(恒 1 个, 无 GUI, 右键存取), 物品渲染在方块内 4px 高处。
     // 红石上升沿触发: 内部是已绑定玩家的激活末影珍珠时把该玩家传送到台上方并消耗珍珠。
