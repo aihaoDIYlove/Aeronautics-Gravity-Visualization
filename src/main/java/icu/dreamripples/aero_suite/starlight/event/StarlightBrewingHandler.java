@@ -3,7 +3,6 @@ package icu.dreamripples.aero_suite.starlight.event;
 import icu.dreamripples.aero_suite.common.config.FeatureGates;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
-// import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
