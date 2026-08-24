@@ -1,5 +1,6 @@
 package icu.dreamripples.aero_suite.starlight.block;
 
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
@@ -33,7 +34,7 @@ import net.minecraft.world.phys.BlockHitResult;
  * <p>实现 {@link IBE}: newBlockEntity/ticker(行为弹板需要 SmartBlockEntity tick)均由
  * 接口默认方法提供。
  */
-public class PearlStasisBlock extends Block implements IBE<PearlStasisBlockEntity> {
+public class PearlStasisBlock extends Block implements IBE<PearlStasisBlockEntity>, IWrenchable {
 
     public PearlStasisBlock(Properties properties) {
         super(properties);

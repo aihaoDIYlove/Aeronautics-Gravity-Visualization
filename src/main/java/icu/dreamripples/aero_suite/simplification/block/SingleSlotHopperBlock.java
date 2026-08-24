@@ -1,6 +1,7 @@
 package icu.dreamripples.aero_suite.simplification.block;
 
 import com.mojang.serialization.MapCodec;
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
  * 单格漏斗方块: 行为/外观/红石启停全部继承原版 HopperBlock,
  * 仅替换 BE 类型(否则 getTicker 硬编码 BlockEntityType.HOPPER 会拿不到 ticker)。
  */
-public class SingleSlotHopperBlock extends HopperBlock {
+public class SingleSlotHopperBlock extends HopperBlock implements IWrenchable {
     public static final MapCodec<HopperBlock> CODEC = simpleCodec(SingleSlotHopperBlock::new);
 
     public SingleSlotHopperBlock(BlockBehaviour.Properties properties) {

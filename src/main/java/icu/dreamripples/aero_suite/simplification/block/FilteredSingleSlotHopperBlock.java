@@ -1,6 +1,7 @@
 package icu.dreamripples.aero_suite.simplification.block;
 
 import com.mojang.serialization.MapCodec;
+import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.equipment.wrench.WrenchItem;
 import com.simibubi.create.content.logistics.filter.FilterItem;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
@@ -43,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>过滤判定本身在 BE 的 {@code canPlaceItem} 收口(见 {@link FilteredSingleSlotHopperBlockEntity}),
  * 本方块只管"标记怎么设", 不管"物品怎么过滤"。
  */
-public class FilteredSingleSlotHopperBlock extends HopperBlock {
+public class FilteredSingleSlotHopperBlock extends HopperBlock implements IWrenchable {
     public static final MapCodec<HopperBlock> CODEC = simpleCodec(FilteredSingleSlotHopperBlock::new);
 
     public FilteredSingleSlotHopperBlock(BlockBehaviour.Properties properties) {

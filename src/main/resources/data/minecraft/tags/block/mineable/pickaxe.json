@@ -9,6 +9,8 @@
     "gravity_visualization:counterweight_light_pearl_redstone",
     "simplification_related:convenient_analog_transmission",
     "simplification_related:sequential_feeder",
+    "simplification_related:single_slot_hopper",
+    "simplification_related:filtered_single_slot_hopper",
     "simplification_related:white_variable_speed_portable_engine",
     "simplification_related:orange_variable_speed_portable_engine",
     "simplification_related:magenta_variable_speed_portable_engine",
@@ -29,6 +31,7 @@
     "starlight_logistics:void_hose_pulley",
     "starlight_logistics:world_anchor",
     "starlight_logistics:stabilizer",
+    "starlight_logistics:pearl_stasis",
     "starlight_logistics:starlight_encased_fluid_pipe"
   ]
 }
