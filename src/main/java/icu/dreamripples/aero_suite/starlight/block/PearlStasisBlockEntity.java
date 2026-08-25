@@ -18,7 +18,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileItem;
+import net.minecraft.core.Position;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,6 +32,7 @@ import net.neoforged.neoforge.items.IItemHandler;import org.jetbrains.annotation
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -40,15 +46,14 @@ import java.util.UUID;
  *   <li>{@code CONTINUOUS_ON}: 有红石时持续触发(tick 轮询, 装入即传);</li>
  *   <li>{@code CONTINUOUS_OFF}: 无红石时持续触发。</li>
  * </ul>
- * 触发条件: 槽内是<b>已绑定玩家</b>的激活末影珍珠({@code ActivatedEnderPearlItem.getOwner}
- * 非空), 把该玩家传送到滞留台上方一格(跨维度直接 {@code ServerPlayer.teleportTo}),
- * 并消耗该珍珠。未绑定珍珠/其他物品/玩家离线均不触发(离线时珍珠保留)。
  *
  * <p><b>客户端同步</b>: 走 SmartBlockEntity 的 update packet(自带 behaviour 的
  * "ScrollValue" 键, tag 恒非空); 自定义字段经 {@link #write}/{@link #read}
  * (SmartBlockEntity 子类惯例, 覆写 loadAdditional 会绕过 behaviour 读写)。
  */
 public class PearlStasisBlockEntity extends SmartBlockEntity {
+    private static final Set<Item> PROJECTILE_ITEMS = Set.of(
+            Items.SNOWBALL, Items.EGG, Items.FIRE_CHARGE, Items.WIND_CHARGE);
 
     private ItemStack held = ItemStack.EMPTY;
     /** 上一次已知的供电状态, 用于 PULSE 模式上升沿检测(瞬态, 不落盘)。 */
@@ -92,7 +97,7 @@ public class PearlStasisBlockEntity extends SmartBlockEntity {
         if (level == null || level.isClientSide()) return;
         boolean powered = level.hasNeighborSignal(worldPosition);
         if (powered && !wasPowered && triggerModeBehaviour.get() == TriggerMode.PULSE) {
-            tryTeleport(level, worldPosition);
+            tryTrigger(level, worldPosition);
         }
         wasPowered = powered;
     }
@@ -107,8 +112,42 @@ public class PearlStasisBlockEntity extends SmartBlockEntity {
         if (mode == TriggerMode.PULSE) return;
         int signal = level.getBestNeighborSignal(worldPosition);
         if (mode.isContinuouslyActive(signal)) {
-            tryTeleport(level, worldPosition);
+            tryTrigger(level, worldPosition);
         }
+    }
+
+    /**
+     * 统一触发入口: 投掷物优先, 否则尝试珍珠传送。
+     */
+    private void tryTrigger(Level level, BlockPos pos) {
+        if (held.isEmpty()) return;
+
+        // ── 投掷物: 雪球/鸡蛋/烈焰弹/风弹(物品单例自身即 ProjectileItem)──
+        if (held.getItem() instanceof ProjectileItem projectileItem && PROJECTILE_ITEMS.contains(held.getItem())) {
+            launchProjectile(level, pos, projectileItem);
+        } else {
+            tryTeleport(level, pos);
+        }
+    }
+
+    private void launchProjectile(Level level, BlockPos pos, ProjectileItem item) {
+        // 发射点: 台面上方一格中心
+        Vec3 spawn = new Vec3(pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5);
+        Direction down = Direction.DOWN;
+        Position position = new Position() {
+            @Override public double x() { return spawn.x; }
+            @Override public double y() { return spawn.y - 0.3; } // 实体原点略低于碰撞箱顶, 贴近台面
+            @Override public double z() { return spawn.z; }
+        };
+
+        Projectile projectile = item.asProjectile(level, position, held, down);
+        item.shoot(projectile, down.getStepX(), down.getStepY(), down.getStepZ(), 1.1F, 0.0F);
+        projectile.setOwner(null); // 无射击者: 不归因玩家, 鸡蛋/雪球不掉落战利品给特定人
+        level.addFreshEntity(projectile);
+        level.levelEvent(1002, pos, 0);
+
+        held.shrink(1);
+        notifyUpdate();
     }
 
     private void tryTeleport(Level level, BlockPos pos) {
