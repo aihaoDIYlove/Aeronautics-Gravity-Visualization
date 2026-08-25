@@ -130,8 +130,10 @@ public final class AeroSuiteFeatures {
             // levitite SA: 产物 aeronautics:levitite, 中间体 incomplete_levitite 绑进删除集
             new Feature("recipe_levitite", Group.STARLIGHT, true,
                     List.of(ModItems.INCOMPLETE_LEVITITE), ModItems.INCOMPLETE_LEVITITE),
+            // 图标 = aeronautics:pearlescent_levitite(aeronautics 类在 jarjar 内层, 编译期不可见, 走注册表查找)
             new Feature("recipe_pearlescent_levitite", Group.STARLIGHT, true,
-                    List.of(), ModItems.INCOMPLETE_LEVITITE),
+                    List.of(), () -> net.minecraft.core.registries.BuiltInRegistries.ITEM
+                            .get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("aeronautics", "pearlescent_levitite"))),
             // 增产组(4)
             new Feature("mult_blaze_rod", Group.STARLIGHT, true, List.of(), () -> Items.BLAZE_ROD),
             new Feature("mult_glowstone_dust", Group.STARLIGHT, true, List.of(), () -> Items.GLOWSTONE_DUST),
