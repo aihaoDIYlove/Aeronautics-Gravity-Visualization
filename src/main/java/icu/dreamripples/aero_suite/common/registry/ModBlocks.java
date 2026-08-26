@@ -523,8 +523,7 @@ public class ModBlocks {
             ModItems.SIMPLIFICATION_ITEMS.register("single_slot_hopper",
                     () -> new BlockItem(SINGLE_SLOT_HOPPER_BLOCK.get(), new Item.Properties()));
 
-    // 带过滤的单格漏斗: 单格漏斗 + 智能溜槽式侧面标记(4 横向面白框, 右键框区设/清过滤;
-    // 支持 Create 过滤卡与普通物品标记)。外观/漏斗行为继承原版漏斗, 贴图复用 single_slot_hopper。
+    // 带过滤的单格漏斗: 单格漏斗 + 智能溜槽式侧面标记。
     // 见 FilteredSingleSlotHopperBlock(交互) / FilteredSingleSlotHopperBlockEntity(过滤咽喉+同步)。
     public static final DeferredHolder<Block, FilteredSingleSlotHopperBlock> FILTERED_SINGLE_SLOT_HOPPER_BLOCK =
             SIMPLIFICATION_BLOCKS.register("filtered_single_slot_hopper",

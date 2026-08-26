@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "simplification_related:item/single_slot_hopper"
+    "layer0": "simplification_related:item/filtered_single_slot_hopper"
   }
 }
