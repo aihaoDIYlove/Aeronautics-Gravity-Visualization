@@ -4,12 +4,15 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "common.FloatingClusterContainerGuardMixin",
+    "common.CreativeTabBannerPaddingMixin",
     "simplification.AnalogTransmissionBlockEntityAccessor",
     "simplification.RotationPropagatorMixin",
     "starlight.PackageEntityMixin",
     "starlight.ClipboardEditPacketMixin"
   ],
   "client": [
+    "client.CreativeModeInventoryScreenAccessor",
+    "client.CreativeModeItemPickerMenuAccessor",
     "gravity.GoggleOverlayRendererMixin",
     "starlight.ClipboardScreenMixin"
   ],
