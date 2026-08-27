@@ -331,7 +331,6 @@ public class ModBlocks {
                                     .mapColor(MapColor.METAL)
                                     .sound(SoundType.COPPER)
                                     .strength(3.5f)
-                                    .noOcclusion()
                                     .requiresCorrectToolForDrops()
                                     .emissiveRendering((s, level, pos) -> true)));
 

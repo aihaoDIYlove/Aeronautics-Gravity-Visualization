@@ -8,6 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -27,8 +28,10 @@ public class StarlightCasingBlock extends CasingBlock {
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (random.nextInt(10) != 0) return; // 每方块约每秒 2 次,与 mycelium 同密度
         if (!FeatureGates.isEnabled("starlight_casing")) return; // 门控关闭,世界内残留方块不再冒粒子
-        // 六个面等概率,在面内随机取点(略外扩 0.05 形成贴面光点而非嵌进方块里)
+        // 六个面等概率;被相邻方块贴住的面用与区块渲染同一套剔除逻辑跳过
         Direction face = Direction.getRandom(random);
+        if (!Block.shouldRenderFace(state, level, pos, face, pos.relative(face))) return;
+        // 在面内随机取点(略外扩 0.05 形成贴面光点而非嵌进方块里)
         double x = pos.getX() + 0.5 + (face.getStepX() * (0.5 + 0.05)) + jitter(random, face.getStepX());
         double y = pos.getY() + 0.5 + (face.getStepY() * (0.5 + 0.05)) + jitter(random, face.getStepY());
         double z = pos.getZ() + 0.5 + (face.getStepZ() * (0.5 + 0.05)) + jitter(random, face.getStepZ());
