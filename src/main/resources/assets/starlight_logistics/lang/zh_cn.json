@@ -40,7 +40,6 @@
   "message.starlight_logistics.addressing_sign.pasted": "已粘贴地址列表",
   "message.starlight_logistics.addressing_sign.copy_empty": "没有可复制的地址",
   "tooltip.starlight_logistics.hose_bottom": "当前软管最底端高度：",
-  "tooltip.starlight_logistics.pearl_stasis": "右键存取 1 个物品；红石信号触发时把已绑定的激活珍珠主人传送到台上方并消耗珍珠。",
   "tooltip.starlight_logistics.hose_too_high": "抽取需软管到达Y：%d及以下",
   "tooltip.starlight_logistics.stabilizer.idle": "休眠",
   "tooltip.starlight_logistics.stabilizer.lift_mode": "浮力",
@@ -64,5 +63,6 @@
   "tooltip.starlight_logistics.pearl_stasis.mode": "红石触发模式",
   "tooltip.starlight_logistics.pearl_stasis.mode.pulse": "红石上升沿触发",
   "tooltip.starlight_logistics.pearl_stasis.mode.continuous_on": "有红石时持续触发",
-  "tooltip.starlight_logistics.pearl_stasis.mode.continuous_off": "无红石时持续触发"
+  "tooltip.starlight_logistics.pearl_stasis.mode.continuous_off": "无红石时持续触发",
+  "tooltip.starlight_logistics.pearl_stasis.teleport": "激活状态下，且内含绑定了玩家的激活珍珠时，消耗激活珍珠将该玩家传送至滞留台上方"
 }

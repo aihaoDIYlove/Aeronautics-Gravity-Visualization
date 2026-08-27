@@ -3,19 +3,25 @@ package icu.dreamripples.aero_suite.starlight.block;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.List;
 
 /**
  * 珍珠滞留台: 参考置物台的右键存取交互, 但单槽恒 1 个物品(无论是否可堆叠)、无 GUI。
@@ -38,6 +44,13 @@ public class PearlStasisBlock extends Block implements IBE<PearlStasisBlockEntit
 
     public PearlStasisBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
+                                TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.translatable("tooltip.starlight_logistics.pearl_stasis.teleport")
+                .withStyle(ChatFormatting.AQUA));
     }
 
     @Override

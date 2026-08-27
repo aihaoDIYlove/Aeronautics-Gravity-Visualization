@@ -60,9 +60,9 @@
   "tooltip.starlight_logistics.world_anchor.pending_export": "Pending export package",
   "tooltip.starlight_logistics.world_anchor.pending_send": "Pending outbound package",
   "block.starlight_logistics.pearl_stasis": "Pearl Stasis Pedestal",
-  "tooltip.starlight_logistics.pearl_stasis": "Right-click to store/retrieve 1 item; a redstone pulse teleports the bound player of an activated pearl above the pedestal and consumes it.",
   "tooltip.starlight_logistics.pearl_stasis.mode": "Redstone Trigger Mode",
   "tooltip.starlight_logistics.pearl_stasis.mode.pulse": "On Rising Edge",
   "tooltip.starlight_logistics.pearl_stasis.mode.continuous_on": "While Powered",
-  "tooltip.starlight_logistics.pearl_stasis.mode.continuous_off": "While Unpowered"
+  "tooltip.starlight_logistics.pearl_stasis.mode.continuous_off": "While Unpowered",
+  "tooltip.starlight_logistics.pearl_stasis.teleport": "While active, if it holds an activated pearl bound to a player, teleports that player above the pedestal"
 }
