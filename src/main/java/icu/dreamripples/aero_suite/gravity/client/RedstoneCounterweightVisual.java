@@ -65,7 +65,8 @@ public class RedstoneCounterweightVisual
 
     @Override
     public void updateLight(float v) {
-        relight(indicator);
+        // 全亮,不吃光照体素场:SubLevel 下 light volume 采样错位 + 漫反射会压暗灯带
+        indicator.light(net.minecraft.client.renderer.LightTexture.FULL_BRIGHT).setChanged();
     }
 
     @Override
