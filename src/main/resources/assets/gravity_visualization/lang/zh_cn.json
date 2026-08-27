@@ -132,6 +132,7 @@
   "aero_suite.config.back": "返回至上级菜单",
   "aero_suite.feature.pearl_stasis": "珍珠滞留台",
   "aero_suite.feature.pearl_stasis.desc": "单槽物品台(恒 1 个,右键存取),红石触发已绑定激活珍珠传送玩家。",
-  "jei.starlight_logistics.info.activated_ender_pearl": "获取方式:\n主手持末影珍珠、副手持回响碎片,右键激活。\n\n激活后绑定当前玩家。\n装入包裹派送至远方,包裹存在 3 秒后自动破裂,将你传送至落点(可跨维度)。",
-  "jei.starlight_logistics.info.starlight_bottle": "获取方式:\n持玻璃瓶进入末地下方，y小于-40的位置,对着粼光之海右键装瓶。\n\n第一瓶需手动获取。\n获得后即可合成虚空软管滑轮,此后星空液体无限抽取,无需再手动装瓶。"
+  "jei.starlight_logistics.info.activated_ender_pearl": "获取方式:\n主手持末影珍珠、副手持回响碎片,右键生成激活的末影珍珠。\n\n激活后绑定当前玩家。\n装入包裹派送至远方,包裹存在 3 秒后自动破裂,将你传送至落点(可跨维度)。",
+  "jei.starlight_logistics.info.starlight_bottle": "获取方式:\n持玻璃瓶进入末地下方，y小于-40的位置,对着粼光之海右键装瓶。\n\n第一瓶需手动获取。\n获得后即可合成虚空软管滑轮,此后星空液体无限抽取,无需再手动装瓶。",
+  "jei.starlight_logistics.pearl_activation.title": "神秘转化"
 }

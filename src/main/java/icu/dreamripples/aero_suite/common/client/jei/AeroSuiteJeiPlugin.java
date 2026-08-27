@@ -5,9 +5,14 @@ import icu.dreamripples.aero_suite.common.config.FeatureGates;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+
+import java.util.List;
 
 /**
  * JEI info 页: 为"无配方获取"的物品挂获取说明页(物品图标 + 文字, JEI 内建 INFO 类别,
@@ -16,7 +21,9 @@ import net.minecraft.resources.ResourceLocation;
  *   <li>激活的末影珍珠: 主手末影珍珠 + 副手回响碎片右键(见 ActivatedEnderPearlHandler)</li>
  *   <li>瓶装星空液体: 玻璃瓶在末地之海俯视虚空右键取液(见 StarlightBottleHandler)</li>
  * </ul>
- * 门控: 功能关闭时不注册 info 页, 与 JEI 配方隐藏语义一致.
+ * 另注册"神秘转化"风格分类(见 {@link PearlActivationCategory}):
+ * 末影珍珠 → 激活的末影珍珠, 让玩家查看珍珠用途时能发现激活链路。
+ * 门控: 功能关闭时不注册 info 页与分类配方, 与 JEI 配方隐藏语义一致.
  */
 @JeiPlugin
 public class AeroSuiteJeiPlugin implements IModPlugin {
@@ -26,10 +33,23 @@ public class AeroSuiteJeiPlugin implements IModPlugin {
     }
 
     @Override
+    public void registerCategories(IRecipeCategoryRegistration registration) {
+        if (FeatureGates.isEnabled("activated_pearl")) {
+            registration.addRecipeCategories(new PearlActivationCategory(
+                    registration.getJeiHelpers().getGuiHelper(),
+                    new ItemStack(ModItems.ACTIVATED_ENDER_PEARL.get())));
+        }
+    }
+
+    @Override
     public void registerRecipes(IRecipeRegistration registration) {
         if (FeatureGates.isEnabled("activated_pearl")) {
             registration.addIngredientInfo(ModItems.ACTIVATED_ENDER_PEARL.get(),
                     Component.translatable("jei.starlight_logistics.info.activated_ender_pearl"));
+            registration.addRecipes(PearlActivationCategory.TYPE, List.of(
+                    new PearlActivationCategory.Conversion(
+                            new ItemStack(Items.ENDER_PEARL),
+                            new ItemStack(ModItems.ACTIVATED_ENDER_PEARL.get()))));
         }
         if (FeatureGates.isEnabled("starlight_bottle")) {
             registration.addIngredientInfo(ModItems.STARLIGHT_BOTTLE.get(),

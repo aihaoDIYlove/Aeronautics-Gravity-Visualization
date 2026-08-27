@@ -133,5 +133,6 @@
   "aero_suite.feature.pearl_stasis": "Pearl Stasis Pedestal",
   "aero_suite.feature.pearl_stasis.desc": "Single-slot pedestal (always 1 item, right-click access); redstone pulse teleports the bound player of an activated pearl.",
   "jei.starlight_logistics.info.activated_ender_pearl": "How to obtain:\nHold an Ender Pearl in your main hand and an Echo Shard in your off hand, then right-click.\n\nThe pearl binds to you.\nShip it in a Create Package; after existing for 3 seconds the package automatically ruptures and teleports you to the landing point (cross-dimensional).",
-  "jei.starlight_logistics.info.starlight_bottle": "How to obtain:\nBring a Glass Bottle into the End Sea, look down at the void and right-click.\n\nThe first bottle must be filled by hand.\nUse it to craft the Void Hose Pulley, which draws Starlight endlessly from then on."
+  "jei.starlight_logistics.info.starlight_bottle": "How to obtain:\nBring a Glass Bottle into the End Sea, look down at the void and right-click.\n\nThe first bottle must be filled by hand.\nUse it to craft the Void Hose Pulley, which draws Starlight endlessly from then on.",
+  "jei.starlight_logistics.pearl_activation.title": "Mysterious Conversion"
 }
