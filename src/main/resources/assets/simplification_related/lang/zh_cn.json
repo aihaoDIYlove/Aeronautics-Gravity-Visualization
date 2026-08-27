@@ -40,6 +40,8 @@
   "tooltip.simplification_related.sequential_feeder.mode": "控制模式",
   "tooltip.simplification_related.sequential_feeder.mode.ignore_redstone": "忽略红石",
   "tooltip.simplification_related.sequential_feeder.mode.redstone_pulse": "红石脉冲控制",
+  "tooltip.simplification_related.sequential_feeder.desc.pulse": "脉冲模式：每次仅允许提取一个物品，红石脉冲可切换至下一步骤物料",
+  "tooltip.simplification_related.sequential_feeder.desc.ignore_redstone": "忽略红石：当一个物品被提取时，自动切换至下一步骤的物料",
   "simplification_related.ponder.convenient_analog_transmission_clutch.header": "无红石信号时的更方便的模拟传动器",
   "simplification_related.ponder.convenient_analog_transmission_clutch.text_1": "无红石信号时,该传动器等效于离合器,不输出任何转速",
   "simplification_related.ponder.convenient_analog_transmission_lookup.header": "用红石信号查表控制输出转速",

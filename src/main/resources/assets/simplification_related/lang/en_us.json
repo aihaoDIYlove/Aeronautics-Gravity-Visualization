@@ -40,6 +40,8 @@
   "tooltip.simplification_related.sequential_feeder.mode": "Control Mode",
   "tooltip.simplification_related.sequential_feeder.mode.ignore_redstone": "Ignore Redstone",
   "tooltip.simplification_related.sequential_feeder.mode.redstone_pulse": "Redstone Pulse",
+  "tooltip.simplification_related.sequential_feeder.desc.pulse": "Pulse mode: only one item is extracted at a time; a redstone pulse advances to the next step",
+  "tooltip.simplification_related.sequential_feeder.desc.ignore_redstone": "Ignore redstone: automatically advances to the next step whenever an item is extracted",
   "simplification_related.ponder.convenient_analog_transmission_clutch.header": "Unpowered, acting as a Clutch",
   "simplification_related.ponder.convenient_analog_transmission_clutch.text_1": "Without a Redstone Signal, it behaves like a Clutch and outputs no rotation",
   "simplification_related.ponder.convenient_analog_transmission_lookup.header": "Speed Lookup via Redstone Signal",

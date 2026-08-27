@@ -3,17 +3,23 @@ package icu.dreamripples.aero_suite.simplification.block;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.List;
 
 /**
  * 顺序供料器方块。右键开 UI(空手或持非交互物品)。破坏时掉落 9 物品槽内容
@@ -24,6 +30,15 @@ public class SequentialFeederBlock extends Block implements IBE<SequentialFeeder
 
     public SequentialFeederBlock(BlockBehaviour.Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
+                                TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.translatable("tooltip.simplification_related.sequential_feeder.desc.pulse")
+                .withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable(
+                "tooltip.simplification_related.sequential_feeder.desc.ignore_redstone").withStyle(ChatFormatting.GRAY));
     }
 
     @Override
