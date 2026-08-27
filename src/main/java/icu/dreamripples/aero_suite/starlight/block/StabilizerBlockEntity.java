@@ -95,22 +95,22 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     private static final double BETA = 10.0;            // 满档角随角速度递减 [度/(rad/s)]
     private static final double MIN_MAX_ANGLE = 5.0;    // 满档角下限 [度]
     // D 项自适应阻尼:KD_eff = KD_BASE * (1 + ALPHA * tiltSpeed)。
-    private static final double KD_BASE = 0.5;          // 基础 D 增益 [N·m·s]
-    private static final double ALPHA = 0.5;            // D 自适应系数 [s/rad]
+    private static final double KD_BASE = 0.6;          // 基础 D 增益 [N·m·s]
+    private static final double ALPHA = 0.6;            // D 自适应系数 [s/rad]
     // 模式判据滞回 [格]:低/高端判定切换需要高度差穿越对面阈值,防零点噪声换向。
     private static final double MODE_HYST = 0.25;
     // 无力臂休眠距离 [格]:离质心过近时差重几乎无力矩,直接休眠。
     private static final double MIN_LEVER_DIST = 0.75;
     // 换向冷却 [tick]:模式切换后锁死这么久,让其余稳定方块引发的质心移动有时间沉淀,
     // 防止多块互相拉扯形成极限环(单靠滞回会把逐帧抖变成大周期固执摆)。
-    private static final int SWITCH_COOLDOWN = 10;
+    private static final int SWITCH_COOLDOWN = 12;
     // 档位斜坡:每 tick 每维最多变化量。瞬时 ±15 kpg 的满幅跳变是多块震荡的放大器,减速逼近目标。
     private static final int MAX_TIER_STEP = 1;
     // 过零衰减 [格]:档位按 |heightDiff| 线性收束到 0,越过此距离才允许满档。
     // 防"满档力矩冲过水平位"每半周泵能 -> 大角度等幅摆(缓慢摆动时尤其致命:D 弱,P 恒满)。
-    private static final double TIER_FADE_BLOCKS = 1.5;
+    private static final double TIER_FADE_BLOCKS = 1.8;
     // 倾斜增强阻尼:kdEff 随倾角线性放大,30° 时 x2、60° 时 x3(慢速大幅摆动的额外耗散)。
-    private static final double DAMP_TILT_GAIN = 1.7;
+    private static final double DAMP_TILT_GAIN = 2.0;
 
     // 模式锁存(服务端瞬态,不持久化):0=未知(下次直接按符号判定)/1=低端(lift)/2=高端(mass)。
     // 任何休眠条件触发即归零,唤醒后首拍重新定方向。switchCooldown>0 时禁止换向(档位仍可调)。
