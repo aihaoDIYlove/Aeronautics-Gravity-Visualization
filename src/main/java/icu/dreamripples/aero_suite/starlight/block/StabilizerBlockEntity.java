@@ -28,6 +28,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,21 +46,36 @@ import java.util.List;
  *   - 姿态:世界 DOWN 经 orientation.transformInverse 到本地 = ld。
  *     pitch = atan2(ld.z, -ld.y);roll = atan2(ld.x, -ld.y);tilt = sqrt(pitch²+roll²)。
  *   - 死区(总倾斜角)由侧面 4 面 ScrollValueBehaviour 调 0..30°。tilt < deadband -> tier (1,1) 休眠。
- *   - 方位 r = (getBlockPos + 0.5) - 质心。|r| < 0.5 -> 无力臂,休眠。
- *   - 误差 error = rz*pitch + rx*roll(力臂加权倾斜投影)。projection = |error|/|r|,projDeg = toDeg(projection)。
+ *   - **模式判据 = 世界竖直高度差**(h)(不再用水平投影 error!):
+ *     h = rel·ld,rel = 方块中心-质心(SubLevel 本地系),ld = 世界 DOWN 的本地表示,
+ *     化简后等价于"质心在世界系下高出我的格数"(本地系点积即可,无需真变换到世界系)。
+ *     h > 0 -> 我在低端 -> lift;h < 0 -> 高端 -> mass。
+ *     旧水平投影 error=rz*pitch+rx*roll 的致命缺陷:质心随自身档位切换实时移动,Sable 重算后
+ *     error 过零换向 -> 满幅 chattering 极限环(翻倒高频闪烁根因)。竖直判据下自身配重强化当前
+ *     决策方向(收敛极性),且绕开 atan2 在 ±90° 翻倒时的退化。
+ *   - **Schmitt 滞回 + 换向冷却 + 档位斜坡**(多块共存防震荡三件套):
+ *     modeLatch 锁存当前模式,换向需 heightDiff 越过对面 ±MODE_HYST 阈值;
+ *     切换后 SWITCH_COOLDOWN tick 内锁死方向(给其余稳定块引发的质心移动时间沉淀,
+ *     否则多块互相拉扯成极限环);setTiers 斜坡限速每 tick 最多 MAX_TIER_STEP 级
+ *     (瞬时满幅跳变是多块震荡的放大器)。任何休眠条件(红石停用/非载具/无质心/死区)
+ *     归零锁存与冷却,唤醒后首拍按符号直接定。
+ *   - 力臂 |质心-方块中心|(3D)< MIN_LEVER_DIST -> 差重无力矩,休眠(锁存保留)。
  *   - **自适应满档角**(按倾斜速度):tiltSpeed = sqrt(ωx²+ωz²)(本地 pitch/roll 角速度,从 D 项缓存读)。
  *     maxAngleEff = MAX_ANGLE_BASE - BETA * tiltSpeed,clamp 到 [MIN_MAX_ANGLE, MAX_ANGLE_BASE]。
  *     慢速(tiltSpeed≈0):30° 满档(温和,防震);快速(tiltSpeed=2):10° 满档(早响应,抢在 45° 物理失效前)。
- *   - tier = clamp(1 + round(15 * projDeg / maxAngleEff), 1, 16)。无固定 KP,满档角随速度自适应。
- *   - 互斥:error > 0(我在低端)-> lift 模式 (1, tier);error < 0(我在高端)-> mass 模式 (tier, 1)。
- *   - tier 变化才 setBlock。
+ *   - **过零衰减**:frac 额外乘 min(1, |heightDiff|/TIER_FADE_BLOCKS),接近水平位输出收束到零——
+ *     否则饱和区满档力矩每半周冲过平衡点泵能一次,形成大角度慢摆极限环(改前 >30° 停不下来的根因)。
+ *     换向后需重新拉开高度差才恢复出力,顺带软启动防二次泵能。
+ *   - tier = clamp(1 + round(15 * frac), 1, 16);setTiers 斜坡逼近目标。
+ *   - 互斥输出:低端 -> lift 模式 (1, tier);高端 -> mass 模式 (tier, 1)。tier 变化才 setBlock。
  *
  * **D 项(阻尼,直接施角冲量)**:每物理 tick 在 sable$physicsTick 里算(BlockEntitySubLevelActor)。
  *   - 读载具全局角速度(handle.getAngularVelocity),转本地系,存 angVelLocalCache 供 P 项读。
  *   - **自适应 KD**:tiltSpeed = sqrt(ωx²+ωz²)。KD_eff = KD_BASE * (1 + ALPHA * tiltSpeed)。
  *     慢速:KD=KD_BASE(温和,不干扰转向);快速:KD 翻倍(强阻尼,防过冲到 45°+)。
  *   - 阻尼 pitch/roll 轴(本地 x/z),**不阻尼 yaw(本地 y)**保转向自由。
- *   - 阻尼力矩 = -KD_eff * (ωx, 0, ωz),角冲量 = 力矩 * timeStep,handle.applyAngularImpulse(本地)。
+ *   - 阻尼力矩 = -KD_eff * (ωx, 0, ωz),KD_eff 还随倾角线性增强(30°x2/60°x3,慢速大幅摆动耗散不足补强),
+ *     角冲量 = 力矩 * timeStep,handle.applyAngularImpulse(本地)。
  *   - D 是外力矩(非角动量交换),不储存角动量,无陀螺进动,不影响 yaw。
  *
  * **自适应的动机**:固定 KP 下,大(早满档)则震荡,小(晚满档)则 45°+ 才触发(物理已失效)。
@@ -81,6 +97,25 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     // D 项自适应阻尼:KD_eff = KD_BASE * (1 + ALPHA * tiltSpeed)。
     private static final double KD_BASE = 0.5;          // 基础 D 增益 [N·m·s]
     private static final double ALPHA = 0.5;            // D 自适应系数 [s/rad]
+    // 模式判据滞回 [格]:低/高端判定切换需要高度差穿越对面阈值,防零点噪声换向。
+    private static final double MODE_HYST = 0.25;
+    // 无力臂休眠距离 [格]:离质心过近时差重几乎无力矩,直接休眠。
+    private static final double MIN_LEVER_DIST = 0.75;
+    // 换向冷却 [tick]:模式切换后锁死这么久,让其余稳定方块引发的质心移动有时间沉淀,
+    // 防止多块互相拉扯形成极限环(单靠滞回会把逐帧抖变成大周期固执摆)。
+    private static final int SWITCH_COOLDOWN = 10;
+    // 档位斜坡:每 tick 每维最多变化量。瞬时 ±15 kpg 的满幅跳变是多块震荡的放大器,减速逼近目标。
+    private static final int MAX_TIER_STEP = 1;
+    // 过零衰减 [格]:档位按 |heightDiff| 线性收束到 0,越过此距离才允许满档。
+    // 防"满档力矩冲过水平位"每半周泵能 -> 大角度等幅摆(缓慢摆动时尤其致命:D 弱,P 恒满)。
+    private static final double TIER_FADE_BLOCKS = 1.5;
+    // 倾斜增强阻尼:kdEff 随倾角线性放大,30° 时 x2、60° 时 x3(慢速大幅摆动的额外耗散)。
+    private static final double DAMP_TILT_GAIN = 1.7;
+
+    // 模式锁存(服务端瞬态,不持久化):0=未知(下次直接按符号判定)/1=低端(lift)/2=高端(mass)。
+    // 任何休眠条件触发即归零,唤醒后首拍重新定方向。switchCooldown>0 时禁止换向(档位仍可调)。
+    private byte modeLatch = 0;
+    private int switchCooldown = 0;
 
     private ScrollValueBehaviour deadbandBehaviour;
     // 红石控制模式(上下两面切换)。value=0 -> ACTIVE_WHEN_OFF(默认,无红石时工作)。
@@ -116,6 +151,12 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         behaviours.add(redstoneModeBehaviour);
     }
 
+    /** 休眠时复位模式锁存与换向冷却:唤醒后首拍按符号直接定向。 */
+    private void resetMode() {
+        modeLatch = 0;
+        switchCooldown = 0;
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -123,12 +164,14 @@ public class StabilizerBlockEntity extends SmartBlockEntity
 
         int signal = level.getBestNeighborSignal(worldPosition);
         if (!redstoneModeBehaviour.get().isActiveFor(signal)) {
+            resetMode();
             setTiers(1, 1);
             return;
         }
 
         SubLevel subLevel = Sable.HELPER.getContaining(this);
         if (!(subLevel instanceof ServerSubLevel serverSubLevel)) {
+            resetMode();
             setTiers(1, 1);
             return;
         }
@@ -136,6 +179,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         MassData massData = serverSubLevel.getMassTracker();
         Vector3dc com = massData.getCenterOfMass();
         if (com == null) {
+            resetMode();
             setTiers(1, 1);
             return;
         }
@@ -151,36 +195,79 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         int deadbandDeg = deadbandBehaviour.getValue();
         double deadbandRad = Math.toRadians(deadbandDeg);
         if (tilt < deadbandRad) {
+            resetMode();
             setTiers(1, 1);
             return;
         }
 
-        double rx = worldPosition.getX() + 0.5 - com.x();
-        double rz = worldPosition.getZ() + 0.5 - com.z();
-        double rMag = Math.sqrt(rx * rx + rz * rz);
-        if (rMag < 0.5) {
+        // 高度判据:方块中心相对质心沿世界重力轴的偏移 h [格]。
+        // 世界 UP 在本地系 = -ld(transformInverse(DOWN));h = "质心在世界系下高出我的格数"
+        //   = (comWorld.y - blockWorld.y) = ((comLocal-blockLocal)·(-ld)) = rel·ld,rel = block-com。
+        // h > 0 -> 质心在我上方 -> 我在低端 -> lift;h < 0 -> 我在高端 -> mass。
+        // 不再走水平投影 error:质心会随自身档位切换而移动,水平判据构成自反馈极限环(高频闪烁根因),
+        // 竖直判据下自身配重反而强化当前决策方向(收敛),且绕开 atan2 在 ±90° 的退化。
+        double bx = worldPosition.getX() + 0.5 - com.x();
+        double by = worldPosition.getY() + 0.5 - com.y();
+        double bz = worldPosition.getZ() + 0.5 - com.z();
+        double distToCom = Math.sqrt(bx * bx + by * by + bz * bz);
+
+        double heightDiff = bx * ld.x() + by * ld.y() + bz * ld.z();
+
+        boolean isLowSide;
+        boolean switched = false;
+        if (switchCooldown > 0) {
+            switchCooldown--;                 // 冷却中:维持现模式,只调档不换向
+            isLowSide = modeLatch == 1;
+            if (!isLowSide && modeLatch != 2) {  // 冷却期锁存异常(理论不可达),兜底重定
+                isLowSide = heightDiff >= 0;
+                modeLatch = (byte) (isLowSide ? 1 : 2);
+            }
+        } else if (modeLatch == 1) {
+            isLowSide = true;   // 锁存低端:除非反向证据越过阈值才换向
+            if (heightDiff < -MODE_HYST) {
+                isLowSide = false;
+                modeLatch = 2;
+                switched = true;
+            }
+        } else if (modeLatch == 2) {
+            isLowSide = false;
+            if (heightDiff > MODE_HYST) {
+                isLowSide = true;
+                modeLatch = 1;
+                switched = true;
+            }
+        } else {
+            isLowSide = heightDiff >= 0;  // 首拍无历史,直接按符号定
+            modeLatch = (byte) (isLowSide ? 1 : 2);
+        }
+        if (switched) switchCooldown = SWITCH_COOLDOWN;
+
+        if (distToCom < MIN_LEVER_DIST) {
+            // 差重几乎无力矩,休眠但保留锁存(暂离≠翻案)
             setTiers(1, 1);
             return;
         }
 
-        double error = rz * pitch + rx * roll;
-        double projection = Math.abs(error) / rMag;
-        double projDeg = Math.toDegrees(projection);
-
-        // 自适应满档角:倾斜速度大 -> 满档角小 -> 早满档(抢在 45° 物理失效前)
+        // 自适应满档角:倾斜速度大 -> 满档角小 -> 早满档(抢在 45° 物理失效前)。档位按总倾斜角调度。
         double tiltSpeed = Math.sqrt(angVelLocalCache.x() * angVelLocalCache.x()
                 + angVelLocalCache.z() * angVelLocalCache.z());
         double maxAngleEff = MAX_ANGLE_BASE - BETA * tiltSpeed;
         if (maxAngleEff < MIN_MAX_ANGLE) maxAngleEff = MIN_MAX_ANGLE;
 
-        double frac = projDeg / maxAngleEff;
+        double frac = Math.toDegrees(tilt) / maxAngleEff;
         if (frac < 0) frac = 0;
         else if (frac > 1) frac = 1;
+
+        // 过零衰减:接近水平位时档位收束(frac 乘以高度差归一值),防止满档力矩冲过平衡点续能。
+        // 副作用是换向后短暂软启动(需重新拉开 ~TIER_FADE_BLOCKS 高度差),恰好抑制二次泵能。
+        double fade = Math.min(1.0, Math.abs(heightDiff) / TIER_FADE_BLOCKS);
+        frac *= fade;
+
         int tier = 1 + (int) Math.round(15 * frac);
         if (tier < 1) tier = 1;
         else if (tier > 16) tier = 16;
 
-        if (error > 0) {
+        if (isLowSide) {
             setTiers(1, tier);  // lift 模式(我在低端,需向上力)
         } else {
             setTiers(tier, 1);  // mass 模式(我在高端,需向下力)
@@ -198,10 +285,14 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         Vector3d angVelLocal = pose.orientation().transformInverse(angVelGlobal, new Vector3d());
         angVelLocalCache.set(angVelLocal);
 
-        // 自适应 KD:倾斜速度大 -> 强阻尼(防过冲到 45°+)
+        // 自适应 KD:倾斜速度大 -> 强阻尼(防过冲到 45°+);大倾角下再线性增强
+        //(慢速大幅摆动时角速度小,纯速度反馈耗散不足,是"大角度慢摆停不下来"的成因之一)
         double tiltSpeed = Math.sqrt(angVelLocal.x() * angVelLocal.x()
                 + angVelLocal.z() * angVelLocal.z());
-        double kdEff = KD_BASE * (1.0 + ALPHA * tiltSpeed);
+        Vector3d ld = new Vector3d(0, -1, 0);
+        pose.orientation().transformInverse(ld);
+        double tiltDeg = Math.toDegrees(Math.atan2(Math.sqrt(ld.x() * ld.x() + ld.z() * ld.z()), -ld.y()));
+        double kdEff = KD_BASE * (1.0 + ALPHA * tiltSpeed) * (1.0 + DAMP_TILT_GAIN * Math.abs(tiltDeg) / MAX_ANGLE_BASE);
 
         // D 项:阻尼 pitch/roll(本地 x/z),不阻尼 yaw(本地 y)以保转向自由
         Vector3d dampTorqueLocal = new Vector3d(-kdEff * angVelLocal.x(), 0, -kdEff * angVelLocal.z());
@@ -209,14 +300,21 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         handle.applyAngularImpulse(dampTorqueLocal.mul(timeStep));
     }
 
-    private void setTiers(int massTier, int liftTier) {
+    /**
+     * 目标档位写入(带斜坡限速):每维每 tick 最多变化 {@link #MAX_TIER_STEP} 级。
+     * 参数是"目标档",实际写入值向目标逼近一步。瞬时满幅跳变会在多块场景互相激励成极限环,
+     * 斜坡让每步质量变化足够小,Sable 的质心反馈被摊平到多拍上。
+     */
+    private void setTiers(int massTarget, int liftTarget) {
         BlockState state = getBlockState();
         int curMass = state.getValue(StabilizerBlock.MASS_TIER);
         int curLift = state.getValue(StabilizerBlock.LIFT_TIER);
-        if (curMass == massTier && curLift == liftTier) return;
+        int newMass = Mth.clamp(curMass + Mth.clamp(massTarget - curMass, -MAX_TIER_STEP, MAX_TIER_STEP), 1, 16);
+        int newLift = Mth.clamp(curLift + Mth.clamp(liftTarget - curLift, -MAX_TIER_STEP, MAX_TIER_STEP), 1, 16);
+        if (newMass == curMass && newLift == curLift) return;
         level.setBlockAndUpdate(worldPosition, state
-                .setValue(StabilizerBlock.MASS_TIER, massTier)
-                .setValue(StabilizerBlock.LIFT_TIER, liftTier));
+                .setValue(StabilizerBlock.MASS_TIER, newMass)
+                .setValue(StabilizerBlock.LIFT_TIER, newLift));
     }
 
     @Override
