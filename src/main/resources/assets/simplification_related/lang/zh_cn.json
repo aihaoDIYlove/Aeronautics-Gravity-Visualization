@@ -34,6 +34,8 @@
   "gui.simplification_related.sequential_feeder.marker_slots": "标记槽：",
   "item.simplification_related.incomplete_sequential_feeder": "顺序供料器（半成品）",
   "tooltip.simplification_related.current_output_speed": "当前输出转速",
+  "tooltip.simplification_related.single_slot_hopper": "一次仅允许1个物品通过。建议搭配顺序供料器食用",
+  "tooltip.simplification_related.filtered_single_slot_hopper": "一次仅允许1个物品通过，附带过滤功能，兼容机械动力的各种过滤器",
   "tooltip.simplification_related.superheated_stress_boost": "超级加热：应力翻倍",
   "tooltip.simplification_related.sequential_feeder.mode": "控制模式",
   "tooltip.simplification_related.sequential_feeder.mode.ignore_redstone": "忽略红石",

@@ -5,8 +5,10 @@ import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.equipment.wrench.WrenchItem;
 import com.simibubi.create.content.logistics.filter.FilterItem;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -14,7 +16,9 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -26,6 +30,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * 带过滤的单格漏斗方块: 外观/红石/朝向/漏斗逻辑全部继承原版 {@link HopperBlock}(与
@@ -49,6 +55,13 @@ public class FilteredSingleSlotHopperBlock extends HopperBlock implements IWrenc
 
     public FilteredSingleSlotHopperBlock(BlockBehaviour.Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
+                                TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.translatable("tooltip.simplification_related.filtered_single_slot_hopper")
+                .withStyle(ChatFormatting.GRAY));
     }
 
     @Override
