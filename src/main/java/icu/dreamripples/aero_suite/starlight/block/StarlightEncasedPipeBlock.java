@@ -1,11 +1,19 @@
 package icu.dreamripples.aero_suite.starlight.block;
 
 import com.simibubi.create.content.fluids.pipes.EncasedPipeBlock;
+import icu.dreamripples.aero_suite.common.config.FeatureGates;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import com.simibubi.create.content.fluids.pipes.FluidPipeBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
+import icu.dreamripples.aero_suite.starlight.ModParticles;
 
 import java.util.function.Supplier;
 
@@ -31,5 +39,19 @@ public class StarlightEncasedPipeBlock extends EncasedPipeBlock {
     @Override
     public BlockEntityType<? extends FluidPipeBlockEntity> getBlockEntityType() {
         return ModBlocks.STARLIGHT_ENCASED_FLUID_PIPE_BE.get();
+    }
+
+    // 星光闪烁粒子(与 StarlightCasingBlock 同密度): 套壳管道外观就是星空机壳,视觉保持一致。
+    // 六面板方块在六个面中心附近随机冒点。
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (random.nextInt(10) != 0) return;
+        if (!FeatureGates.isEnabled("starlight_casing")) return;
+        Direction face = Direction.getRandom(random);
+        double x = pos.getX() + 0.5 + face.getStepX() * 0.55 + (face.getStepX() == 0 ? (random.nextDouble() - 0.5) * 0.8 : 0);
+        double y = pos.getY() + 0.5 + face.getStepY() * 0.55 + (face.getStepY() == 0 ? (random.nextDouble() - 0.5) * 0.8 : 0);
+        double z = pos.getZ() + 0.5 + face.getStepZ() * 0.55 + (face.getStepZ() == 0 ? (random.nextDouble() - 0.5) * 0.8 : 0);
+        ParticleOptions type = ModParticles.STARLIGHT_SPARKLE.get();
+        StarlightCasingBlock.addSparkle(type, level, x, y, z);
     }
 }

@@ -1,6 +1,7 @@
 package icu.dreamripples.aero_suite.common.registry;
 
 import com.simibubi.create.content.decoration.encasing.CasingBlock;
+import icu.dreamripples.aero_suite.starlight.block.StarlightCasingBlock;
 import icu.dreamripples.aero_suite.gravity.block.CounterweightBlock;
 import icu.dreamripples.aero_suite.gravity.block.CounterweightBlockEntity;
 import icu.dreamripples.aero_suite.gravity.block.CounterweightLightBlock;
@@ -324,7 +325,8 @@ public class ModBlocks {
     // 合成: 手持星空液体瓶右键铜机壳 / 机械手 / 注液器 250mb starlight 注液. 详见 Feature 9.
     public static final DeferredHolder<Block, CasingBlock> STARLIGHT_CASING_BLOCK =
             STARLIGHT_BLOCKS.register("starlight_casing",
-                    () -> new CasingBlock(
+                    () -> new StarlightCasingBlock(
+
                             BlockBehaviour.Properties.of()
                                     .mapColor(MapColor.METAL)
                                     .sound(SoundType.COPPER)

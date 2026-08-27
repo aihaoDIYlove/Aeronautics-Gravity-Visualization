@@ -16,10 +16,12 @@ import icu.dreamripples.aero_suite.simplification.client.FilteredHopperRenderer;
 import icu.dreamripples.aero_suite.simplification.client.SingleSlotHopperScreen;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
+import icu.dreamripples.aero_suite.starlight.ModParticles;
 import icu.dreamripples.aero_suite.starlight.client.AddressingSignRenderer;
 import icu.dreamripples.aero_suite.starlight.client.ModPartialModels;
 import icu.dreamripples.aero_suite.starlight.client.PearlStasisRenderer;
 import icu.dreamripples.aero_suite.starlight.client.StabilizerRenderer;
+import icu.dreamripples.aero_suite.starlight.client.StarlightSparkleParticle;
 import icu.dreamripples.aero_suite.starlight.client.WorldAnchorRenderer;
 import icu.dreamripples.aero_suite.starlight.fluid.ModFluids;
 import icu.dreamripples.aero_suite.starlight.network.AddressingSignScrollPayload;
@@ -71,6 +73,12 @@ public class AeronauticsGravityClient {
     public AeronauticsGravityClient(net.neoforged.bus.api.IEventBus modEventBus) {
         // 顺序供料器 Screen(RegisterMenuScreensEvent 走 MOD bus;构造器入参即 mod bus)
         modEventBus.addListener(AeronauticsGravityClient::onRegisterMenuScreens);
+        // 星光闪烁粒子 Provider(RegisterParticleProvidersEvent 走 MOD bus)
+        modEventBus.addListener(AeronauticsGravityClient::onRegisterParticleProviders);
+    }
+
+    private static void onRegisterParticleProviders(net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ModParticles.STARLIGHT_SPARKLE.get(), StarlightSparkleParticle.Provider::new);
     }
 
     private static void onRegisterMenuScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
