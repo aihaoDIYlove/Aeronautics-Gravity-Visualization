@@ -51,7 +51,6 @@
   "tooltip.starlight_logistics.stabilizer.redstone_mode.active_when_off": "Active when unpowered",
   "tooltip.starlight_logistics.stabilizer.redstone_mode.active_when_on": "Active when powered",
   "tooltip.starlight_logistics.world_anchor.address": "World Anchor Address",
-  "tooltip.starlight_logistics.world_anchor.address_conflict": "Address conflict",
   "tooltip.starlight_logistics.world_anchor.contents": "Package Target Address",
   "tooltip.starlight_logistics.world_anchor.empty": "Empty",
   "tooltip.starlight_logistics.world_anchor.mode": "Mode",

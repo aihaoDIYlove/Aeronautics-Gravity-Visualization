@@ -52,7 +52,6 @@
   "tooltip.starlight_logistics.stabilizer.redstone_mode.active_when_off": "无红石时开启",
   "tooltip.starlight_logistics.stabilizer.redstone_mode.active_when_on": "有红石时开启",
   "tooltip.starlight_logistics.world_anchor.address": "锚点地址",
-  "tooltip.starlight_logistics.world_anchor.address_conflict": "地址冲突",
   "tooltip.starlight_logistics.world_anchor.contents": "内容包裹目标地址",
   "tooltip.starlight_logistics.world_anchor.empty": "空",
   "tooltip.starlight_logistics.world_anchor.mode": "模式",
