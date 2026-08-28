@@ -46,6 +46,7 @@
   "tooltip.starlight_logistics.stabilizer.mode": "Mode",
   "tooltip.starlight_logistics.stabilizer.output": "Output",
   "tooltip.starlight_logistics.stabilizer.placement": "Place it away from the contraption's center, otherwise it will have no effect",
+  "tooltip.starlight_logistics.stabilizer.pairing": "Best served with Buoyant Counterweights; the damping they provide helps damp oscillation",
   "tooltip.starlight_logistics.stabilizer.redstone_mode": "Redstone Mode",
   "tooltip.starlight_logistics.stabilizer.redstone_mode.active_when_off": "Active when unpowered",
   "tooltip.starlight_logistics.stabilizer.redstone_mode.active_when_on": "Active when powered",
@@ -64,5 +65,10 @@
   "tooltip.starlight_logistics.pearl_stasis.mode.pulse": "On Rising Edge",
   "tooltip.starlight_logistics.pearl_stasis.mode.continuous_on": "While Powered",
   "tooltip.starlight_logistics.pearl_stasis.mode.continuous_off": "While Unpowered",
-  "tooltip.starlight_logistics.pearl_stasis.teleport": "While active, if it holds an activated pearl bound to a player, teleports that player above the pedestal"
+  "tooltip.starlight_logistics.pearl_stasis.teleport": "While active, if it holds an activated pearl bound to a player, teleports that player above the pedestal",
+  "tooltip.starlight_logistics.world_anchor.send": "Send mode: packages deposited are delivered to the world anchor matching their address",
+  "tooltip.starlight_logistics.world_anchor.send_stuck": "Send mode, packages stuck: an unaddressed/mis-addressed package is present, or the receiving anchor is jammed",
+  "tooltip.starlight_logistics.world_anchor.receive": "Receive mode: receives packages addressed to it. Set the address with a sign/addressing sign",
+  "tooltip.starlight_logistics.world_anchor.receive_stuck": "Receive mode, packages stuck: a package has not been exported yet",
+  "tooltip.starlight_logistics.world_anchor.address_conflict": "Address conflict: two or more world anchors share the same address"
 }

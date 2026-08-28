@@ -47,6 +47,7 @@
   "tooltip.starlight_logistics.stabilizer.mode": "模式",
   "tooltip.starlight_logistics.stabilizer.output": "输出",
   "tooltip.starlight_logistics.stabilizer.placement": "请放置在远离载具中心的位置，否则其不会起效",
+  "tooltip.starlight_logistics.stabilizer.pairing": "建议搭配配“轻”块一起食用，配“轻”块提供的阻尼会改善震荡问题",
   "tooltip.starlight_logistics.stabilizer.redstone_mode": "红石模式",
   "tooltip.starlight_logistics.stabilizer.redstone_mode.active_when_off": "无红石时开启",
   "tooltip.starlight_logistics.stabilizer.redstone_mode.active_when_on": "有红石时开启",
@@ -64,5 +65,10 @@
   "tooltip.starlight_logistics.pearl_stasis.mode.pulse": "红石上升沿触发",
   "tooltip.starlight_logistics.pearl_stasis.mode.continuous_on": "有红石时持续触发",
   "tooltip.starlight_logistics.pearl_stasis.mode.continuous_off": "无红石时持续触发",
-  "tooltip.starlight_logistics.pearl_stasis.teleport": "激活状态下，且内含绑定了玩家的激活珍珠时，消耗激活珍珠将该玩家传送至滞留台上方"
+  "tooltip.starlight_logistics.pearl_stasis.teleport": "激活状态下，且内含绑定了玩家的激活珍珠时，消耗激活珍珠将该玩家传送至滞留台上方",
+  "tooltip.starlight_logistics.world_anchor.send": "发送模式：将存入的包裹依据包裹地址送达对应的世界锚点",
+  "tooltip.starlight_logistics.world_anchor.send_stuck": "发送模式卡包裹：存在无地址/地址不正确包裹，或接收锚点堵塞导致未发送",
+  "tooltip.starlight_logistics.world_anchor.receive": "接收模式：接收对应地址的包裹。需使用告示牌/寻址牌等设置地址",
+  "tooltip.starlight_logistics.world_anchor.receive_stuck": "接收模式卡包裹：存在尚未导出的包裹",
+  "tooltip.starlight_logistics.world_anchor.address_conflict": "地址冲突：存在两个及以上相同地址的世界锚点"
 }

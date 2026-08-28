@@ -48,6 +48,8 @@ public class StabilizerBlock extends Block implements IBE<StabilizerBlockEntity>
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.translatable("tooltip.starlight_logistics.stabilizer.placement")
                 .withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.translatable("tooltip.starlight_logistics.stabilizer.pairing")
+                .withStyle(ChatFormatting.GRAY));
     }
 
     @Override
