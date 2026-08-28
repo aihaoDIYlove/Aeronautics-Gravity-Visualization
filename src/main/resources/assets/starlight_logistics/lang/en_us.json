@@ -70,5 +70,7 @@
   "tooltip.starlight_logistics.world_anchor.send_stuck": "Send mode, packages stuck: an unaddressed/mis-addressed package is present, or the receiving anchor is jammed",
   "tooltip.starlight_logistics.world_anchor.receive": "Receive mode: receives packages addressed to it. Set the address with a sign/addressing sign",
   "tooltip.starlight_logistics.world_anchor.receive_stuck": "Receive mode, packages stuck: a package has not been exported yet",
-  "tooltip.starlight_logistics.world_anchor.address_conflict": "Address conflict: two or more world anchors share the same address"
+  "tooltip.starlight_logistics.world_anchor.address_conflict": "Address conflict: two or more world anchors share the same address",
+  "tooltip.starlight_logistics.void_hose_pulley": "Travel to the End and submerge the pulley's lower end into the Void Sea",
+  "tooltip.starlight_logistics.no_end_sea": "No Void Sea detected"
 }

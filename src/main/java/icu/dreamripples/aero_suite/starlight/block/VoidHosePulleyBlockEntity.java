@@ -75,6 +75,12 @@ public class VoidHosePulleyBlockEntity extends HosePulleyBlockEntity {
         // drainer/filler 在虚空空转为 false, 手动补 infinite hint(复用 Create 的 hint.hose_pulley lang).
         if (isEndSeaActive()) {
             TooltipHelper.addHint(tooltip, "hint.hose_pulley");
+        } else if (getRequiredY() == Integer.MIN_VALUE) {
+            // 本维度无末地之海(如主世界): 不显示 Y 要求
+            CreateLang.builder()
+                    .add(Component.translatable("tooltip.starlight_logistics.no_end_sea")
+                            .withStyle(ChatFormatting.GRAY))
+                    .forGoggles(tooltip);
         } else {
             // 不 active: 提示抽取所需的最低 Y(末地之海渲染顶部 = startY - 2)
             CreateLang.builder()

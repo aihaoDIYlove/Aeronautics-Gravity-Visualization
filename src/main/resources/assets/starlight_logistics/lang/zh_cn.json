@@ -70,5 +70,7 @@
   "tooltip.starlight_logistics.world_anchor.send_stuck": "发送模式卡包裹：存在无地址/地址不正确包裹，或接收锚点堵塞导致未发送",
   "tooltip.starlight_logistics.world_anchor.receive": "接收模式：接收对应地址的包裹。需使用告示牌/寻址牌等设置地址",
   "tooltip.starlight_logistics.world_anchor.receive_stuck": "接收模式卡包裹：存在尚未导出的包裹",
-  "tooltip.starlight_logistics.world_anchor.address_conflict": "地址冲突：存在两个及以上相同地址的世界锚点"
+  "tooltip.starlight_logistics.world_anchor.address_conflict": "地址冲突：存在两个及以上相同地址的世界锚点",
+  "tooltip.starlight_logistics.void_hose_pulley": "前往末地，将软管滑轮下端浸入虚空之海",
+  "tooltip.starlight_logistics.no_end_sea": "未发现虚空之海"
 }
