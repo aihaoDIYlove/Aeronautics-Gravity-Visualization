@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "counterweight_light_pearl"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "gravity_visualization:counterweight"
+    },
+    {
+      "item": "create:brass_casing"
+    },
+    {
+      "item": "aeronautics:pearlescent_levitite"
+    },
+    {
+      "item": "aeronautics:pearlescent_levitite"
+    },
+    {
+      "item": "aeronautics:pearlescent_levitite"
+    },
+    {
+      "item": "aeronautics:pearlescent_levitite"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "gravity_visualization:counterweight_light_pearl"
+  }
+}

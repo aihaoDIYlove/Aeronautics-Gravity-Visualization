@@ -5,21 +5,16 @@
       "key": "counterweight_light_pearl_redstone"
     }
   ],
-  "type": "minecraft:crafting_shaped",
+  "type": "minecraft:crafting_shapeless",
   "category": "misc",
-  "pattern": [
-    "RRR",
-    "RCR",
-    "RRR"
-  ],
-  "key": {
-    "R": {
+  "ingredients": [
+    {
       "item": "minecraft:redstone"
     },
-    "C": {
+    {
       "item": "gravity_visualization:counterweight_light_pearl"
     }
-  },
+  ],
   "result": {
     "count": 1,
     "id": "gravity_visualization:counterweight_light_pearl_redstone"
