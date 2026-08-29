@@ -64,7 +64,7 @@
   "aero_suite.feature.analog_transmission": "Convenient Analog Transmission",
   "aero_suite.feature.analog_transmission.desc": "Analogue transmission mapping redstone 0-15 to fixed RPM.",
   "aero_suite.feature.variable_speed_engine": "Variable Speed Portable Engine",
-  "aero_suite.feature.variable_speed_engine.desc": "Scroll-adjustable speed (32-256, 15 steps); covers all 16 dyed variants.",
+  "aero_suite.feature.variable_speed_engine.desc": "A portable engine with 15 adjustable speed steps",
   "aero_suite.feature.sequential_feeder": "Sequential Feeder",
   "aero_suite.feature.sequential_feeder.desc": "Programmable feed tape: 9 ghost slots + 9 inventory slots, redstone-pulsed; includes intermediate deletion.",
   "aero_suite.feature.single_slot_hopper": "Cardboard Hopper",

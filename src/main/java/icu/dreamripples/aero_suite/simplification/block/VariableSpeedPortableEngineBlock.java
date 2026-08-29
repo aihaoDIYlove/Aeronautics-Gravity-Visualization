@@ -5,7 +5,9 @@ import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineBlock;
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineBlockEntity;
 import dev.simulated_team.simulated.service.SimItemService;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
@@ -13,11 +15,15 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.List;
 
 /**
  * 变速式便携引擎方块 - 继承 Simulated 便携引擎,16 色变种(同原版 DyedBlockList 配色)。
@@ -28,6 +34,13 @@ public class VariableSpeedPortableEngineBlock extends PortableEngineBlock {
 
     public VariableSpeedPortableEngineBlock(Properties properties, DyeColor color) {
         super(properties, color);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
+                                TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.translatable("tooltip.simplification_related.variable_speed_portable_engine")
+                .withStyle(ChatFormatting.GRAY));
     }
 
     @Override

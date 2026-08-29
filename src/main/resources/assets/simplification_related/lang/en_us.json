@@ -36,6 +36,7 @@
   "tooltip.simplification_related.current_output_speed": "Current Output Speed",
   "tooltip.simplification_related.single_slot_hopper": "Only 1 item can pass at a time. Best served with a Sequential Feeder",
   "tooltip.simplification_related.filtered_single_slot_hopper": "Only one item can pass at a time, with filtering support; compatible with Create's various filters",
+  "tooltip.simplification_related.variable_speed_portable_engine": "A portable engine with 15 adjustable speed steps",
   "tooltip.simplification_related.superheated_stress_boost": "Superheated: Stress x2",
   "tooltip.simplification_related.sequential_feeder.mode": "Control Mode",
   "tooltip.simplification_related.sequential_feeder.mode.ignore_redstone": "Ignore Redstone",

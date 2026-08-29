@@ -66,7 +66,7 @@
   "aero_suite.feature.analog_transmission": "更方便的模拟传动器",
   "aero_suite.feature.analog_transmission.desc": "红石 0-15 查表输出固定转速的传动器。",
   "aero_suite.feature.variable_speed_engine": "变速式便携引擎",
-  "aero_suite.feature.variable_speed_engine.desc": "弹板调转速(32-256,15 档),含全部 16 色染色变种。",
+  "aero_suite.feature.variable_speed_engine.desc": "15档位，可调节转速的便携引擎",
   "aero_suite.feature.sequential_feeder": "顺序供料器",
   "aero_suite.feature.sequential_feeder.desc": "可编程投料磁带:9 标记槽 + 9 物品槽,红石脉冲控制;含半成品删除。",
   "aero_suite.feature.single_slot_hopper": "纸板漏斗",
