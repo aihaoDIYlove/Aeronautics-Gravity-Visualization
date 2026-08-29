@@ -4,8 +4,8 @@ import net.createmod.catnip.config.ConfigBase;
 import net.createmod.catnip.config.ConfigBase.ConfigBool;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Aeronautics Suite 的 COMMON 配置树(挂在 gravity_visualization 名下, 三个 mod 共享一份)。
@@ -21,8 +21,8 @@ import java.util.Map;
  */
 public class AeroSuiteConfig extends ConfigBase {
 
-    /** key -> ConfigBool(全部开关, 含三组)。 */
-    public final Map<String, ConfigBool> byKey = new HashMap<>();
+    /** key -> ConfigBool(全部开关, 含三组)。ConcurrentHashMap: 配置屏(客户端线程)写 / 服务端读 */
+    public final Map<String, ConfigBool> byKey = new ConcurrentHashMap<>();
 
     public AeroSuiteConfig() {
         Map<AeroSuiteFeatures.Group, FeatureGroup> groups = new EnumMap<>(AeroSuiteFeatures.Group.class);

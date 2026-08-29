@@ -48,6 +48,10 @@ public class AddressingSignClipboardHandler {
 
     private static final String KEY = "AddressingSignAddresses";
 
+    /** 左键粘贴冷却:LeftClickBlock 按住期间每 tick 触发,无冷却会写放大 + 音效刷屏 */
+    private static final long PASTE_COOLDOWN_MS = 500;
+    private static final java.util.Map<java.util.UUID, Long> lastPasteAt = new java.util.HashMap<>();
+
     /**
      * AllBlocks.CLIPBOARD 是 Registrate BlockEntry,不在 compile classpath
      * (同 ClipboardScreenMixin 注释),故按物品 id 判断。
@@ -102,6 +106,12 @@ public class AddressingSignClipboardHandler {
 
         event.setCanceled(true);
         if (level.isClientSide) return;
+
+        // 冷却内忽略重复触发(按住左键每 tick 重发),粘贴幂等但重建 components + 写方块 + 音效代价不小
+        long now = System.currentTimeMillis();
+        Long last = lastPasteAt.get(player.getUUID());
+        if (last != null && now - last < PASTE_COOLDOWN_MS) return;
+        lastPasteAt.put(player.getUUID(), now);
 
         String joined = copied.getString(KEY);
         if (joined.isBlank()) {

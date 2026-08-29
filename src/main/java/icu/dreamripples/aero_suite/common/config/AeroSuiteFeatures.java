@@ -27,7 +27,8 @@ import icu.dreamripples.aero_suite.common.registry.ModItems;
  *       唯一例外 recipe_levitite -- 中间体 incomplete_levitite 是本 mod 物品, 绑进其删除集。</li>
  * </ul>
  *
- * <p>lang 键: {@code feature.gravity_visualization.<key>} / {@code .desc}。
+     * <p>lang 键: {@code aero_suite.feature.<key>} / {@code aero_suite.feature.<key>.desc}
+     * (代码见 AeroSuiteConfigScreen)。
  */
 public final class AeroSuiteFeatures {
 

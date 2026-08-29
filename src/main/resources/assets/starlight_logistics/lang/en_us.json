@@ -16,6 +16,8 @@
   "block.starlight_logistics.stabilizer": "Stabilizer",
   "block.starlight_logistics.stabilizer.deadband": "Deadband",
   "block.starlight_logistics.starlight_casing": "Starlight Casing",
+  "block.starlight_logistics.starlight": "Starlight Fluid",
+  "block.starlight_logistics.starlight_encased_fluid_pipe": "Starlight Encased Fluid Pipe",
   "block.starlight_logistics.ultralight_glass": "Ultralight Glass",
   "block.starlight_logistics.void_hose_pulley": "Void Hose Pulley",
   "block.starlight_logistics.world_anchor": "World Anchor",

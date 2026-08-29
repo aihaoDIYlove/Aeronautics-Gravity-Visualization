@@ -56,6 +56,11 @@ public class VariableSpeedPortableEngineBlockEntity extends PortableEngineBlockE
     @Override
     public void tick() {
         super.tick();
+        // 旧档/异常存档遗留 ScrollValue=0 读回后引擎点燃却不转且弹板显示 0,兜底回第一档
+        if (speedSetting != null && speedSetting.value == 0) {
+            speedSetting.value = 1;
+            updateGeneratedRotation();
+        }
         if (wasSuperHeated && !isSuperHeated())
             updateGeneratedRotation();
         wasSuperHeated = isSuperHeated();

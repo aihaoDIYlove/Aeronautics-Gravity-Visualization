@@ -1,6 +1,7 @@
 package icu.dreamripples.aero_suite.simplification.block;
 
 import com.simibubi.create.foundation.gui.menu.MenuBase;
+import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -60,7 +61,13 @@ public class SequentialFeederMenu extends MenuBase<SequentialFeederBlockEntity> 
             be.readClient(nbt, extraData.registryAccess());
             return be;
         }
-        return null;
+        // BE 反查失败(其他 mod 远程 openMenu 等边缘场景):返回 null 会让 MenuBase.addSlots
+        // 解引用 contentHolder 直接 NPE 炸客户端,构造离线 BE 兜底(不进世界,仅供菜单显示)
+        SequentialFeederBlockEntity fallback = new SequentialFeederBlockEntity(
+                ModBlocks.SEQUENTIAL_FEEDER_BE.get(), pos,
+                ModBlocks.SEQUENTIAL_FEEDER_BLOCK.get().defaultBlockState());
+        fallback.readClient(nbt, extraData.registryAccess());
+        return fallback;
     }
 
     @Override

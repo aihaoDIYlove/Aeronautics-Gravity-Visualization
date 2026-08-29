@@ -63,8 +63,14 @@ public class StarlightLogistics {
         // AllBlocks.FLUID_PIPE 返回 Registrate 的 BlockEntry, 而 Registrate 是 Create 的 jarjar(不在 compile
         // classpath), 无法访问其类型 -> 改从 registry 按 id 取 FluidPipeBlock 并 cast, 再传入 addVariant.
         event.enqueueWork(() -> {
-            FluidPipeBlock pipe = (FluidPipeBlock) BuiltInRegistries.BLOCK.get(
+            // 防御性 instanceof:Create 缺失/id 变更时 registry.get 返回 AIR,直接强转会
+            // ClassCastException 启动即崩
+            var pipeBlock = BuiltInRegistries.BLOCK.get(
                     ResourceLocation.fromNamespaceAndPath("create", "fluid_pipe"));
+            if (!(pipeBlock instanceof FluidPipeBlock pipe)) {
+                AeroSuite.LOGGER.warn("create:fluid_pipe not found or not a FluidPipeBlock, skip encased variant registration");
+                return;
+            }
             EncasingRegistry.addVariant(pipe, ModBlocks.STARLIGHT_ENCASED_FLUID_PIPE_BLOCK.get());
         });
     }

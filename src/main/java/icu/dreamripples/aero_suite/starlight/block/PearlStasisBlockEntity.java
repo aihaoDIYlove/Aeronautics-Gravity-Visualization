@@ -163,6 +163,9 @@ public class PearlStasisBlockEntity extends SmartBlockEntity {
         if (!held.isEmpty()) {
             tag.put("HeldItem", held.save(registries));
         }
+        // PULSE 模式上升沿判定依赖 wasPowered,不持久化的话重载后红石持续供电会被
+        // 误判为上升沿,珍珠在槽内即双重传送
+        tag.putBoolean("PrevPowered", wasPowered);
     }
 
     @Override
@@ -173,6 +176,7 @@ public class PearlStasisBlockEntity extends SmartBlockEntity {
             Optional<ItemStack> parsed = ItemStack.parse(registries, tag.getCompound("HeldItem"));
             held = parsed.orElse(ItemStack.EMPTY);
         }
+        wasPowered = tag.getBoolean("PrevPowered");
     }
 
     // ── capability: 漏斗/机械手双向 1 格 ──────────────────────
@@ -185,7 +189,9 @@ public class PearlStasisBlockEntity extends SmartBlockEntity {
 
         @Override
         public @NotNull ItemStack getStackInSlot(int slot) {
-            return held;
+            // 返回 copy:直接暴露内部 held 会让外部(漏斗/脚本)绕过 setHeld 的 notifyUpdate
+            // 就地 mutate,客户端不同步
+            return held.copy();
         }
 
         @Override

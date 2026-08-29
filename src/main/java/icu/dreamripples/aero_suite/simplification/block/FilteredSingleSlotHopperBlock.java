@@ -155,10 +155,9 @@ public class FilteredSingleSlotHopperBlock extends HopperBlock implements IWrenc
         if (oldFilter.getItem() instanceof FilterItem && !player.isCreative())
             player.getInventory().placeItemBackInInventory(oldFilter.copy());
 
-        // 设新过滤(空手 = 清除)
-        ItemStack toApply = held.isEmpty() ? ItemStack.EMPTY : held.copy();
-        if (toApply.getItem() instanceof FilterItem)
-            toApply.setCount(1);
+        // 设新过滤(空手 = 清除)。幽灵标记统一 count=1:count 无语义但会随 saveOptional
+        // 存盘/渲染,保留原堆数(如 64)只会造成视觉与存档噪音
+        ItemStack toApply = held.isEmpty() ? ItemStack.EMPTY : held.copyWithCount(1);
         be.setFilter(toApply);
 
         // Create 过滤卡放入消耗 1 个; 普通物品标记不消耗(幽灵)

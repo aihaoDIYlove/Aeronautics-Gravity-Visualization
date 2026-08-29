@@ -41,9 +41,16 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
         super(type, pos, state);
     }
 
+    /** getTargetSpeed 的同 tick 缓存标记(getBestNeighborSignal 每调用扫 6 面,传播热路径上每条边调 2 次) */
+    private long signalCachedAtGameTime = Long.MIN_VALUE;
+    private int cachedSignal;
+
     /** 查表返回当前信号对应的固定 RPM（绝对值）。 */
     public float getTargetSpeed() {
         Level level = getLevel();
+        // 同一 game tick 内复用 tick() 已采样的信号;跨 tick 未刷新时回退实时采样
+        if (level != null && level.getGameTime() == signalCachedAtGameTime)
+            return RPM_TABLE[cachedSignal];
         int signal = (level != null) ? level.getBestNeighborSignal(getBlockPos()) : 0;
         signal = Math.max(0, Math.min(15, signal));
         return RPM_TABLE[signal];
@@ -78,6 +85,9 @@ public class ConvenientAnalogTransmissionBlockEntity extends AnalogTransmissionB
         if (getLevel() == null) return;
 
         final int bestNeighborSignal = getLevel().getBestNeighborSignal(getBlockPos());
+        // 采样一次供本 tick 内 getTargetSpeed 复用(见字段注释)
+        this.cachedSignal = bestNeighborSignal;
+        this.signalCachedAtGameTime = getLevel().getGameTime();
 
         if (!getLevel().isClientSide) {
             // 复用父类持久化的 signal 字段检测变化（signal 从 NBT 恢复，重进后与 bestNeighborSignal 一致，

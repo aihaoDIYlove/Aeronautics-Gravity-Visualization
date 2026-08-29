@@ -6,6 +6,7 @@ import dev.ryanhcode.sable.physics.floating_block.FloatingBlockMaterial;
 import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
@@ -109,8 +110,18 @@ private static final float MARKER_SCALE_FAR = 0.24f;       // 远端字号;FAR/N
     }
 
     private static int tickCounter = 0;
+    /** clientTick 时记录的 ClientLevel 引用:切换维度/退出世界时立即清空 ACTIVE,
+     * 不让 Visualization(持 ClientSubLevel + 整组 LevelChunk)跨维度滞留到 6 分钟超时 */
+    private static ClientLevel activeWorld;
 
     public static void clientTick() {
+        // 维度切换/断线重连守卫:world 引用变化即清空,防大结构 chunk 引用泄漏
+        ClientLevel current = Minecraft.getInstance().level;
+        if (current != activeWorld) {
+            activeWorld = current;
+            ACTIVE.clear();
+            return;
+        }
         ACTIVE.entrySet().removeIf(e -> e.getValue().expiresAt < System.currentTimeMillis());
         // 每 RESCAN_INTERVAL_TICKS 重扫一次,让遮罩反映最新的方块摧毁/放置。
         // showCluster 每帧从 viz.typeGroups 重建 cluster mesh,就地改 Set 下一帧自动生效,无刷新闪烁。

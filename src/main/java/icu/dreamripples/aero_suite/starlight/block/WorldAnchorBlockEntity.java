@@ -199,6 +199,11 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
         String first = null;
         int count = 0;
         for (Direction side : Iterate.directions) {
+            BlockPos neighborPos = worldPosition.relative(side);
+            // 邻接区块未加载时跳过整个更新:getBlockEntity 会返回 null,与"没贴告示牌"无法区分,
+            // 若照常更新会把已注册地址清空并 deregister(接收端间歇消失)。只强加载自身区块,
+            // 告示牌贴在邻接区块时本守卫保住旧地址,区块加载回来后 lazyTick 自然恢复
+            if (level == null || !level.isLoaded(neighborPos)) return;
             String address = getSign(side);
             if (address == null || address.isBlank()) continue;
             if (first == null) first = address;

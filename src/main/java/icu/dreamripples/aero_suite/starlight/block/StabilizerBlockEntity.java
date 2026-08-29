@@ -460,8 +460,18 @@ public class StabilizerBlockEntity extends SmartBlockEntity
 
         // 独立 netId:ValueSettingsPacket 用 behaviourIndex(=behaviour.netId()) 路由 setValueSettings,
         // 默认 netId=0 与 deadbandBehaviour 冲突 -> 调整红石模式时 packet 路由到死区(死区变 1、红石没变)。
+        // 动态取本 behaviour 在 BE behaviour 列表中的索引,替代硬编码 1:两端 addBehaviours 顺序
+        // 一致故索引恒匹配,今后再插入其他 behaviour 也不会静默错路由
         @Override
         public int netId() {
+            if (blockEntity != null) {
+                var behaviours = blockEntity.getAllBehaviours();
+                int i = 0;
+                for (BlockEntityBehaviour behaviour : behaviours) {
+                    if (behaviour == this) return i;
+                    i++;
+                }
+            }
             return 1;
         }
 
