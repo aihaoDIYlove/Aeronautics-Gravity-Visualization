@@ -85,6 +85,15 @@ public final class ModItems {
     public static final Supplier<Item> ZINC_LUMP =
             STARLIGHT_ITEMS.register("zinc_lump", () -> new Item(new Item.Properties().stacksTo(64)));
 
+    // 虚空之触锻造模板: 任意镐子 + 本模板 + 回响碎片在锻造台升级(见 VoidTouchSmithingRecipe),
+    // 镐子原样保留仅注入 VOID_TOUCH 组件. 可用 7 钻石 + 回响碎片复制(见配方 JSON).
+    public static final Supplier<Item> VOID_TOUCH_SMITHING_TEMPLATE =
+            STARLIGHT_ITEMS.register("void_touch_smithing_template", () -> new Item(new Item.Properties().stacksTo(1)));
+
+    // 空间碎片: 采集末地传送门(+1)/末地折跃门(+4)获得, 世界锚点序列装配的造价材料.
+    public static final Supplier<Item> SPACE_SHARD =
+            STARLIGHT_ITEMS.register("space_shard", () -> new Item(new Item.Properties().stacksTo(64)));
+
     // 被激活的末影珍珠: 玩家主手 ender_pearl + 副手 echo_shard 右键合成(见 ActivatedEnderPearlHandler),
     // 携带玩家 UUID(见 ModDataComponents.ACTIVATED_PEARL_OWNER). 装入 Create Package 待物流派送,
     // 包裹作为实体存在 3 秒后自动破裂 -> 生成一颗末影珍珠实体 -> 落地传送玩家到落点(跨维度由 vanilla

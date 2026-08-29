@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "void_touch"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "minecraft:diamond"
+    },
+    "S": {
+      "item": "starlight_logistics:void_touch_smithing_template"
+    },
+    "X": {
+      "item": "minecraft:echo_shard"
+    }
+  },
+  "pattern": [
+    "#S#",
+    "#X#",
+    "###"
+  ],
+  "result": {
+    "count": 2,
+    "id": "starlight_logistics:void_touch_smithing_template"
+  }
+}

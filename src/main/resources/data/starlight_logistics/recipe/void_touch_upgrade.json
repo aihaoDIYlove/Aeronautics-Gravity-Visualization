@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "gravity_visualization:feature_enabled",
+      "key": "void_touch"
+    }
+  ],
+  "type": "starlight_logistics:void_touch",
+  "template": {
+    "item": "starlight_logistics:void_touch_smithing_template"
+  },
+  "base": {
+    "tag": "minecraft:pickaxes"
+  },
+  "addition": {
+    "item": "minecraft:echo_shard"
+  },
+  "result": {
+    "count": 1,
+    "id": "minecraft:diamond_pickaxe"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "starlight_logistics:item/void_touch_smithing_template"
+  }
+}

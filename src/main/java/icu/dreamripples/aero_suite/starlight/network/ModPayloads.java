@@ -27,6 +27,16 @@ public class ModPayloads {
                 AddressingSignScrollPayload.STREAM_CODEC,
                 ModPayloads::handleScroll
         );
+        event.registrar("1").playToServer(
+                VoidTouchLimitPayload.TYPE,
+                VoidTouchLimitPayload.STREAM_CODEC,
+                ModPayloads::handleVoidTouchLimit
+        );
+        event.registrar("1").playToClient(
+                VoidTouchHighlightPayload.TYPE,
+                VoidTouchHighlightPayload.STREAM_CODEC,
+                ModPayloads::handleVoidTouchHighlight
+        );
     }
 
     private static void handle(ObserveMachinePayload payload, IPayloadContext context) {
@@ -44,6 +54,19 @@ public class ModPayloads {
             if (level.getBlockEntity(payload.pos()) instanceof AddressingSignBlockEntity be) {
                 be.setSelected(be.clampSelected(payload.newSelected()));
             }
+        }
+    }
+
+    // 虚空之触连锁高亮(S2C): 仅客户端执行, lambda 在客户端 dist 才会触碰 client-only 类
+    private static void handleVoidTouchHighlight(VoidTouchHighlightPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> icu.dreamripples.aero_suite.starlight.client.VoidTouchHighlightClient
+                .apply(payload.positions()));
+    }
+
+    // 虚空之触 Shift+滚轮调挡位(C2S): 服务端验证后更新挡位(内含 clamp), 预览态则刷新高亮
+    private static void handleVoidTouchLimit(VoidTouchLimitPayload payload, IPayloadContext context) {
+        if (context.player() instanceof ServerPlayer sp) {
+            icu.dreamripples.aero_suite.starlight.event.VoidTouchHandler.onAdjustLimit(sp, payload.delta());
         }
     }
 }

@@ -30,7 +30,7 @@ public final class AeroSuiteCreativeBannerLayout {
     public record Section(ResourceLocation id, Component title, ResourceLocation texture, int bannerRow) {}
 
     /** 每段物品数,顺序 = ModCreativeTabs.displayItems 的分组顺序。 */
-    private static final int[] SECTION_ITEM_COUNTS = {9, 6, 9};
+    private static final int[] SECTION_ITEM_COUNTS = {9, 6, 11};
 
     public static final List<Section> SECTIONS = build();
 

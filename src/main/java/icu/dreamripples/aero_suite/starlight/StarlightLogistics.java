@@ -51,6 +51,7 @@ public class StarlightLogistics {
         ModFluids.FLUID_TYPES.register(modEventBus);
         ModFluids.FLUIDS.register(modEventBus);
         ModParticles.STARLIGHT_PARTICLES.register(modEventBus);
+        icu.dreamripples.aero_suite.starlight.recipe.ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
         ModPayloads.register(modEventBus);
         modEventBus.addListener(StarlightLogistics::onCommonSetup);
         AeroSuite.LOGGER.info("Aeronautics: Starlight Logistics loaded!");

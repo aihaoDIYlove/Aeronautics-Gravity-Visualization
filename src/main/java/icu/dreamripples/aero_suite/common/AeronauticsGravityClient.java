@@ -41,6 +41,7 @@ import dev.simulated_team.simulated.content.blocks.analog_transmission.AnalogTra
 import dev.simulated_team.simulated.content.blocks.portable_engine.PortableEngineRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.client.event.InputEvent;
@@ -226,6 +227,18 @@ public class AeronauticsGravityClient {
         MassVisualizer.clientTick();
         // 过滤漏斗侧面标记白框(准星命中时画)
         FilteredHopperOutline.clientTick();
+        // 虚空之触连锁高亮(服务端下发集合, Outliner 簇轮廓)
+        icu.dreamripples.aero_suite.starlight.client.VoidTouchHighlightClient.clientTick();
+    }
+
+    // 虚空之触词条: 含 VOID_TOUCH 组件的镐子在名称下方追加墨绿"虚空之触"
+    @SubscribeEvent
+    public static void onItemTooltip(net.neoforged.neoforge.event.entity.player.ItemTooltipEvent event) {
+        var stack = event.getItemStack();
+        if (stack.has(icu.dreamripples.aero_suite.starlight.component.ModDataComponents.VOID_TOUCH.get())) {
+            event.getToolTip().add(1, Component.translatable("aero_suite.void_touch")
+                    .withStyle(net.minecraft.ChatFormatting.DARK_GREEN));
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -245,7 +258,19 @@ public class AeronauticsGravityClient {
         if (mc.player == null || !mc.player.isShiftKeyDown()) return;
         if (!(mc.hitResult instanceof BlockHitResult hit) || hit.getType() != BlockHitResult.Type.BLOCK) return;
         BlockPos pos = hit.getBlockPos();
-        if (mc.level == null || !(mc.level.getBlockState(pos).getBlock() instanceof AddressingSignBlock)) return;
+        if (mc.level == null) return;
+
+        // 虚空之触 shift+滚轮调挡位: 主手带词条的镐子优先(寻址牌判定在前, 互斥目标)
+        if (mc.player.getMainHandItem().has(icu.dreamripples.aero_suite.starlight.component.ModDataComponents.VOID_TOUCH.get())
+                && icu.dreamripples.aero_suite.common.config.FeatureGates.isEnabled("void_touch")
+                && !(mc.level.getBlockState(pos).getBlock() instanceof AddressingSignBlock)) {
+            mc.getConnection().send(new icu.dreamripples.aero_suite.starlight.network.VoidTouchLimitPayload(
+                    event.getScrollDeltaY() > 0 ? 1 : -1)); // 上滑增挡, 下滑减挡
+            event.setCanceled(true);
+            return;
+        }
+
+        if (!(mc.level.getBlockState(pos).getBlock() instanceof AddressingSignBlock)) return;
         if (!(mc.level.getBlockEntity(pos) instanceof AddressingSignBlockEntity be)) return;
 
         int size = be.getAddresses().size();

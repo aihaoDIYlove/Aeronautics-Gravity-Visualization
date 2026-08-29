@@ -15,15 +15,13 @@
   },
   "sequence": [
     {
-      "type": "create:filling",
+      "type": "create:deploying",
       "ingredients": [
         {
           "item": "starlight_logistics:incomplete_world_anchor"
         },
         {
-          "type": "neoforge:single",
-          "amount": 1000,
-          "fluid": "starlight_logistics:starlight"
+          "item": "starlight_logistics:space_shard"
         }
       ],
       "results": [

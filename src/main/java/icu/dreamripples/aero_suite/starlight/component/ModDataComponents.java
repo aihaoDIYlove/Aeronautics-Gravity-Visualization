@@ -1,8 +1,11 @@
 package icu.dreamripples.aero_suite.starlight.component;
 
+import com.mojang.serialization.Codec;
 import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Unit;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
@@ -32,5 +35,17 @@ public class ModDataComponents {
                     () -> DataComponentType.<PearlOwner>builder()
                             .persistent(PearlOwner.CODEC)
                             .networkSynchronized(PearlOwner.STREAM_CODEC)
+                            .build());
+
+    /**
+     * 虚空之触: 无载荷标记组件. 任意镐子 + 虚空之触锻造模板 + 回响碎片在锻造台升级后注入
+     * (见 {@code VoidTouchSmithingRecipe}), 镐子本体/附魔/组件原样保留.
+     * 行为(连锁采集/末地门采集)见 {@code VoidTouchHandler}, tooltip 由客户端 ItemTooltipEvent 渲染.
+     */
+    public static final Supplier<DataComponentType<Unit>> VOID_TOUCH =
+            DATA_COMPONENTS.register("void_touch",
+                    () -> DataComponentType.<Unit>builder()
+                            .persistent(Codec.unit(Unit.INSTANCE))
+                            .networkSynchronized(StreamCodec.unit(Unit.INSTANCE))
                             .build());
 }

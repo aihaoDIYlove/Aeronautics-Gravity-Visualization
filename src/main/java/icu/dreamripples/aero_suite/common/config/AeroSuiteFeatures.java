@@ -110,6 +110,10 @@ public final class AeroSuiteFeatures {
                     List.of(ModBlocks.PEARL_STASIS_ITEM), ModBlocks.PEARL_STASIS_ITEM),
             new Feature("activated_pearl", Group.STARLIGHT, true,
                     List.of(ModItems.ACTIVATED_ENDER_PEARL), ModItems.ACTIVATED_ENDER_PEARL),
+            // 虚空之触: 锻造模板+空间碎片两个物品一并门控; 升级配方/模板复制配方 JSON 同挂此 key
+            new Feature("void_touch", Group.STARLIGHT, true,
+                    List.of(ModItems.VOID_TOUCH_SMITHING_TEMPLATE, ModItems.SPACE_SHARD),
+                    ModItems.VOID_TOUCH_SMITHING_TEMPLATE),
             new Feature("lightweight_glass", Group.STARLIGHT, true,
                     List.of(ModBlocks.LIGHTWEIGHT_GLASS_ITEM), ModBlocks.LIGHTWEIGHT_GLASS_ITEM),
             new Feature("ultralight_glass", Group.STARLIGHT, true,
