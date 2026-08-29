@@ -127,6 +127,7 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
     public void tick() {
         super.tick();
         if (level == null || level.isClientSide) return;
+        ensureForceLoaded();
 
         AnchorMode mode = getMode();
         if (mode == AnchorMode.SEND) {
@@ -226,9 +227,20 @@ public class WorldAnchorBlockEntity extends PackagePortBlockEntity implements IH
         return null;
     }
 
+    // 强加载是否已应用(onLoad 反序列化路径上 setChunkForced 有死锁先例,延迟到 tick 首拍)
+    private boolean forceLoadApplied;
+
     @Override
     public void onLoad() {
         super.onLoad();
+        // 只打标记,实际的强加载延迟到 tick() 首拍执行(onLoad 期间本区块 load future 未完成,
+        // 同步 setChunkForced 会触发 ChunkMap 强加载更新,存在死锁/IllegalStateException 先例)
+        forceLoadApplied = false;
+    }
+
+    private void ensureForceLoaded() {
+        if (forceLoadApplied) return;
+        forceLoadApplied = true;
         if (level instanceof ServerLevel sl && !level.isClientSide) {
             if (isInsideSubLevel(sl)) {
                 // 载具上: 用 Sable forceLoadTicket 保活载具(不踩 setChunkForced 的 processUnloads 卡死坑)

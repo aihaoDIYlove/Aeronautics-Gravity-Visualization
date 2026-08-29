@@ -178,6 +178,11 @@ public class SequentialFeederBlockEntity extends SmartBlockEntity implements Men
             advanceToNextMarked();
             if (!hasAnyMarker() || stepState == StepState.TAKEN)
                 stepState = StepState.WAITING;
+        } else if (!markers.getStackInSlot(changedSlot).isEmpty() && !isMarked(currentStep)) {
+            // 悬空指针校正:读档遗留的悬空 currentStep(read 只在已有标记时校正)在首个标记
+            // 被设置时归位到该槽,否则 ARMED 后 extract 因 slot != currentStep 永远取不到
+            currentStep = changedSlot;
+            setChanged();
         }
         if (!level.isClientSide)
             notifyUpdate();

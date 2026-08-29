@@ -123,6 +123,17 @@ public class RotationPropagatorMixin {
             }
         }
 
+        // 双源守卫:主 BE 已被本连接之外的外部输入驱动(source 存在且不指向 neighbor)时不再注入
+        // 查表转速,放行原值让 vanilla 的 overpower 规则以诚实数值仲裁 -- 否则注入值与另一输入
+        // 反复交叉 overpower 会累积 flicker score,逼近 MAX_FLICKER_SCORE 触发 destroyBlock。
+        // 例外:source 指向内部 extraWheel(齿轮面驱动路径,规则 1 已换算为查表转速),此时
+        // 传动杆面仍需注入,否则 vanilla 原值会把查表转换覆写掉。
+        if (ourBE.hasSource() && !ourBE.isDrivenBy(neighbor)) {
+            KineticBlockEntity extra = ourBE.getExtraKinetics();
+            boolean internalSource = extra != null && ourBE.source.equals(extra.getBlockPos());
+            if (!internalSource) return;
+        }
+
         // 规则 4：注入查表 RPM，符号取自原版返回值（含齿轮箱反转修饰符）
         injectTableSpeed(ourBE, original, cir);
     }

@@ -130,8 +130,12 @@ public class SparkWandItem extends Item {
                 }
                 // 别碰我的机器!:附魔苦力怕克星秒杀苦力怕(creeper_buster 对苦力怕 +100 伤害,满血 20 必杀,
                 // 故"持有该附魔 + 击杀苦力怕"即等价秒杀)。
+                // holderOrThrow 在附魔 JSON 缺失(被数据包覆盖/移除)时抛异常崩服,改为判空查询
+                Holder<Enchantment> buster = target.level().registryAccess()
+                        .registryOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT)
+                        .getHolder(ModEnchantments.CREEPER_BUSTER).orElse(null);
                 if (target.getType() == EntityType.CREEPER
-                        && stack.getEnchantmentLevel(target.level().holderOrThrow(ModEnchantments.CREEPER_BUSTER)) > 0) {
+                        && buster != null && stack.getEnchantmentLevel(buster) > 0) {
                     ModTriggers.CREEPER_BUSTER_KILL.get().trigger(serverPlayer);
                 }
             }

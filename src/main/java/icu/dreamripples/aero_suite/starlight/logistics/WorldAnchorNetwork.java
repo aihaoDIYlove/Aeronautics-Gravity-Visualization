@@ -90,7 +90,11 @@ public class WorldAnchorNetwork {
         if (level == null || !level.isLoaded(target.pos())) return SendResult.TARGET_UNLOADED;
         IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, target.pos(), null);
         if (handler == null) return SendResult.TARGET_FULL;
-        ItemStack remaining = ItemHandlerHelper.insertItem(handler, box, false);
-        return remaining.isEmpty() ? SendResult.SUCCESS : SendResult.TARGET_FULL;
+        // 先 simulate 试满额:直接插入在包裹堆叠 >1 时可能出现"部分插入"——远端已收部分物品而
+        // 发送端仍保留整箱(复制 bug)。当前 Create 包裹 maxStack=1 不可触发,防御性兜底。
+        ItemStack simulated = ItemHandlerHelper.insertItem(handler, box.copy(), true);
+        if (!simulated.isEmpty()) return SendResult.TARGET_FULL;
+        ItemHandlerHelper.insertItem(handler, box, false);
+        return SendResult.SUCCESS;
     }
 }
