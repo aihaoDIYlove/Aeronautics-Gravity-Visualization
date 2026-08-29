@@ -9,7 +9,7 @@
   "ingredient": {
     "item": "create:andesite_casing"
   },
-  "loops": 2,
+  "loops": 1,
   "transitional_item": {
     "id": "gravity_visualization:incomplete_counterweight"
   },
