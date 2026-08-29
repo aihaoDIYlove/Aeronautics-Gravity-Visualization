@@ -53,7 +53,15 @@
           "item": "starlight_logistics:incomplete_stabilizer"
         },
         {
-          "item": "gravity_visualization:counterweight_light_redstone"
+          "type": "neoforge:compound",
+          "ingredients": [
+            {
+              "item": "gravity_visualization:counterweight_light_redstone"
+            },
+            {
+              "item": "gravity_visualization:counterweight_light_pearl_redstone"
+            }
+          ]
         }
       ],
       "results": [
