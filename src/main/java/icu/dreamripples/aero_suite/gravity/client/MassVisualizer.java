@@ -227,7 +227,7 @@ private static final float MARKER_SCALE_FAR = 0.24f;       // 远端字号;FAR/N
 
                             totalM += mass;
 
-                            // 浮力:同 BlockState 同值(来自 floating_material override),首次遇到算一次。
+                            // 浮力:同 BlockState 同值(来自 floating_scale override),首次遇到算一次。
                             // 标称浮力 = liftStrength * floatingScale。getFloatingMaterial/getFloatingScale 只读
                             // state 属性,不涉及 isSolid,所以不依赖 bg(与 getMass 不同)。
                             double lift;
