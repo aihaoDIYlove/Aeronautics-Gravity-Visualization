@@ -181,7 +181,7 @@ public final class ExtendoGrabServer {
         if (dist > player.blockInteractionRange()) return;
         double distance = Math.max(MIN_GRAB_DISTANCE, dist);
 
-        Session session = new Session(player.getUUID(), level, serverSubLevel, anchorLocal, distance);
+        Session session = new Session(player.getUUID(), level, serverSubLevel, anchorLocal);
         SESSIONS.put(player.getUUID(), session);
         sendSync(player, true, distance);
     }
@@ -266,7 +266,6 @@ public final class ExtendoGrabServer {
         private final Vector3d playerRelativeGoal = new Vector3d(); // 客户端每 tick 上传
         private final Vector3d localGoal = new Vector3d();          // 每 tick 复用暂存
         private final Quaterniond orientation = new Quaterniond();  // 约束姿态系(= 创建时载具姿态, Tab 旋转时客户端改写)
-        private final double distance;                              // 拉伸距离(创建时定, 回执给客户端)
         private final double maxForce;
         private long lastCostTick;
         private long lastPacketTick;
@@ -274,13 +273,12 @@ public final class ExtendoGrabServer {
         private PhysicsConstraintHandle constraint;
 
         private Session(UUID playerUuid, ServerLevel level, ServerSubLevel subLevel,
-                        org.joml.Vector3dc anchorLocal, double distance) {
+                        org.joml.Vector3dc anchorLocal) {
             this.playerUuid = playerUuid;
             this.level = level;
             this.subLevel = subLevel;
             this.plotAnchor.set(anchorLocal);
             this.orientation.set(subLevel.logicalPose().orientation());
-            this.distance = distance;
             this.maxForce = Mth.clamp(subLevel.getMassTracker().getMass() * MAX_FORCE_PER_MASS,
                     MIN_MAX_FORCE, MAX_MAX_FORCE);
             // 首个拖拽包到达前不算断流
