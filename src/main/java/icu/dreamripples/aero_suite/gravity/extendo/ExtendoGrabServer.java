@@ -16,6 +16,7 @@ import dev.ryanhcode.sable.sublevel.system.SubLevelPhysicsSystem;
 import dev.simulated_team.simulated.content.blocks.rope.rope_connector.RopeConnectorBlock;
 import icu.dreamripples.aero_suite.common.AeroSuiteIds;
 import icu.dreamripples.aero_suite.common.config.FeatureGates;
+import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
 import icu.dreamripples.aero_suite.starlight.network.ExtendoGrabActionPayload;
 import icu.dreamripples.aero_suite.starlight.network.ExtendoGrabDragPayload;
 import icu.dreamripples.aero_suite.starlight.network.ExtendoGrabSyncPayload;
@@ -182,6 +183,11 @@ public final class ExtendoGrabServer {
         Session session = new Session(player.getUUID(), level, serverSubLevel, anchorLocal);
         SESSIONS.put(player.getUUID(), session);
         sendSync(player, true, distance);
+        // 成就: 首次提起 / 提起 100 kpg 以上重物(mass 单位即 MassVisualizer 显示的 kpg)
+        ModTriggers.EXTENDO_GRAB_FIRST_LIFT.get().trigger(player);
+        if (serverSubLevel.getMassTracker().getMass() > 100.0) {
+            ModTriggers.EXTENDO_GRAB_HEAVY_LIFT.get().trigger(player);
+        }
     }
 
     /**

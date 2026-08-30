@@ -1,0 +1,25 @@
+{
+  "display": {
+    "icon": {
+      "id": "create:industrial_iron_block"
+    },
+    "title": {
+      "translate": "advancements.gravity_visualization.extendo_grab_heavy_lift.title"
+    },
+    "description": {
+      "translate": "advancements.gravity_visualization.extendo_grab_heavy_lift.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "parent": "gravity_visualization:root",
+  "criteria": {
+    "heavy_lift": {
+      "trigger": "gravity_visualization:extendo_grab_heavy_lift",
+      "conditions": {}
+    }
+  },
+  "sends_telemetry_event": false
+}

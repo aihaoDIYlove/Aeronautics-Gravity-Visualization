@@ -37,4 +37,12 @@ public class ModTriggers {
     // 触发点在 PackageEntityMixin 破裂分支(player != null), 语义已确保, matches 恒真.
     public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> PEARL_PACKAGE_TELEPORT =
             TRIGGERS.register("pearl_package_teleport", SparkWandKillTrigger::new);
+
+    // 机械手载具抓取成就(Feature 17): 抓取会话确认 = "提起"(触发点 ExtendoGrabServer.tryStart
+    // 末尾), 语义已确保, matches 恒真; 重型成就在触发点按质量 > 100 kpg 分流。
+    public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> EXTENDO_GRAB_FIRST_LIFT =
+            TRIGGERS.register("extendo_grab_first_lift", SparkWandKillTrigger::new);
+
+    public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> EXTENDO_GRAB_HEAVY_LIFT =
+            TRIGGERS.register("extendo_grab_heavy_lift", SparkWandKillTrigger::new);
 }

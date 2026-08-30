@@ -1,0 +1,25 @@
+{
+  "display": {
+    "icon": {
+      "id": "create:extendo_grip"
+    },
+    "title": {
+      "translate": "advancements.gravity_visualization.extendo_grab_first_lift.title"
+    },
+    "description": {
+      "translate": "advancements.gravity_visualization.extendo_grab_first_lift.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "parent": "gravity_visualization:root",
+  "criteria": {
+    "first_lift": {
+      "trigger": "gravity_visualization:extendo_grab_first_lift",
+      "conditions": {}
+    }
+  },
+  "sends_telemetry_event": false
+}
