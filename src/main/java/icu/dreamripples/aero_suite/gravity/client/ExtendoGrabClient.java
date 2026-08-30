@@ -40,9 +40,10 @@ import org.joml.Vector3dc;
  * 发 {@link ExtendoGrabDragPayload}; sync(false)/回执超时/本地任一释放条件 -> 复位。
  * 服务端为权威(校验绳索连接器/触及距离/消耗/切物品/死亡等), 客户端镜像校验只为省包。
  *
- * <p>姿态与距离: active 后按住 Simulated 创造手杖的姿态键({@code SimKeys.ROTATE_MODE}, 默认 Tab,
- * 不自建 KeyMapping -- 直接复用其键位, 在控制设置里随创造手杖一并改键)移动鼠标, 鼠标位移经
- * {@link #onMouseMove} 改写目标姿态并取消 vanilla 视角转动(mixin 注入, 仿 Simulated
+ * <p>姿态与距离: 拖拽中载具姿态与玩家视角**水平锁定**(yaw 跟随, 俯仰不随 -- "手持"语义, 与创造
+ * 手杖的世界固定姿态不同), 按住 Simulated 创造手杖的姿态键({@code SimKeys.ROTATE_MODE}, 默认 Tab,
+ * 不自建 KeyMapping -- 直接复用其键位, 在控制设置里随创造手杖一并改键)移动鼠标可叠加调整姿态,
+ * 鼠标位移经 {@link #onMouseMove} 改写目标姿态并取消 vanilla 视角转动(mixin 注入, 仿 Simulated
  * 创造手杖同款数学)。按住 Tab 期间 vanilla 玩家列表会同显(创造手杖亦有此视觉副作用)。
  * 滚轮调拉伸远近(吞滚轮防切快捷栏, 创造手杖同款灵敏度曲线), 机械手伸出动画随载具实际距离伸缩
  * ({@link #keepGripExtended})。
@@ -66,7 +67,8 @@ public final class ExtendoGrabClient {
     /** 乐观置位的抓取会话; 仅 active=true 时才算真正拖拽(服务端已确认)。 */
     private static SubLevel sessionSubLevel;
     private static Vector3dc sessionAnchor;   // sublevel 本地锚点(命中方块中心)
-    private static final Quaterniond sessionOrientation = new Quaterniond();
+    private static final Quaterniond sessionOrientation = new Quaterniond();  // 约束姿态系(= 创建时载具姿态, Tab 旋转时客户端改写)
+    private static float lastFollowYaw;   // 上一 tick 玩家 yaw(视角跟随: yaw 变化量反向锁进载具姿态)
     private static double sessionDistance;    // 服务端回执的权威拉伸距离
     private static boolean active;
     private static int awaitingAck;
@@ -111,6 +113,7 @@ public final class ExtendoGrabClient {
         sessionSubLevel = subLevel;
         sessionAnchor = JOMLConversion.atCenterOf(hit.getBlockPos());
         sessionOrientation.set(subLevel.logicalPose().orientation());
+        lastFollowYaw = player.getYRot();
         sessionDistance = 0;
         active = false;
         awaitingAck = ACK_TIMEOUT_TICKS;
@@ -147,6 +150,16 @@ public final class ExtendoGrabClient {
             // 由服务端统一刹车 + 回执 sync(false); 客户端若补发"停止"包反而会把刹车路径变成保留动量
             clear();
             return;
+        }
+
+        // 视角跟随("手持"语义, 与创造手杖的差异点): 玩家转向时把载具世界姿态前乘反向 yaw 旋转,
+        // 锁定载具与玩家视角的相对水平角度(不跟俯仰 -- 像端着托盘, 低头东西不翻; Tab 旋转叠加其上)。
+        // 玩家视角转 Δyaw 等价世界系 R_y(-Δyaw), 载具同乘即保持相对角; yaw 过 ±180 界时 Δ≈±360°
+        // 自动等于恒等旋转, 无需特判。
+        float yaw = player.getYRot();
+        if (yaw != lastFollowYaw) {
+            sessionOrientation.premul(new Quaterniond().rotationY(-Math.toRadians(yaw - lastFollowYaw)));
+            lastFollowYaw = yaw;
         }
 
         // 目标点 = 视线方向 × 拉伸距离(玩家相对偏移; 服务端加回插值眼位) -- 创造手杖同款
