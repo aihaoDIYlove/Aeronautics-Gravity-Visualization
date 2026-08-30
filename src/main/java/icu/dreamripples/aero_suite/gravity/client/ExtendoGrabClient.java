@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -39,17 +40,23 @@ import org.joml.Vector3dc;
  * 发 {@link ExtendoGrabDragPayload}; sync(false)/回执超时/本地任一释放条件 -> 复位。
  * 服务端为权威(校验绳索连接器/触及距离/消耗/切物品/死亡等), 客户端镜像校验只为省包。
  *
- * <p>姿态控制: active 后按住 Simulated 创造手杖的姿态键({@code SimKeys.ROTATE_MODE}, 默认 Tab,
+ * <p>姿态与距离: active 后按住 Simulated 创造手杖的姿态键({@code SimKeys.ROTATE_MODE}, 默认 Tab,
  * 不自建 KeyMapping -- 直接复用其键位, 在控制设置里随创造手杖一并改键)移动鼠标, 鼠标位移经
  * {@link #onMouseMove} 改写目标姿态并取消 vanilla 视角转动(mixin 注入, 仿 Simulated
  * 创造手杖同款数学)。按住 Tab 期间 vanilla 玩家列表会同显(创造手杖亦有此视觉副作用)。
+ * 滚轮调拉伸远近(吞滚轮防切快捷栏, 创造手杖同款灵敏度曲线), 机械手伸出动画随载具实际距离伸缩
+ * ({@link #keepGripExtended})。
  */
 public final class ExtendoGrabClient {
 
     private static final double ROTATE_SENSITIVITY = 0.35;   // Simulated 创造手杖默认灵敏度
+    /** 滚轮调距灵敏度 */
+    private static final double SCROLL_SENSITIVITY = 0.5;
     private static final int ACK_TIMEOUT_TICKS = 40;         // 开始请求无回执的复位时限
     /** 与服务端 ExtendoGrabServer.DISTANCE_BUFFER 一致的客户端镜像释放阈值 */
     private static final double DISTANCE_BUFFER = 2.0;
+    /** 与服务端 ExtendoGrabServer.MIN_GRAB_DISTANCE 一致的拉伸距离下限 */
+    private static final double MIN_GRAB_DISTANCE = 2.0;
 
     static {
         // 服务端 S2C 回执 -> 客户端会话状态(payload 注册处只读此字段, 不引用客户端类, 专用服安全)
@@ -165,17 +172,42 @@ public final class ExtendoGrabClient {
     }
 
     /**
-     * 拖拽确认期间钉住 Create 伸缩机械手的伸出动画(攻击时置 0.95、每 tick 衰减 ×0.95)。
+     * 滚轮调距(创造手杖同款): 拖拽确认后滚轮增减拉伸距离并吞掉滚轮(不切快捷栏)。
+     * 灵敏度随当前距离缩放(clamp(√(dist/10), 1, 5), 近距微调远距粗调), 按住疾跑 ×4;
+     * 距离限 [触及下限 2, 触及距离+缓冲](超出会被服务端脱手)。纯客户端状态: 服务端每 tick
+     * 只消费客户端上传的目标点, 无需同步包。
+     */
+    public static boolean onMouseScroll(double deltaY) {
+        if (!active || sessionSubLevel == null) return false;
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        if (player == null) return false;
+        double sensMultiplier = Mth.clamp(Math.sqrt(sessionDistance / 10.0), 1.0, 5.0)
+                * (mc.options.keySprint.isDown() ? 4.0 : 1.0);
+        sessionDistance = Mth.clamp(sessionDistance + deltaY * SCROLL_SENSITIVITY * sensMultiplier,
+                MIN_GRAB_DISTANCE, player.blockInteractionRange() + DISTANCE_BUFFER);
+        return true;
+    }
+
+    /**
+     * 拖拽确认期间驱动 Create 伸缩机械手的伸出动画(攻击时置 0.95、每 tick 衰减 ×0.95)。
      * 须经 ClientTickEvent.Post 的 LOWEST 优先级调用(AeronauticsGravityClient.onClientTickLast),
      * 保证覆写发生在 Create 的 NORMAL 衰减之后, 否则渲染会看到逐 tick 呼吸。
-     * 停止拖拽后不再覆写, 动画按 Create 原生衰减自然收回。
+     * 伸出程度随载具实际距离映射: [2, 触及+缓冲] -> 视觉伸缩 [0.25, 1.0]。注意 Create 渲染器
+     * (ExtendoGripItemRenderer/RenderHandler)把动画值<b>立方</b>后才是视觉伸缩, 所以映射在视觉域
+     * 做完再开立方回动画域——直接给动画域下限会立方归零(0.2^3≈0.008 ≈ 全缩, 实测踩坑)。
+     * 滚轮调距/载具飞远时动画随之伸缩; 停止拖拽后不再覆写, 动画按 Create 原生衰减自然收回。
      */
     public static void keepGripExtended() {
         if (!active || sessionSubLevel == null) return;
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || !ExtendoGrabServer.isHoldingGrip(mc.player)) return;
-        ExtendoGripRenderHandler.mainHandAnimation = 0.95f;
-        ExtendoGripRenderHandler.lastMainHandAnimation = 0.95f;
+        LocalPlayer player = mc.player;
+        if (player == null || !ExtendoGrabServer.isHoldingGrip(player)) return;
+        double maxDist = player.blockInteractionRange() + DISTANCE_BUFFER;
+        double t = Mth.clamp((anchorWorldDistance(player) - MIN_GRAB_DISTANCE) / (maxDist - MIN_GRAB_DISTANCE), 0.0, 1.0);
+        float anim = (float) Math.cbrt(0.05 + 0.95 * t);
+        ExtendoGripRenderHandler.mainHandAnimation = anim;
+        ExtendoGripRenderHandler.lastMainHandAnimation = anim;
     }
 
     /** 服务端回执(S2C, 经 ExtendoGrabSyncPayload.clientListener 分发, 客户端主线程)。 */
@@ -208,12 +240,17 @@ public final class ExtendoGrabClient {
         return false;
     }
 
-    private static boolean distanceExceeded(LocalPlayer player) {
+    /** 锚点当前世界坐标到玩家眼位的实际距离(镜像释放与伸出动画共用)。 */
+    private static double anchorWorldDistance(LocalPlayer player) {
         org.joml.Vector3d anchorWorld = sessionSubLevel.logicalPose().transformPosition(
                 new org.joml.Vector3d(sessionAnchor));
-        double reach = player.blockInteractionRange() + DISTANCE_BUFFER;
         Vec3 eye = player.getEyePosition();
-        return eye.distanceToSqr(anchorWorld.x, anchorWorld.y, anchorWorld.z) > reach * reach;
+        return Math.sqrt(eye.distanceToSqr(anchorWorld.x, anchorWorld.y, anchorWorld.z));
+    }
+
+    private static boolean distanceExceeded(LocalPlayer player) {
+        double reach = player.blockInteractionRange() + DISTANCE_BUFFER;
+        return anchorWorldDistance(player) > reach;
     }
 
     private static void stop() {

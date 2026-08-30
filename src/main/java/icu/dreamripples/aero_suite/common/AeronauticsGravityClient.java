@@ -264,8 +264,13 @@ public class AeronauticsGravityClient {
 
     // 寻址牌 shift+滚轮切换选中地址:上滚=上一个(deltaY>0 -> -1),下滚=下一个,停末页不回绕。
     // cancel 事件防止 vanilla 潜行滚轮切物品栏。
+    // 机械手载具抓取优先: 拖拽确认后滚轮 = 调拉伸远近(吞掉滚轮, 防切快捷栏), 创造手杖同款。
     @SubscribeEvent
     public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
+        if (ExtendoGrabClient.onMouseScroll(event.getScrollDeltaY())) {
+            event.setCanceled(true);
+            return;
+        }
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || !mc.player.isShiftKeyDown()) return;
         if (!(mc.hitResult instanceof BlockHitResult hit) || hit.getType() != BlockHitResult.Type.BLOCK) return;
