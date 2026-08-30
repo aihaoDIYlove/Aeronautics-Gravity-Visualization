@@ -1,7 +1,6 @@
 package icu.dreamripples.aero_suite.gravity.extendo;
 
 import com.simibubi.create.content.equipment.armor.BacktankUtil;
-import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.physics.PhysicsPipeline;
 import dev.ryanhcode.sable.api.physics.constraint.ConstraintJointAxis;
 import dev.ryanhcode.sable.api.physics.constraint.FreeConstraintConfiguration;
@@ -169,9 +168,8 @@ public final class ExtendoGrabServer {
         if (plot == null || plot.getSubLevel() != serverSubLevel) return;
         // 锚点方块必须是绳索连接器
         if (!(level.getBlockState(anchorPos).getBlock() instanceof RopeConnectorBlock)) return;
-        // 禁止抓取玩家所在的载具(chunk 列 plot 归属判定): 站在载具上抓它 = 目标点随人车一起移动的
-        // 反馈回路, 等于沿视线无限飞行(用户判定超模)
-        if (Sable.HELPER.getContaining(player) == serverSubLevel) return;
+        // 禁止抓取玩家所站的载具(骑乘飞行漏洞: 站上去抓自己 = 目标点随人车反馈回路 = 沿视线无限飞行)
+        if (isStandingOn(player, serverSubLevel)) return;
 
         Vector3d anchorLocal = JOMLConversion.atCenterOf(anchorPos);
         Vector3d anchorWorld = serverSubLevel.logicalPose().transformPosition(new Vector3d(anchorLocal));
@@ -184,6 +182,20 @@ public final class ExtendoGrabServer {
         Session session = new Session(player.getUUID(), level, serverSubLevel, anchorLocal);
         SESSIONS.put(player.getUUID(), session);
         sendSync(player, true, distance);
+    }
+
+    /**
+     * 玩家是否站在该载具上(骑乘飞行漏洞拦截)。
+     * 坐标链: 玩家父世界坐标 --transformPositionInverse--> 载具本地坐标; 本地坐标值即 plotyard
+     * 全局坐标, 可直接喂父 Level.getBlockState 读载具方块(与 tryStart 锚点校验同一条等价链;
+     * {@code Sable.HELPER.getContaining} 系列吃 plotyard 全局坐标, 拿玩家普通世界坐标去查
+     * 恒为 null, 不能用)。脚下 0.6 格内有非空气方块即视为踩在载具上(跳起掠过会被保守拦截)。
+     */
+    private static boolean isStandingOn(ServerPlayer player, ServerSubLevel subLevel) {
+        Vector3d local = subLevel.logicalPose().transformPositionInverse(
+                new Vector3d(player.getX(), player.getY(), player.getZ()));
+        return !player.serverLevel().getBlockState(
+                BlockPos.containing(local.x, local.y - 0.6, local.z)).isAir();
     }
 
     /**
@@ -223,7 +235,7 @@ public final class ExtendoGrabServer {
                     || !FeatureGates.isEnabled(GATE_KEY)
                     || !isHoldingGrip(player)                         // 切物品/副手/耐久耗尽碎裂
                     || session.subLevel.isRemoved()                   // 载具被拆
-                    || Sable.HELPER.getContaining(player) == session.subLevel   // 中途跳上载具(防骑乘飞行回路)
+                    || isStandingOn(player, session.subLevel)         // 中途跳上载具(防骑乘飞行回路)
                     || player.getFoodData().getFoodLevel() <= 0       // 饥饿耗尽
                     || now - session.lastPacketTick > PACKET_TIMEOUT_TICKS;   // 客户端断流
 

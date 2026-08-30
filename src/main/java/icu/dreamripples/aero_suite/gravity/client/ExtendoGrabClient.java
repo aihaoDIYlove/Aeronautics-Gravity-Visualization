@@ -12,14 +12,17 @@ import icu.dreamripples.aero_suite.gravity.extendo.ExtendoGrabServer;
 import icu.dreamripples.aero_suite.starlight.network.ExtendoGrabActionPayload;
 import icu.dreamripples.aero_suite.starlight.network.ExtendoGrabDragPayload;
 import icu.dreamripples.aero_suite.starlight.network.ExtendoGrabSyncPayload;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -106,8 +109,15 @@ public final class ExtendoGrabClient {
         // 仅绳索连接器接管(客户端预校验, 服务端仍权威复核): 其余载具方块的交互完全不受影响,
         // 也避免误点后乐观置位造成短窗吞右键
         if (!isRopeConnectorAt(subLevel, hit.getBlockPos())) return false;
-        // 镜像服务端"禁抓所站载具"(站上去抓自己 = 骑乘飞行回路), 服务端仍权威复核
-        if (Sable.HELPER.getContainingClient(player.position()) == subLevel) return false;
+        // 镜像服务端"禁抓所站载具"(站上去抓自己 = 骑乘飞行回路), 服务端仍权威复核;
+        // 拒绝时弹 actionbar 提示(点按是离散事件, 无刷屏问题)
+        if (subLevel instanceof ClientSubLevel cs && isStandingOn(player, cs)) {
+            player.displayClientMessage(
+                    Component.translatable("aero_suite.extendo_grab.self_grab_denied")
+                            .withStyle(ChatFormatting.GOLD),
+                    true);
+            return false;
+        }
 
         // 乐观置位 + 发起请求; 绳索连接器/触及距离由服务端权威校验, 回执确认后才进入拖拽
         sessionSubLevel = subLevel;
@@ -237,20 +247,37 @@ public final class ExtendoGrabClient {
     }
 
     /**
-     * 客户端查子关方块: 子关 chunk 不注册进父 Level chunk map({@code cs.getBlockState} 读不到,
-     * 见 MassVisualizer gotcha), 按 plot 已加载 chunk 直接查(MassVisualizer.SubLevelBlockGetter 同款单点版)。
+     * 载具本地(plotyard)坐标读方块: 客户端 plot chunk 不注册进父世界 chunk map
+     * (MassVisualizer gotcha), 按已加载 chunk 逐个查; 未加载返回 null(按"不在载具上"处理, 与
+     * 服务端未加载=空气的 fail-open 行为一致)。
      */
-    private static boolean isRopeConnectorAt(SubLevel subLevel, BlockPos pos) {
-        if (!(subLevel instanceof ClientSubLevel cs)) return false;
+    private static BlockState subLevelBlockState(ClientSubLevel cs, BlockPos pos) {
         ChunkPos chunkPos = new ChunkPos(pos);
         for (var holder : cs.getPlot().getLoadedChunks()) {
             LevelChunk chunk = holder.getChunk();
-            if (chunk == null) continue;
-            if (chunk.getPos().equals(chunkPos)) {
-                return chunk.getBlockState(pos).getBlock() instanceof RopeConnectorBlock;
+            if (chunk != null && chunk.getPos().equals(chunkPos)) {
+                return chunk.getBlockState(pos);
             }
         }
-        return false;
+        return null;
+    }
+
+    /** 命中方块是否为绳索连接器(客户端预校验, 服务端仍权威复核)。 */
+    private static boolean isRopeConnectorAt(SubLevel subLevel, BlockPos pos) {
+        if (!(subLevel instanceof ClientSubLevel cs)) return false;
+        BlockState state = subLevelBlockState(cs, pos);
+        return state != null && state.getBlock() instanceof RopeConnectorBlock;
+    }
+
+    /**
+     * 玩家是否站在该载具上(骑乘飞行漏洞拦截, 镜像服务端 isStandingOn):
+     * 玩家父世界坐标逆变换到载具本地系, 脚下 0.6 格内有非空气方块即视为踩在载具上。
+     */
+    private static boolean isStandingOn(LocalPlayer player, ClientSubLevel cs) {
+        org.joml.Vector3d local = cs.logicalPose().transformPositionInverse(
+                new org.joml.Vector3d(player.getX(), player.getY(), player.getZ()));
+        BlockState below = subLevelBlockState(cs, BlockPos.containing(local.x, local.y - 0.6, local.z));
+        return below != null && !below.isAir();
     }
 
     /** 锚点当前世界坐标到玩家眼位的实际距离(镜像释放与伸出动画共用)。 */
