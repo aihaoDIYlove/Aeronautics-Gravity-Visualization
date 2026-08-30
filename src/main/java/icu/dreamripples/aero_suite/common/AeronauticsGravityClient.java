@@ -2,6 +2,7 @@ package icu.dreamripples.aero_suite.common;
 
 import com.simibubi.create.CreateClient;
 import icu.dreamripples.aero_suite.gravity.GravityVisualization;
+import icu.dreamripples.aero_suite.gravity.client.ExtendoGrabClient;
 import icu.dreamripples.aero_suite.starlight.StarlightLogistics;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
@@ -226,6 +227,30 @@ public class AeronauticsGravityClient {
         MassVisualizer.clientTick();
         // 过滤漏斗侧面标记白框(准星命中时画)
         FilteredHopperOutline.clientTick();
+        // 机械手载具抓取: 拖拽确认后每 tick 发目标点/姿态, 并镜像释放校验
+        ExtendoGrabClient.clientTick();
+    }
+
+    // 机械手载具抓取: 拖拽期间钉住 Create 伸缩机械手的伸出动画。必须 LOWEST -- Create 的
+    // ExtendoGripRenderHandler 在 ClientTickEvent.Post(默认 NORMAL)里每 tick 衰减动画值,
+    // 只有排在它之后覆写才能让渲染全程看到恒定值, 否则逐 tick 呼吸(0.95 -> 0.90 循环)。
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onClientTickLast(ClientTickEvent.Post event) {
+        ExtendoGrabClient.keepGripExtended();
+    }
+
+    // 机械手载具抓取: use 键按压点按切换(拖拽中右键 = 停止并吞掉; 未拖拽时对载具方块乐观发起
+    // 开始请求不吞交互 -- vanilla 对绳索连接器本无操作, 其他载具方块交互照常)。
+    // use 输入对主/副手各发一次事件, onUsePress 内部分流处理。
+    @SubscribeEvent
+    public static void onInteractKey(InputEvent.InteractionKeyMappingTriggered event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.player.isSpectator()) return;
+        if (event.getKeyMapping() != mc.options.keyUse) return;
+        if (ExtendoGrabClient.onUsePress(event.getHand())) {
+            event.setCanceled(true);
+            event.setSwingHand(false);
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

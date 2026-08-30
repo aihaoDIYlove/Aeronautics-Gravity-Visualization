@@ -134,5 +134,7 @@
   "aero_suite.feature.pearl_stasis.desc": "Single-slot pedestal (always 1 item, right-click access); redstone pulse teleports the bound player of an activated pearl.",
   "jei.starlight_logistics.info.activated_ender_pearl": "How to obtain:\nHold an Ender Pearl in your main hand and an Echo Shard in your off hand, then right-click.\n\nThe pearl binds to you.\nShip it in a Create Package; after existing for 3 seconds the package automatically ruptures and teleports you to the landing point (cross-dimensional).",
   "jei.starlight_logistics.info.starlight_bottle": "How to obtain:\nBring a Glass Bottle into the End Sea, look down at the void and right-click.\n\nThe first bottle must be filled by hand.\nUse it to craft the Void Hose Pulley, which draws Starlight endlessly from then on.",
-  "jei.starlight_logistics.pearl_activation.title": "Mysterious Conversion"
+  "jei.starlight_logistics.pearl_activation.title": "Mysterious Conversion",
+  "aero_suite.feature.extendo_grab": "Extendo Grip Vehicle Grab",
+  "aero_suite.feature.extendo_grab.desc": "Hold Create's Extendo Grip and right-click a Rope Connector on a physics vehicle to grab it; right-click again to release. While dragging, hold the physics staff rotate key (default Tab) and move the mouse to rotate the vehicle. Costs 10 grip durability per second (15 backtank air instead while wearing a Copper Backtank, roughly one full tank per minute) and 1 hunger point per second; the vehicle you are standing on cannot be grabbed. Releases automatically when hunger runs out, the grip is switched away, you die, or the vehicle leaves the grip's reach."
 }

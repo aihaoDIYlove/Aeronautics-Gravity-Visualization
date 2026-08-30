@@ -8,6 +8,7 @@ import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.common.registry.ModCreativeTabs;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
+import icu.dreamripples.aero_suite.gravity.extendo.ExtendoGrabServer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 
@@ -29,6 +30,8 @@ public class GravityVisualization {
         ModBlocks.GRAVITY_BLOCK_ENTITIES.register(modEventBus);
         ModTriggers.TRIGGERS.register(modEventBus);
         ModCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
+        // 机械手载具抓取: 注册 Sable 物理 tick 钩子(幂等; 服务端约束施力, 客户端回调不触发)
+        ExtendoGrabServer.init();
         AeroSuite.LOGGER.info("Aeronautics: Gravity Visualization loaded!");
     }
 
@@ -48,8 +51,12 @@ public class GravityVisualization {
 
     // 三个 mod 的配置按钮都指向同一份自绘配置屏(读 gravity_visualization 的 COMMON 配置, 本地化见 AeroSuiteConfigScreen)
     private static void registerConfigScreen(net.neoforged.fml.ModContainer container) {
-        container.registerExtensionPoint(
-                net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
-                (c, last) -> new icu.dreamripples.aero_suite.common.config.AeroSuiteConfigScreen(last));
+        // 注册必须走 client-only 的 ConfigScreenRegistrar: IConfigScreenFactory lambda 的实现方法
+        // 签名含 vanilla Screen, lambda 若编译进本公共入口类, DEDICATED_SERVER 上类校验即解析
+        // Screen -> dist-clean RuntimeException, 三 mod 全部构造失败。运行期 if 守卫救不了,
+        // 必须把 lambda 物理隔离到仅在客户端加载的类里。
+        if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) {
+            icu.dreamripples.aero_suite.common.client.ConfigScreenRegistrar.register(container);
+        }
     }
 }
