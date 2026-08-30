@@ -104,7 +104,7 @@ public class AeroSuiteConfigScreen extends Screen {
             return;
         FeatureGates.CONFIG.byKey.get(f.key()).set(value);
         FeatureGates.invalidate();
-        if (!f.deletesItems() && !reloadHintShown) {
+        if (isRecipeGate(f) && !reloadHintShown) {
             reloadHintShown = true;
             if (Minecraft.getInstance().player != null)
                 Minecraft.getInstance().player.displayClientMessage(
@@ -175,12 +175,19 @@ public class AeroSuiteConfigScreen extends Screen {
             List<Component> lines = new ArrayList<>();
             lines.add(Component.translatable("aero_suite.feature." + f.key()).withStyle(ChatFormatting.GOLD));
             lines.addAll(wrap(Component.translatable("aero_suite.feature." + f.key() + ".desc").getString(), 240));
-            lines.add(Component.translatable(f.deletesItems()
-                    ? "aero_suite.config.item_gate" : "aero_suite.config.recipe_gate")
+            lines.add(Component.translatable(
+                    f.deletesItems() ? "aero_suite.config.item_gate"
+                            : isRecipeGate(f) ? "aero_suite.config.recipe_gate"
+                            : "aero_suite.config.behavior_gate")
                     .withStyle(ChatFormatting.GRAY));
             lines.add(Component.literal(f.key()).withStyle(ChatFormatting.DARK_GRAY));
             graphics.renderComponentTooltip(this.font, lines, mouseX, mouseY);
         }
+    }
+
+    /** 纯配方开关: 不删物品且 key 以 recipe_ 开头(产物为 vanilla/其他 mod, 改动需 /reload)。 */
+    private static boolean isRecipeGate(AeroSuiteFeatures.Feature f) {
+        return !f.deletesItems() && f.key().startsWith("recipe_");
     }
 
     private void drawState(GuiGraphics graphics, int rowX, int rowW, int y, boolean on) {
