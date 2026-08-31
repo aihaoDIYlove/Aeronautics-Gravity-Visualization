@@ -179,8 +179,9 @@ public final class ExtendoGrabClient {
     }
 
     /**
-     * MouseHandler.turnPlayer 注入点: active 且按住姿态键时, 鼠标位移改写载具目标姿态并取消
-     * vanilla 视角转动。返回 true = 取消 vanilla 转动。
+     * Entity.turn 注入点(EntityTurnMixin, 加性注入避免与 Simulated 在 turnPlayer 调用点的
+     * @Inject 抢同一条指令): active 且按住姿态键时, 鼠标位移改写载具目标姿态并取消 vanilla
+     * 视角转动。返回 true = 取消 vanilla 转动。
      */
     public static boolean onMouseMove(double yaw, double pitch) {
         // isPressed() 内部判 keybind null, Simulated 客户端未初始化时安全返回 false
@@ -216,7 +217,7 @@ public final class ExtendoGrabClient {
      * 拖拽确认期间驱动 Create 伸缩机械手的伸出动画(攻击时置 0.95、每 tick 衰减 ×0.95)。
      * 须经 ClientTickEvent.Post 的 LOWEST 优先级调用(AeronauticsGravityClient.onClientTickLast),
      * 保证覆写发生在 Create 的 NORMAL 衰减之后, 否则渲染会看到逐 tick 呼吸。
-     * 伸出程度随载具实际距离映射: [2, 触及+缓冲] -> 视觉伸缩 [0.25, 1.0]。注意 Create 渲染器
+     * 伸出程度随载具实际距离映射: [2, 触及+缓冲] -> 视觉伸缩 [0.05, 1.0]。注意 Create 渲染器
      * (ExtendoGripItemRenderer/RenderHandler)把动画值<b>立方</b>后才是视觉伸缩, 所以映射在视觉域
      * 做完再开立方回动画域——直接给动画域下限会立方归零(0.2^3≈0.008 ≈ 全缩, 实测踩坑)。
      * 滚轮调距/载具飞远时动画随之伸缩; 停止拖拽后不再覆写, 动画按 Create 原生衰减自然收回。

@@ -38,7 +38,9 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaterniond;
+import org.joml.Quaterniondc;
 import org.joml.Vector3d;
+import org.joml.Vector3dc;
 
 import java.util.Iterator;
 import java.util.List;
@@ -70,7 +72,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>校验(服务端权威, 客户端不可信): 会话创建时校验 锚点方块属于该 sublevel 的 plot
  * (仿世界锚点 isInsideSubLevel) + 该方块是绳索连接器 + 眼位距离 ≤ 触及距离; 拖拽包校验
- * subLevel 一致。攻击/锁定模式刻意不做(用户决策: 超模)。
+ * subLevel 一致 + 目标点有限且限长(触及+缓冲) + 四元数有限并归一化, 且锚点字段一律忽略
+ * (以创建时校验值为准, 防挪锚点绕过触及校验)。攻击/锁定模式刻意不做(用户决策: 超模)。
  */
 @EventBusSubscriber(modid = AeroSuiteIds.GRAVITY_ID)
 public final class ExtendoGrabServer {
@@ -143,10 +146,32 @@ public final class ExtendoGrabServer {
         Session session = SESSIONS.get(player.getUUID());
         if (session == null || !isHoldingGrip(player)) return;
         if (!session.subLevel.getUniqueId().equals(payload.subLevel())) return;
+
+        // 客户端不可信, 逐包校验(合法客户端三种值恒在界内, 见 ExtendoGrabClient.clientTick/onMouseMove):
+        // 目标点必须有限且长度 ≤ 触及+缓冲(与服务端脱手阈值同界); 姿态四元数必须有限且非零(可归一化)。
+        // 非法包整体丢弃且不刷新 lastPacketTick -> 持续非法自然走断流超时脱手, 无法借此保活会话。
+        Vector3dc goal = payload.playerRelativeGoal();
+        Quaterniondc rawOrientation = payload.orientation();
+        if (!isFinite(goal) || !isFinite(rawOrientation)) return;
+        if (goal.length() > player.blockInteractionRange() + DISTANCE_BUFFER) return;
+        Quaterniond orientation = new Quaterniond(rawOrientation);
+        if (orientation.lengthSquared() < 1.0e-12) return;
+        orientation.normalize();
+
         session.lastPacketTick = session.level.getGameTime();
-        session.playerRelativeGoal.set(payload.playerRelativeGoal());
-        session.plotAnchor.set(payload.localAnchor());
-        session.orientation.set(payload.orientation());
+        session.playerRelativeGoal.set(goal);
+        // payload.localAnchor() 刻意忽略: 锚点以 tryStart 校验过的为准(合法客户端每次也原样回传),
+        // 防止客户端每包挪锚点绕过物理 tick 的触及距离校验/改变约束焊点(字段仅为协议对齐而保留)
+        session.orientation.set(orientation);
+    }
+
+    private static boolean isFinite(Vector3dc v) {
+        return Double.isFinite(v.x()) && Double.isFinite(v.y()) && Double.isFinite(v.z());
+    }
+
+    private static boolean isFinite(Quaterniondc q) {
+        return Double.isFinite(q.x()) && Double.isFinite(q.y())
+                && Double.isFinite(q.z()) && Double.isFinite(q.w());
     }
 
     /** 建立会话: 全部条件通过才创建, 任何失败静默忽略(客户端等不到回执自然复位)。 */
@@ -280,7 +305,7 @@ public final class ExtendoGrabServer {
         private final UUID playerUuid;
         private final ServerLevel level;
         private final ServerSubLevel subLevel;
-        private final Vector3d plotAnchor = new Vector3d();         // 抓取锚点(sublevel 本地, 块中心)
+        private final Vector3d plotAnchor = new Vector3d();         // 抓取锚点(sublevel 本地, 块中心; 创建时校验定死, 拖拽包不更新)
         private final Vector3d playerRelativeGoal = new Vector3d(); // 客户端每 tick 上传
         private final Vector3d localGoal = new Vector3d();          // 每 tick 复用暂存
         private final Quaterniond orientation = new Quaterniond();  // 约束姿态系(= 创建时载具姿态, Tab 旋转时客户端改写)

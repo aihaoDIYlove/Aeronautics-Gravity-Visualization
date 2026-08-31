@@ -14,7 +14,7 @@
     "client.CreativeModeInventoryScreenAccessor",
     "client.CreativeModeItemPickerMenuAccessor",
     "gravity.GoggleOverlayRendererMixin",
-    "gravity.MouseHandlerMixin",
+    "gravity.EntityTurnMixin",
     "starlight.ClipboardScreenMixin"
   ],
   "injectors": {

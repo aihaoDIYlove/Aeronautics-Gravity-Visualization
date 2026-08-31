@@ -17,8 +17,10 @@ import java.util.UUID;
  * <ul>
  *   <li>playerRelativeGoal = 视线方向 × 拉伸距离(玩家相对偏移; 服务端加回插值眼位得到世界目标点,
  *       规避客户端/服务端眼位时差)</li>
- *   <li>localAnchor = 抓取锚点(sublevel 本地坐标, 即命中方块中心; 透传保持与创造手杖一致)</li>
- *   <li>orientation = 目标姿态四元数(服务端把它作为约束坐标系, Tab 旋转时由客户端改写)</li>
+ *   <li>localAnchor = 抓取锚点(sublevel 本地坐标, 即命中方块中心; 透传保持与创造手杖一致。
+ *       服务端刻意忽略此字段 -- 锚点以建立会话时校验过的值为准, 透传仅为协议对齐)</li>
+ *   <li>orientation = 目标姿态四元数(服务端把它作为约束坐标系, Tab 旋转时由客户端改写;
+ *       服务端校验有限性并归一化)</li>
  * </ul>
  */
 public record ExtendoGrabDragPayload(UUID subLevel, Vector3dc playerRelativeGoal, Vector3dc localAnchor,
