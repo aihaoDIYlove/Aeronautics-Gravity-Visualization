@@ -15,6 +15,7 @@ import dev.ryanhcode.sable.sublevel.plot.LevelPlot;
 import dev.ryanhcode.sable.sublevel.system.SubLevelPhysicsSystem;
 import dev.simulated_team.simulated.content.blocks.rope.rope_connector.RopeConnectorBlock;
 import icu.dreamripples.aero_suite.common.AeroSuiteIds;
+import icu.dreamripples.aero_suite.common.config.AeroSuiteConfig;
 import icu.dreamripples.aero_suite.common.config.FeatureGates;
 import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
 import icu.dreamripples.aero_suite.starlight.network.ExtendoGrabActionPayload;
@@ -54,10 +55,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>玩法: 手持 {@code create:extendo_grip} 右键载具上的 {@code simulated:rope_connector}
  * 点按切换拖拽(与 Simulated 创造手杖同款: 约束马达拖拽, Tab+鼠标调姿态), 生存消耗:
  * <ul>
- *   <li>耐久 10/秒(200 耐久约撑 20 秒) -- 铜背罐可代付({@link BacktankUtil#canAbsorbDamage}, 与
- *       Create 伸缩手/土豆加农炮同机制): 每次调用扣 max(基础容量/usesPerTank, 1) 气, usesPerTank=60
- *       => 15 气/秒 => 整罐 900 气正好 1 分钟; 扩容附魔只加容量不降价。背罐无耐久, 资源是空气
- *       DataComponent</li>
+ *   <li>耐久 10/秒、背罐空气 15/秒(基础罐 900 点 = 整罐 1 分钟)、饥饿 1 点/秒 -- 三项均可在配置屏
+ *       "数值特性相关"页调整(即时生效); 铜背罐可代付耐久({@link BacktankUtil#canAbsorbDamage}, 与
+ *       Create 伸缩手/土豆加农炮同机制, 每秒一调扣配置的气/秒, 扩容附魔只加容量不降价)。
+ *       背罐无耐久, 资源是空气 DataComponent</li>
  *   <li>饥饿 1/秒({@code causeFoodExhaustion(4)}, vanilla 4 exhaustion = 1 点饥饿/饱和)</li>
  * </ul>
  * 自动释放: 再次右键 / 主手离开机械手(含耐久耗尽碎裂、切到副手) / 饥饿归零 / 死亡、离线、换维度 /
@@ -95,17 +96,14 @@ public final class ExtendoGrabServer {
     private static final double MIN_GRAB_DISTANCE = 2.0;
     private static final double DISTANCE_BUFFER = 2.0;
 
-    // 生存消耗(每秒)
+    // 生存消耗(每秒; 三项数值均可在配置屏"数值特性相关"页调整, 见下方 hungerPerSecond 等读取器)
     private static final int COST_INTERVAL_TICKS = 20;
     /** 拖拽包失联超时: 客户端每 tick 发包, 断流 2 秒(40 tick)视为客户端已放弃 */
     private static final int PACKET_TIMEOUT_TICKS = 40;
-    private static final int DURABILITY_PER_SECOND = 10;
-    /**
-     * canAbsorbDamage 的 usesPerTank: 每次调用扣 max(900 基础空气/usesPerTank, 1) 气(扩容附魔
-     * 只加容量不降价) => 60 => 15 气/秒(每消耗秒一调), 整罐 900 气 = 60 秒。
-     */
-    private static final int BACKTANK_USES_PER_TANK = 60;
-    private static final float EXHAUSTION_PER_SECOND = 4.0f; // vanilla: 4 exhaustion = 1 饥饿(先扣饱和)
+    /** vanilla: 4 exhaustion = 1 点饥饿(先扣饱和) */
+    private static final float EXHAUSTION_PER_HUNGER = 4.0f;
+    /** 背罐基础空气容量(Create 默认 900; 扩容附魔只加容量不降价, 按比例延长可拖拽时长) */
+    private static final int BASE_AIR = 900;
 
     private static final Map<UUID, Session> SESSIONS = new ConcurrentHashMap<>();
     private static volatile boolean sableHooked;
@@ -119,6 +117,26 @@ public final class ExtendoGrabServer {
         if (sableHooked) return;
         sableHooked = true;
         SableEventPlatform.INSTANCE.onPhysicsTick((physicsSystem, timeStep) -> physicsTickAll(physicsSystem));
+    }
+
+    // ── 数值特性(配置屏"数值特性相关"页可调; CONFIG 未加载时回退默认值, 与 AeroSuiteConfig.Tunables 默认一致) ──
+
+    /** 抓取时每秒消耗的饥饿值(点); 0 = 不消耗。 */
+    public static float hungerPerSecond() {
+        AeroSuiteConfig c = FeatureGates.CONFIG;
+        return c != null ? c.tunables.extendoGrabHunger.getF() : AeroSuiteConfig.Tunables.HUNGER_DEFAULT;
+    }
+
+    /** 抓取时每秒消耗的机械手耐久; 0 = 不消耗。 */
+    public static int durabilityPerSecond() {
+        AeroSuiteConfig c = FeatureGates.CONFIG;
+        return c != null ? c.tunables.extendoGrabDurability.get() : AeroSuiteConfig.Tunables.DURABILITY_DEFAULT;
+    }
+
+    /** 穿背罐时每秒代扣的背罐空气; usesPerTank = 基础容量/本值(canAbsorbDamage 每调用扣 基础容量/usesPerTank 气)。 */
+    public static int airPerSecond() {
+        AeroSuiteConfig c = FeatureGates.CONFIG;
+        return c != null ? c.tunables.extendoGrabAir.get() : AeroSuiteConfig.Tunables.AIR_DEFAULT;
     }
 
     /** create:extendo_grip 判定(客户端/服务端共用; 缓存注册表查找结果)。 */
@@ -273,11 +291,16 @@ public final class ExtendoGrabServer {
             if (!release) {
                 if (now - session.lastCostTick >= COST_INTERVAL_TICKS) {
                     session.lastCostTick = now;
-                    player.causeFoodExhaustion(EXHAUSTION_PER_SECOND);   // 创造免疫(invulnerable)
+                    float hunger = hungerPerSecond();
+                    if (hunger > 0)
+                        player.causeFoodExhaustion(hunger * EXHAUSTION_PER_HUNGER);   // 创造免疫(invulnerable)
                     // 背罐(含创造)代付 -> 不扣耐久; 否则扣机械手耐久(吃耐久附魔, 碎裂后下一 tick isHoldingGrip 释放)
-                    if (!BacktankUtil.canAbsorbDamage(player, BACKTANK_USES_PER_TANK)) {
-                        ItemStack grip = player.getMainHandItem();
-                        grip.hurtAndBreak(DURABILITY_PER_SECOND, player, EquipmentSlot.MAINHAND);
+                    if (!BacktankUtil.canAbsorbDamage(player, Math.max(BASE_AIR / airPerSecond(), 1))) {
+                        int durability = durabilityPerSecond();
+                        if (durability > 0) {
+                            ItemStack grip = player.getMainHandItem();
+                            grip.hurtAndBreak(durability, player, EquipmentSlot.MAINHAND);
+                        }
                     }
                 }
             }

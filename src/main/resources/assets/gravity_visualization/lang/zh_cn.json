@@ -142,5 +142,14 @@
   "advancements.gravity_visualization.extendo_grab_first_lift.title": "\"生存模式物理手杖\"",
   "advancements.gravity_visualization.extendo_grab_first_lift.description": "首次使用伸缩机械手提起物理化结构",
   "advancements.gravity_visualization.extendo_grab_heavy_lift.title": "劲大",
-  "advancements.gravity_visualization.extendo_grab_heavy_lift.description": "提起质量超过100kpg的物理化结构"
+  "advancements.gravity_visualization.extendo_grab_heavy_lift.description": "提起质量超过100kpg的物理化结构",
+  "aero_suite.config.category.items": "物品配方相关",
+  "aero_suite.config.category.tunables": "数值特性相关",
+  "aero_suite.config.edit_hint": "左键 + / 右键 -, 潜行点击 ×10 倍率",
+  "aero_suite.tunables.hunger": "机械手抓取:饥饿值消耗/秒",
+  "aero_suite.tunables.hunger.tooltip": "抓取时每秒消耗的饥饿值(点)。0 = 不消耗。",
+  "aero_suite.tunables.durability": "机械手抓取:耐久消耗/秒",
+  "aero_suite.tunables.durability.tooltip": "抓取时每秒消耗的伸缩机械手耐久(穿戴铜背罐时改扣背罐空气)。0 = 不消耗。",
+  "aero_suite.tunables.air": "机械手抓取:背罐空气消耗/秒",
+  "aero_suite.tunables.air.tooltip": "穿戴铜背罐时每秒代扣的背罐空气。基础罐 900 点,默认 15/秒 = 整罐 1 分钟;扩容附魔按比例延长。"
 }

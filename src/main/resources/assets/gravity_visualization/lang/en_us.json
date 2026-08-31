@@ -142,5 +142,14 @@
   "advancements.gravity_visualization.extendo_grab_first_lift.title": "\"Survival-Mode Physics Staff\"",
   "advancements.gravity_visualization.extendo_grab_first_lift.description": "Lift a physics structure with the Extendo Grip for the first time",
   "advancements.gravity_visualization.extendo_grab_heavy_lift.title": "So Strong",
-  "advancements.gravity_visualization.extendo_grab_heavy_lift.description": "Lift a physics structure weighing over 100 kpg"
+  "advancements.gravity_visualization.extendo_grab_heavy_lift.description": "Lift a physics structure weighing over 100 kpg",
+  "aero_suite.config.category.items": "Items & Recipes",
+  "aero_suite.config.category.tunables": "Feature Tunables",
+  "aero_suite.config.edit_hint": "Left-click + / right-click -, sneak for ×10",
+  "aero_suite.tunables.hunger": "Grip grab: hunger cost/sec",
+  "aero_suite.tunables.hunger.tooltip": "Hunger points consumed per second while grabbing. 0 = no cost.",
+  "aero_suite.tunables.durability": "Grip grab: durability cost/sec",
+  "aero_suite.tunables.durability.tooltip": "Extendo Grip durability consumed per second while grabbing (backtank air instead while wearing a Copper Backtank). 0 = no cost.",
+  "aero_suite.tunables.air": "Grip grab: backtank air/sec",
+  "aero_suite.tunables.air.tooltip": "Backtank air drained per second while grabbing with a Copper Backtank. A base tank holds 900 air; default 15/sec = one minute per tank. Capacity enchantment extends it proportionally."
 }
