@@ -250,12 +250,23 @@ public final class ExtendoGrabServer {
      * 全局坐标, 可直接喂父 Level.getBlockState 读载具方块(与 tryStart 锚点校验同一条等价链;
      * {@code Sable.HELPER.getContaining} 系列吃 plotyard 全局坐标, 拿玩家普通世界坐标去查
      * 恒为 null, 不能用)。脚下 0.6 格内有非空气方块即视为踩在载具上(跳起掠过会被保守拦截)。
+     * 按碰撞箱采样(中心+四角): 只查中心点的话, 潜行站到载具边缘(中心悬空)即可绕过判定,
+     * 反馈回路照样成立继续起飞。采样半径取 半宽+0.1 **向外扩**(而非收缩容差): 原版潜行
+     * 边缘防坠会把玩家钉在重叠只剩一丝的位置, 收缩容差挡不住"最边边"; 判定方向是
+     * fail-closed(宁可误判成站在载具上拒绝抓取, 也不给漏洞留缝)。
      */
     private static boolean isStandingOn(ServerPlayer player, ServerSubLevel subLevel) {
-        Vector3d local = subLevel.logicalPose().transformPositionInverse(
-                new Vector3d(player.getX(), player.getY(), player.getZ()));
-        return !player.serverLevel().getBlockState(
-                BlockPos.containing(local.x, local.y - 0.6, local.z)).isAir();
+        double r = player.getBbWidth() * 0.5 + 0.1;
+        for (int i = 0; i < 5; i++) {
+            double ox = i == 0 ? 0 : (i & 1) == 0 ? -r : r;
+            double oz = i == 0 ? 0 : i < 3 ? r : -r;
+            Vector3d local = subLevel.logicalPose().transformPositionInverse(
+                    new Vector3d(player.getX() + ox, player.getY(), player.getZ() + oz));
+            if (!player.serverLevel().getBlockState(
+                    BlockPos.containing(local.x, local.y - 0.6, local.z)).isAir())
+                return true;
+        }
+        return false;
     }
 
     /**

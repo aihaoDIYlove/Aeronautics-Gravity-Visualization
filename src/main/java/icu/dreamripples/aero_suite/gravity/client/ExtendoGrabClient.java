@@ -291,12 +291,20 @@ public final class ExtendoGrabClient {
     /**
      * 玩家是否站在该载具上(骑乘飞行漏洞拦截, 镜像服务端 isStandingOn):
      * 玩家父世界坐标逆变换到载具本地系, 脚下 0.6 格内有非空气方块即视为踩在载具上。
+     * 按碰撞箱采样(中心+四角): 潜行站到载具边缘时中心悬空, 只查中心会被绕过。
      */
     private static boolean isStandingOn(LocalPlayer player, ClientSubLevel cs) {
-        org.joml.Vector3d local = cs.logicalPose().transformPositionInverse(
-                new org.joml.Vector3d(player.getX(), player.getY(), player.getZ()));
-        BlockState below = subLevelBlockState(cs, BlockPos.containing(local.x, local.y - 0.6, local.z));
-        return below != null && !below.isAir();
+        double r = player.getBbWidth() * 0.5 + 0.1;
+        for (int i = 0; i < 5; i++) {
+            double ox = i == 0 ? 0 : (i & 1) == 0 ? -r : r;
+            double oz = i == 0 ? 0 : i < 3 ? r : -r;
+            org.joml.Vector3d local = cs.logicalPose().transformPositionInverse(
+                    new org.joml.Vector3d(player.getX() + ox, player.getY(), player.getZ() + oz));
+            BlockState below = subLevelBlockState(cs, BlockPos.containing(local.x, local.y - 0.6, local.z));
+            if (below != null && !below.isAir())
+                return true;
+        }
+        return false;
     }
 
     /** 锚点当前世界坐标到玩家眼位的实际距离(镜像释放与伸出动画共用)。 */
