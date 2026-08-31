@@ -151,5 +151,7 @@
   "aero_suite.tunables.durability": "Grip grab: durability cost/sec",
   "aero_suite.tunables.durability.tooltip": "Extendo Grip durability consumed per second while grabbing (backtank air instead while wearing a Copper Backtank). 0 = no cost.",
   "aero_suite.tunables.air": "Grip grab: backtank air/sec",
-  "aero_suite.tunables.air.tooltip": "Backtank air drained per second while grabbing with a Copper Backtank. A base tank holds 900 air; default 15/sec = one minute per tank. Capacity enchantment extends it proportionally."
+  "aero_suite.tunables.air.tooltip": "Backtank air drained per second while grabbing with a Copper Backtank. A base tank holds 900 air; default 15/sec = one minute per tank. Capacity enchantment extends it proportionally.",
+  "aero_suite.tunables.softness": "Drag Softness",
+  "aero_suite.tunables.softness.tooltip": "Softness of the extendo-grip drag. 0 = identical to the creative physics staff (unlimited force, fully rigid follow, no shaking on fast view turns); higher values continuously scale the force cap from 100x down to 1x (3x vehicle weight) and soften the stiffness, for a springier feel with slight lag. If it shakes, dial toward 0."
 }

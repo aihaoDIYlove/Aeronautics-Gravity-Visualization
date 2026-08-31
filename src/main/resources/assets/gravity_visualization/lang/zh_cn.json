@@ -151,5 +151,7 @@
   "aero_suite.tunables.durability": "机械手抓取:耐久消耗/秒",
   "aero_suite.tunables.durability.tooltip": "抓取时每秒消耗的伸缩机械手耐久(穿戴铜背罐时改扣背罐空气)。0 = 不消耗。",
   "aero_suite.tunables.air": "机械手抓取:背罐空气消耗/秒",
-  "aero_suite.tunables.air.tooltip": "穿戴铜背罐时每秒代扣的背罐空气。基础罐 900 点,默认 15/秒 = 整罐 1 分钟;扩容附魔按比例延长。"
+  "aero_suite.tunables.air.tooltip": "穿戴铜背罐时每秒代扣的背罐空气。基础罐 900 点,默认 15/秒 = 整罐 1 分钟;扩容附魔按比例延长。",
+  "aero_suite.tunables.softness": "拖拽软度",
+  "aero_suite.tunables.softness.tooltip": "机械手拖拽的软硬度。0 = 与创造物理手杖一致(不限力, 彻底跟手, 急转视角不摇晃); 越大越软, 力上限从 100 倍连续收到 1 倍(3 倍自重)、刚度逐步衰减, 手感温和有弹性但跟随略有延迟。晃动时往 0 方向调。"
 }

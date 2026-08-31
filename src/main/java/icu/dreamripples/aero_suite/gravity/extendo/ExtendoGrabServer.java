@@ -139,6 +139,16 @@ public final class ExtendoGrabServer {
         return c != null ? c.tunables.extendoGrabAir.get() : AeroSuiteConfig.Tunables.AIR_DEFAULT;
     }
 
+    /**
+     * 拖拽软度; 0 = 与创造物理手杖完全一致(全刚度 + 不限力, 彻底跟手), 调大则约束刚度按
+     * 1/(1+S) 软化并启用力上限。手杖拖拽从不摇晃的根因即它 hasMaxForce=false 不限力 --
+     * 限力约束在急转视角时需求力矩超过上限反复饱和/释放, 表现为载具剧烈摇晃。
+     */
+    public static float softness() {
+        AeroSuiteConfig c = FeatureGates.CONFIG;
+        return c != null ? c.tunables.extendoGrabSoftness.getF() : AeroSuiteConfig.Tunables.SOFTNESS_DEFAULT;
+    }
+
     /** create:extendo_grip 判定(客户端/服务端共用; 缓存注册表查找结果)。 */
     public static boolean isHoldingGrip(Player player) {
         Item item = extendoGripItem;
@@ -223,7 +233,8 @@ public final class ExtendoGrabServer {
         if (dist > player.blockInteractionRange()) return;
         double distance = Math.max(MIN_GRAB_DISTANCE, dist);
 
-        Session session = new Session(player.getUUID(), level, serverSubLevel, anchorLocal);
+        Session session = new Session(player.getUUID(), level, serverSubLevel, anchorLocal,
+                anchorWorld.sub(eye.x, eye.y, eye.z, new Vector3d()));
         SESSIONS.put(player.getUUID(), session);
         sendSync(player, true, distance);
         // 成就: 首次提起 / 提起 100 kpg 以上重物(mass 单位即 MassVisualizer 显示的 kpg)
@@ -339,11 +350,14 @@ public final class ExtendoGrabServer {
         private PhysicsConstraintHandle constraint;
 
         private Session(UUID playerUuid, ServerLevel level, ServerSubLevel subLevel,
-                        org.joml.Vector3dc anchorLocal) {
+                        org.joml.Vector3dc anchorLocal, Vector3dc initialGoal) {
             this.playerUuid = playerUuid;
             this.level = level;
             this.subLevel = subLevel;
             this.plotAnchor.set(anchorLocal);
+            // 初始目标 = 锚点(玩家相对偏移): 首个拖拽包下一 tick 才到, 若留 (0,0,0) 则首个
+            // 物理 tick 约束目标 = 眼位, 不限力下载具朝玩家猛冲(双击快速释放即"沿视线弹飞")
+            this.playerRelativeGoal.set(initialGoal);
             this.orientation.set(subLevel.logicalPose().orientation());
             this.maxForce = Mth.clamp(subLevel.getMassTracker().getMass() * MAX_FORCE_PER_MASS,
                     MIN_MAX_FORCE, MAX_MAX_FORCE);
@@ -361,9 +375,25 @@ public final class ExtendoGrabServer {
             attachConstraint(physicsSystem);
             if (constraint == null) return;
 
+            // 软度 S(效果在 [0,1] 内铺开, >1 只是继续放慢弹簧):
+            //  刚度/阻尼同乘 1/(1+9S), 保持阻尼比只放慢响应;
+            //  力上限从 100 倍(≈ 不限力, 求解器实际不会饱和)连续收到 1 倍(3 倍自重)。
+            // 两项都必须连续 -- 摇晃根因是限力饱和而非刚度: 旧实现 S>0 即启用 1 倍上限,
+            // 0 -> 0.01 跨过"不限力/限力"断崖, 手感天差地别。
+            double soft = Mth.clamp(softness(), 0.0, 1.0);
+            double stiffScale = 1.0 / (1.0 + 9.0 * soft);
+            double linearStiffness = LINEAR_STIFFNESS * stiffScale;
+            double linearDamping = LINEAR_DAMPING * stiffScale;
+            double angularStiffness = ANGULAR_STIFFNESS * stiffScale;
+            double angularDamping = ANGULAR_DAMPING * stiffScale;
+            boolean hasMaxForce = soft > 1.0e-3;
+            double forceCap = hasMaxForce
+                    ? Mth.clamp(maxForce * (1.0 + 99.0 * (1.0 - soft)), MIN_MAX_FORCE, MAX_MAX_FORCE)
+                    : 0.0;
+
             // 角轴: 目标 0 + 高刚度 = 姿态焊在 orientation 系上(Tab 旋转改写 orientation)
             for (ConstraintJointAxis axis : ConstraintJointAxis.ANGULAR) {
-                constraint.setMotor(axis, 0.0, ANGULAR_STIFFNESS, ANGULAR_DAMPING, true, maxForce);
+                constraint.setMotor(axis, 0.0, angularStiffness, angularDamping, hasMaxForce, forceCap);
             }
 
             // 触及距离校验: 眼位(逐物理 tick 插值) ↔ 锚点当前世界坐标, 超出即脱手
@@ -384,9 +414,9 @@ public final class ExtendoGrabServer {
             // 线轴目标 = (玩家相对偏移 + 插值眼位) 变换到约束姿态系(创造手杖同款)
             localGoal.set(playerRelativeGoal).add(ex, ey, ez);
             orientation.transformInverse(localGoal);
-            constraint.setMotor(ConstraintJointAxis.LINEAR_X, localGoal.x(), LINEAR_STIFFNESS, LINEAR_DAMPING, true, maxForce);
-            constraint.setMotor(ConstraintJointAxis.LINEAR_Y, localGoal.y(), LINEAR_STIFFNESS, LINEAR_DAMPING, true, maxForce);
-            constraint.setMotor(ConstraintJointAxis.LINEAR_Z, localGoal.z(), LINEAR_STIFFNESS, LINEAR_DAMPING, true, maxForce);
+            constraint.setMotor(ConstraintJointAxis.LINEAR_X, localGoal.x(), linearStiffness, linearDamping, hasMaxForce, forceCap);
+            constraint.setMotor(ConstraintJointAxis.LINEAR_Y, localGoal.y(), linearStiffness, linearDamping, hasMaxForce, forceCap);
+            constraint.setMotor(ConstraintJointAxis.LINEAR_Z, localGoal.z(), linearStiffness, linearDamping, hasMaxForce, forceCap);
         }
 
         private void attachConstraint(SubLevelPhysicsSystem physicsSystem) {

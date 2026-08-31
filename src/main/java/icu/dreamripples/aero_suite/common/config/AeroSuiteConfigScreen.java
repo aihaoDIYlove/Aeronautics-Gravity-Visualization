@@ -140,7 +140,10 @@ public class AeroSuiteConfigScreen extends Screen {
                           boolean integer, DoubleSupplier getter, DoubleConsumer setter) {
 
         String format(double v) {
-            return integer ? String.valueOf((long) v) : String.format("%.1f", v);
+            if (integer) return String.valueOf((long) v);
+            // 小数位随步长走: step 0.5/0.1 -> 1 位, 0.01 -> 2 位, 余类推
+            int places = Math.max(1, (int) Math.ceil(-Math.log10(step)));
+            return String.format("%." + places + "f", v);
         }
     }
 
@@ -164,7 +167,7 @@ public class AeroSuiteConfigScreen extends Screen {
         return list;
     }
 
-    /** 数值特性行(顺序即显示顺序; 现仅机械手抓取的三个每秒消耗)。 */
+    /** 数值特性行(顺序即显示顺序; 机械手抓取的三个每秒消耗 + 拖拽软度)。 */
     private List<NumRow> tunableRows() {
         List<NumRow> rows = new ArrayList<>();
         rows.add(new NumRow("aero_suite.tunables.hunger", "aero_suite.tunables.hunger.tooltip",
@@ -179,6 +182,10 @@ public class AeroSuiteConfigScreen extends Screen {
                 1, 1, 900, true,
                 () -> { var c = config(); return c != null ? c.tunables.extendoGrabAir.get() : 0; },
                 v -> { var c = config(); if (c != null) c.tunables.extendoGrabAir.set((int) v); }));
+        rows.add(new NumRow("aero_suite.tunables.softness", "aero_suite.tunables.softness.tooltip",
+                0.01, 0, 1, false,
+                () -> { var c = config(); return c != null ? c.tunables.extendoGrabSoftness.getF() : 0; },
+                v -> { var c = config(); if (c != null) c.tunables.extendoGrabSoftness.set(v); }));
         return rows;
     }
 
@@ -189,6 +196,7 @@ public class AeroSuiteConfigScreen extends Screen {
         c.tunables.extendoGrabHunger.set((double) AeroSuiteConfig.Tunables.HUNGER_DEFAULT);
         c.tunables.extendoGrabDurability.set(AeroSuiteConfig.Tunables.DURABILITY_DEFAULT);
         c.tunables.extendoGrabAir.set(AeroSuiteConfig.Tunables.AIR_DEFAULT);
+        c.tunables.extendoGrabSoftness.set((double) AeroSuiteConfig.Tunables.SOFTNESS_DEFAULT);
     }
 
     private List<AeroSuiteFeatures.Feature> pageFeatures() {

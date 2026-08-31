@@ -50,6 +50,7 @@ public class AeroSuiteConfig extends ConfigBase {
         public static final float HUNGER_DEFAULT = 1.0f;
         public static final int DURABILITY_DEFAULT = 10;
         public static final int AIR_DEFAULT = 15;
+        public static final float SOFTNESS_DEFAULT = 0.75f;
 
         /** 抓取时每秒消耗的饥饿值(点); 0 = 不消耗 */
         public final ConfigFloat extendoGrabHunger =
@@ -60,6 +61,12 @@ public class AeroSuiteConfig extends ConfigBase {
         /** 穿背罐时代扣的背罐空气/秒(基础罐 900 点, 默认 15 = 整罐 1 分钟) */
         public final ConfigInt extendoGrabAir =
                 i(AIR_DEFAULT, 1, 900, "extendo_grab_air_per_second");
+        /**
+         * 拖拽软度; 0 = 与创造物理手杖完全一致(全刚度 + 不限力, 彻底跟手), 调大则约束刚度按
+         * 1/(1+S) 软化并启用力上限(按载具质量限 3 倍重力), 拖重物手感更温和但跟随有弹性
+         */
+        public final ConfigFloat extendoGrabSoftness =
+                f(SOFTNESS_DEFAULT, 0f, 1f, "extendo_grab_softness");
 
         @Override
         public String getName() {
