@@ -1,6 +1,7 @@
 package icu.dreamripples.aero_suite.gravity.extendo;
 
 import com.simibubi.create.content.equipment.armor.BacktankUtil;
+import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.physics.PhysicsPipeline;
 import dev.ryanhcode.sable.api.physics.constraint.ConstraintJointAxis;
 import dev.ryanhcode.sable.api.physics.constraint.FreeConstraintConfiguration;
@@ -246,27 +247,16 @@ public final class ExtendoGrabServer {
 
     /**
      * 玩家是否站在该载具上(骑乘飞行漏洞拦截)。
-     * 坐标链: 玩家父世界坐标 --transformPositionInverse--> 载具本地坐标; 本地坐标值即 plotyard
-     * 全局坐标, 可直接喂父 Level.getBlockState 读载具方块(与 tryStart 锚点校验同一条等价链;
-     * {@code Sable.HELPER.getContaining} 系列吃 plotyard 全局坐标, 拿玩家普通世界坐标去查
-     * 恒为 null, 不能用)。脚下 0.6 格内有非空气方块即视为踩在载具上(跳起掠过会被保守拦截)。
-     * 按碰撞箱采样(中心+四角): 只查中心点的话, 潜行站到载具边缘(中心悬空)即可绕过判定,
-     * 反馈回路照样成立继续起飞。采样半径取 半宽+0.1 **向外扩**(而非收缩容差): 原版潜行
-     * 边缘防坠会把玩家钉在重叠只剩一丝的位置, 收缩容差挡不住"最边边"; 判定方向是
-     * fail-closed(宁可误判成站在载具上拒绝抓取, 也不给漏洞留缝)。
+     * 用 {@code Sable.HELPER.getTrackingSubLevel(player)} -- Sable 实体移动扩展在碰撞时
+     * 精确记录玩家踩在哪个 sublevel(Simulated 把手同款判定)。注意别用
+     * {@code getContaining} 系列: 它按 plotyard 全局 chunk 键位, 喂玩家普通世界坐标恒
+     * 返回 null。自研几何采样(逆变换查脚下方块)已弃: 载具斜置时采样点会落进方块缝隙漏判。
      */
     private static boolean isStandingOn(ServerPlayer player, ServerSubLevel subLevel) {
-        double r = player.getBbWidth() * 0.5 + 0.1;
-        for (int i = 0; i < 5; i++) {
-            double ox = i == 0 ? 0 : (i & 1) == 0 ? -r : r;
-            double oz = i == 0 ? 0 : i < 3 ? r : -r;
-            Vector3d local = subLevel.logicalPose().transformPositionInverse(
-                    new Vector3d(player.getX() + ox, player.getY(), player.getZ() + oz));
-            if (!player.serverLevel().getBlockState(
-                    BlockPos.containing(local.x, local.y - 0.6, local.z)).isAir())
-                return true;
-        }
-        return false;
+        // Sable 自带的站立追踪(EntityMovementExtension, 碰撞时精确记录玩家踩在哪个
+        // sublevel 上) -- Simulated 把手 HandleConstraint 同款判定。精确无采样, 潜行贴边/
+        // 载具斜置天然覆盖(自研几何采样会因斜置角点落进方块缝隙漏判, 已弃)。
+        return Sable.HELPER.getTrackingSubLevel(player) == subLevel;
     }
 
     /**
