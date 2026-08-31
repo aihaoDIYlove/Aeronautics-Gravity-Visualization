@@ -7,11 +7,14 @@ import dev.ryanhcode.sable.sublevel.ClientSubLevel;
 import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.content.blocks.rope.rope_connector.RopeConnectorBlock;
 import dev.simulated_team.simulated.index.SimKeys;
+import dev.simulated_team.simulated.util.SimColors;
 import icu.dreamripples.aero_suite.common.config.FeatureGates;
 import icu.dreamripples.aero_suite.gravity.extendo.ExtendoGrabServer;
 import icu.dreamripples.aero_suite.starlight.network.ExtendoGrabActionPayload;
 import icu.dreamripples.aero_suite.starlight.network.ExtendoGrabDragPayload;
 import icu.dreamripples.aero_suite.starlight.network.ExtendoGrabSyncPayload;
+import net.createmod.catnip.outliner.Outliner;
+import net.createmod.catnip.theme.Color;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -23,6 +26,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -176,6 +180,16 @@ public final class ExtendoGrabClient {
         Vec3 goal = player.getLookAngle().scale(sessionDistance);
         sendToServer(new ExtendoGrabDragPayload(sessionSubLevel.getUniqueId(),
                 JOMLConversion.toJOML(goal), sessionAnchor, sessionOrientation));
+
+        // 抓取高亮: 复用 Simulated 绳索右键选点时的 Outliner 点框效果(同款绿色/线宽),
+        // 锚点方块中心随载具移动, chase 平滑跟随; 松手后停止刷新, Outliner 自动淡出(8 tick)。
+        org.joml.Vector3d center = sessionSubLevel.logicalPose().transformPosition(
+                new org.joml.Vector3d(sessionAnchor));
+        Outliner.getInstance().chaseAABB("extendo_grab_anchor",
+                        new AABB(center.x, center.y, center.z, center.x, center.y, center.z))
+                .colored(new Color(SimColors.SUCCESS_LIME))
+                .lineWidth(1 / 3f)
+                .disableLineNormals();
     }
 
     /**
