@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": true
   },
-  "parent": "gravity_visualization:root",
+  "parent": "gravity_visualization:extendo_grab_first_lift",
   "criteria": {
     "heavy_lift": {
       "trigger": "gravity_visualization:extendo_grab_heavy_lift",

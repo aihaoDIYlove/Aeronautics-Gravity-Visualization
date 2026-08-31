@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": true
   },
-  "parent": "gravity_visualization:root",
+  "parent": "gravity_visualization:spark_wand_kill",
   "criteria": {
     "kill_creeper": {
       "trigger": "gravity_visualization:creeper_buster_kill",
