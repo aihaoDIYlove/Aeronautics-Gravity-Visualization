@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": true
   },
-  "parent": "gravity_visualization:root",
+  "parent": "gravity_visualization:goggle_observe",
   "criteria": {
     "kill_arthropod": {
       "trigger": "gravity_visualization:spark_wand_kill",

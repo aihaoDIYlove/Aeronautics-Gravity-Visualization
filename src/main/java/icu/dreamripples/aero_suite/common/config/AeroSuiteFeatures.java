@@ -86,6 +86,12 @@ public final class AeroSuiteFeatures {
             // 铁块 SA 赌重锤核心(产物 vanilla)
             new Feature("recipe_heavy_core", Group.GRAVITY, true,
                     List.of(), () -> Items.HEAVY_CORE),
+            // 机械手载具抓取: 纯行为开关(无产物物品, 不删东西; 行为代码 ExtendoGrabServer/ExtendoGrabClient
+            // 内 isEnabled 早期返回)。图标 = create:extendo_grip(Create 是 maven 直依赖但 Registrate 类型
+            // 不在编译类路径, 走注册表查找, 同 recipe_pearlescent_levitite)
+            new Feature("extendo_grab", Group.GRAVITY, true,
+                    List.of(), () -> net.minecraft.core.registries.BuiltInRegistries.ITEM
+                            .get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("create", "extendo_grip"))),
             // ── 航空学: 方便物品 ───────────────────────────────────
             new Feature("analog_transmission", Group.SIMPLIFICATION, true,
                     List.of(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_ITEM), ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_ITEM),

@@ -77,8 +77,10 @@ public class StarlightLogistics {
 
     // 三个 mod 的配置按钮都指向同一份自绘配置屏(读 gravity_visualization 的 COMMON 配置, 本地化见 AeroSuiteConfigScreen)
     private static void registerConfigScreen(net.neoforged.fml.ModContainer container) {
-        container.registerExtensionPoint(
-                net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
-                (c, last) -> new icu.dreamripples.aero_suite.common.config.AeroSuiteConfigScreen(last));
+        // 注册走 client-only 的 ConfigScreenRegistrar: lambda 签名引用 vanilla Screen, 公共入口类
+        // 在 DEDICATED_SERVER 上类校验即崩(运行期 if 守卫救不了), 必须物理隔离(同 mod1/mod2)
+        if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) {
+            icu.dreamripples.aero_suite.common.client.ConfigScreenRegistrar.register(container);
+        }
     }
 }

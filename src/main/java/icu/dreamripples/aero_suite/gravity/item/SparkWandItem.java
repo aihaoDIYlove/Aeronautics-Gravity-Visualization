@@ -1,6 +1,4 @@
 package icu.dreamripples.aero_suite.gravity.item;
-
-import icu.dreamripples.aero_suite.common.AeroSuite;
 import icu.dreamripples.aero_suite.gravity.ModEnchantments;
 import icu.dreamripples.aero_suite.gravity.advancement.ModTriggers;
 import icu.dreamripples.aero_suite.gravity.client.SparkWandClient;
