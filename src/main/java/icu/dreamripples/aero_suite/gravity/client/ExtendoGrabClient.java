@@ -247,9 +247,13 @@ public final class ExtendoGrabClient {
         if (player == null || !ExtendoGrabServer.isHoldingGrip(player)) return;
         double maxDist = player.blockInteractionRange() + DISTANCE_BUFFER;
         double t = Mth.clamp((anchorWorldDistance(player) - MIN_GRAB_DISTANCE) / (maxDist - MIN_GRAB_DISTANCE), 0.0, 1.0);
-        float anim = (float) Math.cbrt(0.05 + 0.95 * t);
-        ExtendoGripRenderHandler.mainHandAnimation = anim;
-        ExtendoGripRenderHandler.lastMainHandAnimation = anim;
+        float target = (float) Math.cbrt(0.05 + 0.95 * t);
+        // 向目标渐进而非直接写入: 直接跳变则抓取瞬间机械手"啪"地伸出(收回有 Create 原生
+        // 衰减动画, 伸出却没有)。
+        // 只写 mainHandAnimation、不动 lastMainHandAnimation: 渲染器每帧做
+        // lerp(partialTick, last, main) 帧间插值, 两个都写死 = 插值被抹平, 只剩 20Hz 台阶(卡帧感)。
+        float cur = Mth.clamp(ExtendoGripRenderHandler.mainHandAnimation, 0.0f, 1.0f);
+        ExtendoGripRenderHandler.mainHandAnimation = cur + (target - cur) * 0.8f;
     }
 
     /** 服务端回执(S2C, 经 ExtendoGrabSyncPayload.clientListener 分发, 客户端主线程)。 */
@@ -294,6 +298,9 @@ public final class ExtendoGrabClient {
      * 按碰撞箱采样(中心+四角): 潜行站到载具边缘时中心悬空, 只查中心会被绕过。
      */
     private static boolean isStandingOn(LocalPlayer player, ClientSubLevel cs) {
+        // 首选 Sable 站立追踪(EntityMovementExtension, 碰撞时精确记录踩在哪个 sublevel,
+        // Simulated 把手同款判定); 几何采样兜底 -- 载具斜置时采样角点可能落进方块缝隙。
+        if (Sable.HELPER.getTrackingSubLevel(player) == cs) return true;
         double r = player.getBbWidth() * 0.5 + 0.1;
         for (int i = 0; i < 5; i++) {
             double ox = i == 0 ? 0 : (i & 1) == 0 ? -r : r;
