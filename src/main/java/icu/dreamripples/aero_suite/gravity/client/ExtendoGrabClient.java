@@ -182,11 +182,15 @@ public final class ExtendoGrabClient {
                 JOMLConversion.toJOML(goal), sessionAnchor, sessionOrientation));
 
         // 抓取高亮: 复用 Simulated 绳索右键选点时的 Outliner 点框效果(同款绿色/线宽),
-        // 锚点方块中心随载具移动, chase 平滑跟随; 松手后停止刷新, Outliner 自动淡出(8 tick)。
-        org.joml.Vector3d center = sessionSubLevel.logicalPose().transformPosition(
-                new org.joml.Vector3d(sessionAnchor));
+        // 松手后停止刷新, Outliner 自动淡出(8 tick)。
+        // 喂给 Outliner 的必须是 sublevel 本地(plotyard)坐标, 而非预变换后的主世界坐标:
+        // Sable 的 ChasingAABBOutlineMixin 在每帧渲染时拿框中心 getContainingClient 查到
+        // sublevel 后 push renderPose() 绕相机重投影(= 渲染在子维度, 与载具同帧插值),
+        // 绳索连物理鬼畜都跟得上的原因; 预变换成主世界坐标则 mixin 查不到 sublevel,
+        // 只剩 20Hz tick 刷新 + chase 平滑, 必然不跟手。
         Outliner.getInstance().chaseAABB("extendo_grab_anchor",
-                        new AABB(center.x, center.y, center.z, center.x, center.y, center.z))
+                        new AABB(sessionAnchor.x(), sessionAnchor.y(), sessionAnchor.z(),
+                                sessionAnchor.x(), sessionAnchor.y(), sessionAnchor.z()))
                 .colored(new Color(SimColors.SUCCESS_LIME))
                 .lineWidth(1 / 3f)
                 .disableLineNormals();
