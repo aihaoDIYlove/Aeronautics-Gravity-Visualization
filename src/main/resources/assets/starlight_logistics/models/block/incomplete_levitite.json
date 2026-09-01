@@ -1,0 +1,38 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:translucent",
+  "textures": {
+    "particle": "starlight_logistics:block/ultralight_glass",
+    "glass": "starlight_logistics:block/ultralight_glass",
+    "fluid": "aeronautics:fluid/levitite_blend_still"
+  },
+  "elements": [
+    {
+      "name": "glass_shell",
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": { "texture": "#glass", "uv": [0, 0, 16, 16] },
+        "south": { "texture": "#glass", "uv": [0, 0, 16, 16] },
+        "west": { "texture": "#glass", "uv": [0, 0, 16, 16] },
+        "east": { "texture": "#glass", "uv": [0, 0, 16, 16] },
+        "up": { "texture": "#glass", "uv": [0, 0, 16, 16] },
+        "down": { "texture": "#glass", "uv": [0, 0, 16, 16] }
+      }
+    },
+    {
+      "name": "levitite_blend_core",
+      "from": [0.01, 0.01, 0.01],
+      "to": [15.99, 8, 15.99],
+      "shade": false,
+      "faces": {
+        "north": { "texture": "#fluid", "uv": [0, 8, 16, 16] },
+        "south": { "texture": "#fluid", "uv": [0, 8, 16, 16] },
+        "west": { "texture": "#fluid", "uv": [0, 8, 16, 16] },
+        "east": { "texture": "#fluid", "uv": [0, 8, 16, 16] },
+        "up": { "texture": "#fluid", "uv": [0, 0, 16, 16] },
+        "down": { "texture": "#fluid", "uv": [0, 16, 16, 0] }
+      }
+    }
+  ]
+}

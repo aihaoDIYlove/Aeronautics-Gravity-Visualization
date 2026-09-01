@@ -1,3 +1,4 @@
 {
-  "parent": "aeronautics:block/levitite"
+  "parent": "starlight_logistics:block/incomplete_levitite",
+  "render_type": "minecraft:translucent"
 }
