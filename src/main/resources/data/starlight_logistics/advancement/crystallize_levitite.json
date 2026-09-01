@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "id": "starlight_logistics:incomplete_levitite"
+      "id": "aeronautics:levitite"
     },
     "title": {
       "translate": "advancements.starlight_logistics.crystallize_levitite.title"
@@ -21,7 +21,7 @@
       "conditions": {
         "items": [
           {
-            "items": "starlight_logistics:incomplete_levitite"
+            "items": "aeronautics:levitite"
           }
         ]
       }
