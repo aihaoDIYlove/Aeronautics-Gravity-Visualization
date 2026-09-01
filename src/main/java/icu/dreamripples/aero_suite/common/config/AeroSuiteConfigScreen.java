@@ -11,7 +11,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
@@ -83,6 +87,7 @@ public class AeroSuiteConfigScreen extends Screen {
         y += bh + gap;
         addRenderableWidget(Button.builder(Component.translatable("aero_suite.config.category.tunables"), b -> {
             mode = Mode.TUNABLES;
+            scrollOffset = 0;
             init();
         }).bounds((this.width - bw) / 2, y, bw, bh).build());
         y += bh + gap * 2;
@@ -151,42 +156,54 @@ public class AeroSuiteConfigScreen extends Screen {
         return FeatureGates.CONFIG;
     }
 
-    /** 数值页头部开关行: 机械手载具抓取(其数值行紧随其后)。 */
-    private List<AeroSuiteFeatures.Feature> headGateRows() {
-        List<AeroSuiteFeatures.Feature> list = new ArrayList<>();
-        for (AeroSuiteFeatures.Feature f : AeroSuiteFeatures.ALL)
-            if ("extendo_grab".equals(f.key())) list.add(f);
-        return list;
+    /**
+     * 数值页统一行模型: 开关行(gate)与数值编辑行(num)二选一,
+     * 顺序由 {@link #tunRows()} 显式声明, 保证开关行与配套数值行相邻。
+     */
+    private record TunRow(AeroSuiteFeatures.Feature gate, NumRow num) {
+
+        static TunRow of(AeroSuiteFeatures.Feature f) { return new TunRow(f, null); }
+
+        static TunRow of(NumRow n) { return new TunRow(null, n); }
     }
 
-    /** 数值页尾部开关行: 与数值无关的独立行为开关(星空酿造基底), 排在所有数值行之后。 */
-    private List<AeroSuiteFeatures.Feature> tailGateRows() {
-        List<AeroSuiteFeatures.Feature> list = new ArrayList<>();
+    /** 按 key 从 ALL 表取特性(数值页的开关行散落声明, 这里统一取用)。 */
+    private static AeroSuiteFeatures.Feature findGate(String key) {
         for (AeroSuiteFeatures.Feature f : AeroSuiteFeatures.ALL)
-            if ("recipe_starlight_brewing".equals(f.key())) list.add(f);
-        return list;
+            if (f.key().equals(key)) return f;
+        throw new IllegalStateException("unknown feature key: " + key);
     }
 
-    /** 数值特性行(顺序即显示顺序; 机械手抓取的三个每秒消耗 + 拖拽软度)。 */
-    private List<NumRow> tunableRows() {
-        List<NumRow> rows = new ArrayList<>();
-        rows.add(new NumRow("aero_suite.tunables.hunger", "aero_suite.tunables.hunger.tooltip",
+    /**
+     * 数值页全部行, 顺序即显示顺序:
+     * 机械手开关 -> 机械手 4 项数值 -> 星空机壳粒子开关 -> 粒子距离 -> 星空酿造基底。
+     */
+    private List<TunRow> tunRows() {
+        List<TunRow> list = new ArrayList<>();
+        list.add(TunRow.of(findGate("extendo_grab")));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.hunger", "aero_suite.tunables.hunger.tooltip",
                 0.5, 0, 20, false,
                 () -> { var c = config(); return c != null ? c.tunables.extendoGrabHunger.getF() : 0; },
-                v -> { var c = config(); if (c != null) c.tunables.extendoGrabHunger.set(v); }));
-        rows.add(new NumRow("aero_suite.tunables.durability", "aero_suite.tunables.durability.tooltip",
+                v -> { var c = config(); if (c != null) c.tunables.extendoGrabHunger.set(v); })));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.durability", "aero_suite.tunables.durability.tooltip",
                 1, 0, 100, true,
                 () -> { var c = config(); return c != null ? c.tunables.extendoGrabDurability.get() : 0; },
-                v -> { var c = config(); if (c != null) c.tunables.extendoGrabDurability.set((int) v); }));
-        rows.add(new NumRow("aero_suite.tunables.air", "aero_suite.tunables.air.tooltip",
+                v -> { var c = config(); if (c != null) c.tunables.extendoGrabDurability.set((int) v); })));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.air", "aero_suite.tunables.air.tooltip",
                 1, 1, 900, true,
                 () -> { var c = config(); return c != null ? c.tunables.extendoGrabAir.get() : 0; },
-                v -> { var c = config(); if (c != null) c.tunables.extendoGrabAir.set((int) v); }));
-        rows.add(new NumRow("aero_suite.tunables.softness", "aero_suite.tunables.softness.tooltip",
+                v -> { var c = config(); if (c != null) c.tunables.extendoGrabAir.set((int) v); })));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.softness", "aero_suite.tunables.softness.tooltip",
                 0.01, 0, 1, false,
                 () -> { var c = config(); return c != null ? c.tunables.extendoGrabSoftness.getF() : 0; },
-                v -> { var c = config(); if (c != null) c.tunables.extendoGrabSoftness.set(v); }));
-        return rows;
+                v -> { var c = config(); if (c != null) c.tunables.extendoGrabSoftness.set(v); })));
+        list.add(TunRow.of(findGate("starlight_casing_particles")));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.particle_distance", "aero_suite.tunables.particle_distance.tooltip",
+                1, 1, 128, true,
+                () -> { var c = config(); return c != null ? c.tunables.starlightCasingParticleDistance.get() : 0; },
+                v -> { var c = config(); if (c != null) c.tunables.starlightCasingParticleDistance.set((int) v); })));
+        list.add(TunRow.of(findGate("recipe_starlight_brewing")));
+        return list;
     }
 
     /** 重置所有数值特性(默认值单一事实源 = {@link AeroSuiteConfig.Tunables} 常量)。 */
@@ -197,20 +214,48 @@ public class AeroSuiteConfigScreen extends Screen {
         c.tunables.extendoGrabDurability.set(AeroSuiteConfig.Tunables.DURABILITY_DEFAULT);
         c.tunables.extendoGrabAir.set(AeroSuiteConfig.Tunables.AIR_DEFAULT);
         c.tunables.extendoGrabSoftness.set((double) AeroSuiteConfig.Tunables.SOFTNESS_DEFAULT);
+        c.tunables.starlightCasingParticleDistance.set(AeroSuiteConfig.Tunables.PARTICLE_DISTANCE_DEFAULT);
     }
 
     private List<AeroSuiteFeatures.Feature> pageFeatures() {
-        List<AeroSuiteFeatures.Feature> list = new ArrayList<>();
+        // 本页实际展示的条目(同组且不归数值页管)
+        Set<String> inPage = new HashSet<>();
         for (AeroSuiteFeatures.Feature f : AeroSuiteFeatures.ALL)
-            if (f.group() == page && !isTunablesOwned(f)) list.add(f);
-        return list;
+            if (f.group() == page && !isTunablesOwned(f)) inPage.add(f.key());
+
+        // 子条目 -> 主条目 索引(仅收同页的父子关系; 跨页引用如数值页管理的条目不产生层级)
+        Map<String, List<AeroSuiteFeatures.Feature>> childrenOf = new HashMap<>();
+        for (AeroSuiteFeatures.Feature f : AeroSuiteFeatures.ALL)
+            if (inPage.contains(f.key()) && f.parent() != null && inPage.contains(f.parent()))
+                childrenOf.computeIfAbsent(f.parent(), k -> new ArrayList<>()).add(f);
+
+        // 主条目(含无子条目的)按声明顺序输出, 子条目 DFS 紧随其后 -- 顺序由结构保证而非声明顺序
+        List<AeroSuiteFeatures.Feature> ordered = new ArrayList<>();
+        for (AeroSuiteFeatures.Feature f : AeroSuiteFeatures.ALL) {
+            if (!inPage.contains(f.key())) continue;
+            if (f.parent() != null && inPage.contains(f.parent())) continue; // 已挂主条目下, 由 DFS 输出
+            ordered.add(f);
+            appendChildren(f.key(), childrenOf, ordered);
+        }
+        return ordered;
+    }
+
+    /** 深度优先拼装子条目(支持嵌套层级, 子条目的子条目依序缩进挂在各自父条目后)。 */
+    private static void appendChildren(String key, Map<String, List<AeroSuiteFeatures.Feature>> childrenOf,
+                                       List<AeroSuiteFeatures.Feature> out) {
+        for (AeroSuiteFeatures.Feature child : childrenOf.getOrDefault(key, List.of())) {
+            out.add(child);
+            appendChildren(child.key(), childrenOf, out);
+        }
     }
 
     /** 开关展示在"数值特性相关"页的特性, 物品配方分组列表不再重复出现。 */
     private static boolean isTunablesOwned(AeroSuiteFeatures.Feature f) {
-        // extendo_grab: 数值页有对应的三个消耗值编辑行, 开关行与之合并
+        // extendo_grab: 数值页有对应的消耗值编辑行, 开关行与之合并
         // recipe_starlight_brewing: 纯行为开关(星空酿造基底), 归入数值页集中管理
-        return "extendo_grab".equals(f.key()) || "recipe_starlight_brewing".equals(f.key());
+        // starlight_casing_particles: 纯行为开关(星空机壳粒子), 与粒子距离数值行配套
+        return "extendo_grab".equals(f.key()) || "recipe_starlight_brewing".equals(f.key())
+                || "starlight_casing_particles".equals(f.key());
     }
 
     /** 即时保存: 写 toml + 重建门控缓存; 纯配方开关改动提示一次 /reload。 */
@@ -280,12 +325,14 @@ public class AeroSuiteConfigScreen extends Screen {
             boolean hovered = mouseX >= rowX && mouseX < rowX + rowW && mouseY >= y && mouseY < y + ROW_HEIGHT - 2;
             if (hovered) hoveredIndex = row;
 
+            // 子条目缩进 + 弱化标签色, 与主条目拉开视觉层级
+            int indent = f.parent() != null ? 14 : 0;
             graphics.fill(rowX, y, rowX + rowW, y + ROW_HEIGHT - 2, hovered ? 0x60FFFFFF : 0x30000000);
             Item icon = f.icon().get();
             if (icon != null)
-                graphics.renderItem(new ItemStack(icon), rowX + 4, y + 4);
+                graphics.renderItem(new ItemStack(icon), rowX + 4 + indent, y + 4);
             graphics.drawString(this.font, Component.translatable("aero_suite.feature." + f.key()),
-                    rowX + 28, y + 8, 0xFFFFFF);
+                    rowX + 28 + indent, y + 8, f.parent() != null ? 0xBFBFBF : 0xFFFFFF);
             drawState(graphics, rowX, rowW, y, FeatureGates.isEnabled(f.key()));
         }
 
@@ -318,76 +365,54 @@ public class AeroSuiteConfigScreen extends Screen {
         }
 
         int listTop = TOP_MARGIN;
-        List<AeroSuiteFeatures.Feature> head = headGateRows();
-        List<AeroSuiteFeatures.Feature> tail = tailGateRows();
-        List<NumRow> rows = tunableRows();
+        List<TunRow> rows = tunRows();
+        int totalRows = rows.size();
 
-        // 行布局: 机械手开关 -> 机械手数值行 x3 -> 独立行为开关(星空酿造基底)
-        int y;
-        boolean hovered;
-        for (int i = 0; i < head.size(); i++) {
-            AeroSuiteFeatures.Feature f = head.get(i);
-            y = listTop + i * ROW_HEIGHT;
-            hovered = mouseX >= rowX && mouseX < rowX + rowW && mouseY >= y && mouseY < y + ROW_HEIGHT - 2;
-            graphics.fill(rowX, y, rowX + rowW, y + ROW_HEIGHT - 2, hovered ? 0x60FFFFFF : 0x30000000);
-            Item icon = f.icon().get();
-            if (icon != null)
-                graphics.renderItem(new ItemStack(icon), rowX + 4, y + 4);
-            graphics.drawString(this.font, Component.translatable("aero_suite.feature." + f.key()),
-                    rowX + 28, y + 8, 0xFFFFFF);
-            drawState(graphics, rowX, rowW, y, FeatureGates.isEnabled(f.key()));
-        }
+        // 行数超出可视区时滚动(与 FEATURES 页同款),防止尾部行盖住底部返回按钮
+        int visibleRows = Math.max(1, (this.height - BOTTOM_MARGIN - TOP_MARGIN) / ROW_HEIGHT);
+        int maxOffset = Math.max(0, totalRows - visibleRows);
+        scrollOffset = Mth.clamp(Math.round(scrollOffset), 0, maxOffset);
 
-        for (int i = 0; i < rows.size(); i++) {
-            NumRow row = rows.get(i);
-            y = listTop + (head.size() + i) * ROW_HEIGHT;
-            hovered = mouseX >= rowX && mouseX < rowX + rowW && mouseY >= y && mouseY < y + ROW_HEIGHT - 2;
+        hoveredIndex = -1;
+        int drawn = 0;
+        for (int abs = (int) scrollOffset; abs < totalRows && drawn < visibleRows; abs++, drawn++) {
+            TunRow entry = rows.get(abs);
+            int y = listTop + drawn * ROW_HEIGHT;
+            boolean hovered = mouseX >= rowX && mouseX < rowX + rowW && mouseY >= y && mouseY < y + ROW_HEIGHT - 2;
+            if (hovered) hoveredIndex = abs;
             graphics.fill(rowX, y, rowX + rowW, y + ROW_HEIGHT - 2, hovered ? 0x60FFFFFF : 0x30000000);
-            graphics.drawString(this.font, Component.translatable(row.labelKey()), rowX + 28, y + 8, 0xFFFFFF);
-            String value = row.format(row.getter().getAsDouble());
-            graphics.drawString(this.font, value, rowX + rowW - 16 - this.font.width(value), y + 8, 0x55FF55);
-        }
-
-        for (int i = 0; i < tail.size(); i++) {
-            AeroSuiteFeatures.Feature f = tail.get(i);
-            y = listTop + (head.size() + rows.size() + i) * ROW_HEIGHT;
-            hovered = mouseX >= rowX && mouseX < rowX + rowW && mouseY >= y && mouseY < y + ROW_HEIGHT - 2;
-            graphics.fill(rowX, y, rowX + rowW, y + ROW_HEIGHT - 2, hovered ? 0x60FFFFFF : 0x30000000);
-            Item icon = f.icon().get();
-            if (icon != null)
-                graphics.renderItem(new ItemStack(icon), rowX + 4, y + 4);
-            graphics.drawString(this.font, Component.translatable("aero_suite.feature." + f.key()),
-                    rowX + 28, y + 8, 0xFFFFFF);
-            drawState(graphics, rowX, rowW, y, FeatureGates.isEnabled(f.key()));
+            if (entry.gate() != null) {
+                AeroSuiteFeatures.Feature f = entry.gate();
+                Item icon = f.icon().get();
+                if (icon != null)
+                    graphics.renderItem(new ItemStack(icon), rowX + 4, y + 4);
+                graphics.drawString(this.font, Component.translatable("aero_suite.feature." + f.key()),
+                        rowX + 28, y + 8, 0xFFFFFF);
+                drawState(graphics, rowX, rowW, y, FeatureGates.isEnabled(f.key()));
+            } else {
+                NumRow row = entry.num();
+                graphics.drawString(this.font, Component.translatable(row.labelKey()), rowX + 28, y + 8, 0xFFFFFF);
+                String value = row.format(row.getter().getAsDouble());
+                graphics.drawString(this.font, value, rowX + rowW - 16 - this.font.width(value), y + 8, 0x55FF55);
+            }
         }
 
         // tooltip(悬浮行)
-        hoveredIndex = -1;
-        int totalRows = head.size() + rows.size() + tail.size();
-        if (mouseX >= rowX && mouseX < rowX + rowW && mouseY >= listTop
-                && mouseY < listTop + totalRows * ROW_HEIGHT) {
-            int idx = (int) ((mouseY - listTop) / ROW_HEIGHT);
-            hoveredIndex = idx;
+        if (hoveredIndex >= 0 && mouseX >= rowX && mouseX < rowX + rowW) {
+            TunRow entry = rows.get(hoveredIndex);
             List<Component> lines = new ArrayList<>();
-            if (idx < head.size()) {
-                AeroSuiteFeatures.Feature f = head.get(idx);
+            if (entry.gate() != null) {
+                AeroSuiteFeatures.Feature f = entry.gate();
                 lines.add(Component.translatable("aero_suite.feature." + f.key()).withStyle(ChatFormatting.GOLD));
                 lines.addAll(wrap(Component.translatable("aero_suite.feature." + f.key() + ".desc").getString(), 240));
                 lines.add(Component.translatable(f.deletesItems() ? "aero_suite.config.item_gate"
                         : isRecipeGate(f) ? "aero_suite.config.recipe_gate"
                         : "aero_suite.config.behavior_gate").withStyle(ChatFormatting.GRAY));
-            } else if (idx - head.size() < rows.size()) {
-                NumRow row = rows.get(idx - head.size());
+            } else {
+                NumRow row = entry.num();
                 lines.add(Component.translatable(row.labelKey()).withStyle(ChatFormatting.GOLD));
                 lines.addAll(wrap(Component.translatable(row.tooltipKey()).getString(), 240));
                 lines.add(Component.translatable("aero_suite.config.edit_hint").withStyle(ChatFormatting.GRAY));
-            } else if (idx - head.size() - rows.size() < tail.size()) {
-                AeroSuiteFeatures.Feature f = tail.get(idx - head.size() - rows.size());
-                lines.add(Component.translatable("aero_suite.feature." + f.key()).withStyle(ChatFormatting.GOLD));
-                lines.addAll(wrap(Component.translatable("aero_suite.feature." + f.key() + ".desc").getString(), 240));
-                lines.add(Component.translatable(f.deletesItems() ? "aero_suite.config.item_gate"
-                        : isRecipeGate(f) ? "aero_suite.config.recipe_gate"
-                        : "aero_suite.config.behavior_gate").withStyle(ChatFormatting.GRAY));
             }
             graphics.renderComponentTooltip(this.font, lines, mouseX, mouseY);
         }
@@ -455,32 +480,25 @@ public class AeroSuiteConfigScreen extends Screen {
 
         if (mode == Mode.TUNABLES) {
             int listTop = TOP_MARGIN;
-            if (mouseX >= rowX && mouseX < rowX + rowW && mouseY >= listTop) {
-                int idx = (int) ((mouseY - listTop) / ROW_HEIGHT);
-                List<AeroSuiteFeatures.Feature> head = headGateRows();
-                List<AeroSuiteFeatures.Feature> tail = tailGateRows();
-                List<NumRow> rows = tunableRows();
-                // 与渲染行序一致: 头部开关 -> 数值行 -> 尾部开关
-                if (idx < head.size()) {
-                    AeroSuiteFeatures.Feature f = head.get(idx);
-                    setKey(f, !FeatureGates.isEnabled(f.key()));
-                    return true;
-                }
-                int numIdx = idx - head.size();
-                if (numIdx >= 0 && numIdx < rows.size()) {
-                    NumRow row = rows.get(numIdx);
+            List<TunRow> rows = tunRows();
+            int visibleRows = Math.max(1, (this.height - BOTTOM_MARGIN - TOP_MARGIN) / ROW_HEIGHT);
+            if (mouseX >= rowX && mouseX < rowX + rowW && mouseY >= listTop
+                    && mouseY < listTop + Math.min(rows.size(), visibleRows) * ROW_HEIGHT) {
+                // 与渲染同款换算: 视区内行号 + 滚动偏移 = 绝对行号
+                int idx = (int) ((mouseY - listTop) / ROW_HEIGHT) + (int) scrollOffset;
+                if (idx >= 0 && idx < rows.size()) {
+                    TunRow entry = rows.get(idx);
+                    if (entry.gate() != null) {
+                        setKey(entry.gate(), !FeatureGates.isEnabled(entry.gate().key()));
+                        return true;
+                    }
+                    NumRow row = entry.num();
                     double step = row.step() * (hasShiftDown() ? 10 : 1);
                     double sign = button == 0 ? 1 : button == 1 ? -1 : 0;
                     if (sign != 0) {
                         row.setter().accept(Mth.clamp(row.getter().getAsDouble() + sign * step, row.min(), row.max()));
                         return true;
                     }
-                }
-                int tailIdx = idx - head.size() - rows.size();
-                if (tailIdx >= 0 && tailIdx < tail.size()) {
-                    AeroSuiteFeatures.Feature f = tail.get(tailIdx);
-                    setKey(f, !FeatureGates.isEnabled(f.key()));
-                    return true;
                 }
             }
         }
@@ -490,11 +508,16 @@ public class AeroSuiteConfigScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (scrollY != 0 && mode == Mode.FEATURES) {
-            List<AeroSuiteFeatures.Feature> features = pageFeatures();
+        if (scrollY != 0 && (mode == Mode.FEATURES || mode == Mode.TUNABLES)) {
+            int rowCount;
+            if (mode == Mode.FEATURES) {
+                rowCount = pageFeatures().size();
+            } else {
+                rowCount = tunRows().size();
+            }
             int visibleRows = (this.height - BOTTOM_MARGIN - TOP_MARGIN) / ROW_HEIGHT;
             // 双向钳制(短列表上界为 0),并吸附到整数防止小数 offset 让渲染行/点击判定错位
-            int maxOffset = Math.max(0, features.size() - visibleRows);
+            int maxOffset = Math.max(0, rowCount - visibleRows);
             scrollOffset = Math.round(Mth.clamp(scrollOffset - scrollY, 0, maxOffset));
             return true;
         }

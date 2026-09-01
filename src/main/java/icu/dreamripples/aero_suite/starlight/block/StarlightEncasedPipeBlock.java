@@ -47,6 +47,7 @@ public class StarlightEncasedPipeBlock extends EncasedPipeBlock {
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (random.nextInt(10) != 0) return;
         if (!FeatureGates.isEnabled("starlight_casing")) return;
+        if (!StarlightCasingBlock.sparkleAllowed(level, pos)) return;
         Direction face = Direction.getRandom(random);
         if (!Block.shouldRenderFace(state, level, pos, face, pos.relative(face))) return;
         double x = pos.getX() + 0.5 + face.getStepX() * 0.55 + (face.getStepX() == 0 ? (random.nextDouble() - 0.5) * 0.8 : 0);

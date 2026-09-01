@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 /**
  * mod3 粒子类型注册。粒子本体(SuspendedTownParticle 子类)与 Provider 是 client-only,
  * 挂在 AeronauticsGravityClient 的 RegisterParticleProvidersEvent;此处只注册 common 侧
- * 的 ParticleType,方块 animateTick 在两端都可见此类型但仅客户端实际发射。
+ * 的 ParticleType,方块 animateTick 在两端都可见此类型但仅客户端实际渲染。
  */
 public class ModParticles {
     public static final DeferredRegister<ParticleType<?>> STARLIGHT_PARTICLES =

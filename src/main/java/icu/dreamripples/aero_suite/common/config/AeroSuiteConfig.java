@@ -51,6 +51,7 @@ public class AeroSuiteConfig extends ConfigBase {
         public static final int DURABILITY_DEFAULT = 10;
         public static final int AIR_DEFAULT = 15;
         public static final float SOFTNESS_DEFAULT = 0.75f;
+        public static final int PARTICLE_DISTANCE_DEFAULT = 32;
 
         /** 抓取时每秒消耗的饥饿值(点); 0 = 不消耗 */
         public final ConfigFloat extendoGrabHunger =
@@ -67,6 +68,9 @@ public class AeroSuiteConfig extends ConfigBase {
          */
         public final ConfigFloat extendoGrabSoftness =
                 f(SOFTNESS_DEFAULT, 0f, 1f, "extendo_grab_softness");
+        /** 星空机壳粒子渲染距离(格); 玩家超出此距离的机壳/套壳管道不再冒星光粒子 */
+        public final ConfigInt starlightCasingParticleDistance =
+                i(PARTICLE_DISTANCE_DEFAULT, 1, 128, "starlight_casing_particle_distance");
 
         @Override
         public String getName() {

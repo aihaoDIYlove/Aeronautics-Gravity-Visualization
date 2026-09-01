@@ -51,11 +51,25 @@ public final class AeroSuiteFeatures {
      * @param group        UI 分页/配置子树
      * @param items        关闭时纳入"获取即删"的物品(空 = 纯配方开关)
      * @param icon         UI 图标物品(纯配方开关用其 vanilla 产物)
+     * @param parent       主条目 key(可为 null = 自身是主条目)。子条目在配置屏保证渲染在
+     *                     主条目紧后方(与声明顺序无关);主条目可以没有子条目。
+     *                     仅影响 UI 层级展示,开关之间无任何联动语义(各子条目仍是独立开关)。
      */
     public record Feature(String key, Group group, boolean defaultValue,
-                          List<Supplier<? extends Item>> items, Supplier<? extends Item> icon) {
+                          List<Supplier<? extends Item>> items, Supplier<? extends Item> icon, String parent) {
 
         public boolean deletesItems() { return !items.isEmpty(); }
+
+        /** 无父条目的主条目(兼容既有四参写法)。 */
+        public Feature(String key, Group group, boolean defaultValue,
+                       List<Supplier<? extends Item>> items, Supplier<? extends Item> icon) {
+            this(key, group, defaultValue, items, icon, null);
+        }
+
+        /** 挂到指定主条目下成为子条目(其余元数据不变)。 */
+        public Feature under(String parentKey) {
+            return new Feature(key, group, defaultValue, items, icon, parentKey);
+        }
     }
 
     // ── WARNING ────────────────────────────────────────────────
@@ -72,17 +86,23 @@ public final class AeroSuiteFeatures {
             new Feature("counterweight", Group.GRAVITY, true,
                     List.of(ModBlocks.COUNTERWEIGHT_ITEM, ModItems.INCOMPLETE_COUNTERWEIGHT),
                     ModBlocks.COUNTERWEIGHT_ITEM),
+            // 配重块家族变体挂主条目 counterweight 下(仅 UI 层级,开关各自独立)
             new Feature("counterweight_redstone", Group.GRAVITY, true,
-                    List.of(ModBlocks.COUNTERWEIGHT_REDSTONE_ITEM), ModBlocks.COUNTERWEIGHT_REDSTONE_ITEM),
+                    List.of(ModBlocks.COUNTERWEIGHT_REDSTONE_ITEM), ModBlocks.COUNTERWEIGHT_REDSTONE_ITEM)
+                    .under("counterweight"),
             new Feature("counterweight_light", Group.GRAVITY, true,
                     List.of(ModBlocks.COUNTERWEIGHT_LIGHT_ITEM, ModItems.INCOMPLETE_COUNTERWEIGHT_LIGHT),
-                    ModBlocks.COUNTERWEIGHT_LIGHT_ITEM),
+                    ModBlocks.COUNTERWEIGHT_LIGHT_ITEM)
+                    .under("counterweight"),
             new Feature("counterweight_light_pearl", Group.GRAVITY, true,
-                    List.of(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_ITEM), ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_ITEM),
+                    List.of(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_ITEM), ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_ITEM)
+                    .under("counterweight"),
             new Feature("counterweight_light_redstone", Group.GRAVITY, true,
-                    List.of(ModBlocks.COUNTERWEIGHT_LIGHT_REDSTONE_ITEM), ModBlocks.COUNTERWEIGHT_LIGHT_REDSTONE_ITEM),
+                    List.of(ModBlocks.COUNTERWEIGHT_LIGHT_REDSTONE_ITEM), ModBlocks.COUNTERWEIGHT_LIGHT_REDSTONE_ITEM)
+                    .under("counterweight"),
             new Feature("counterweight_light_pearl_redstone", Group.GRAVITY, true,
-                    List.of(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_ITEM), ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_ITEM),
+                    List.of(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_ITEM), ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_ITEM)
+                    .under("counterweight"),
             // 铁块 SA 赌重锤核心(产物 vanilla)
             new Feature("recipe_heavy_core", Group.GRAVITY, true,
                     List.of(), () -> Items.HEAVY_CORE),
@@ -105,7 +125,8 @@ public final class AeroSuiteFeatures {
             new Feature("single_slot_hopper", Group.SIMPLIFICATION, true,
                     List.of(ModBlocks.SINGLE_SLOT_HOPPER_ITEM), ModBlocks.SINGLE_SLOT_HOPPER_ITEM),
             new Feature("filtered_single_slot_hopper", Group.SIMPLIFICATION, true,
-                    List.of(ModBlocks.FILTERED_SINGLE_SLOT_HOPPER_ITEM), ModBlocks.FILTERED_SINGLE_SLOT_HOPPER_ITEM),
+                    List.of(ModBlocks.FILTERED_SINGLE_SLOT_HOPPER_ITEM), ModBlocks.FILTERED_SINGLE_SLOT_HOPPER_ITEM)
+                    .under("single_slot_hopper"),
             // ── 航空学: 星空物流 ───────────────────────────────────
             new Feature("stabilizer", Group.STARLIGHT, true,
                     List.of(ModBlocks.STABILIZER_ITEM, ModItems.INCOMPLETE_STABILIZER), ModBlocks.STABILIZER_ITEM),
@@ -123,6 +144,10 @@ public final class AeroSuiteFeatures {
                     List.of(ModBlocks.ULTRALIGHT_GLASS_ITEM), ModBlocks.ULTRALIGHT_GLASS_ITEM),
             new Feature("starlight_casing", Group.STARLIGHT, true,
                     List.of(ModBlocks.STARLIGHT_CASING_ITEM), ModBlocks.STARLIGHT_CASING_ITEM),
+            // 星空机壳粒子: 纯行为开关, 只关世界内闪烁粒子(方块/配方不受影响); 挂主条目 starlight_casing 下
+            new Feature("starlight_casing_particles", Group.STARLIGHT, true,
+                    List.of(), ModBlocks.STARLIGHT_CASING_ITEM)
+                    .under("starlight_casing"),
             new Feature("void_hose_pulley", Group.STARLIGHT, true,
                     List.of(ModBlocks.VOID_HOSE_PULLEY_ITEM), ModBlocks.VOID_HOSE_PULLEY_ITEM),
             new Feature("starlight_bucket", Group.STARLIGHT, true,

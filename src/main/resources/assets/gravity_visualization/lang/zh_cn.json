@@ -148,5 +148,9 @@
   "aero_suite.tunables.air": "机械手抓取:背罐空气消耗/秒",
   "aero_suite.tunables.air.tooltip": "穿戴铜背罐时每秒代扣的背罐空气。基础罐 900 点,默认 15/秒 = 整罐 1 分钟;扩容附魔按比例延长。",
   "aero_suite.tunables.softness": "拖拽软度",
-  "aero_suite.tunables.softness.tooltip": "机械手拖拽的软硬度。0 = 与创造物理手杖一致(不限力, 彻底跟手, 急转视角不摇晃); 越大越软, 力上限从 100 倍连续收到 1 倍(3 倍自重)、刚度逐步衰减, 手感温和有弹性但跟随略有延迟。晃动时往 0 方向调。"
+  "aero_suite.tunables.softness.tooltip": "机械手拖拽的软硬度。0 = 与创造物理手杖一致(不限力, 彻底跟手, 急转视角不摇晃); 越大越软, 力上限从 100 倍连续收到 1 倍(3 倍自重)、刚度逐步衰减, 手感温和有弹性但跟随略有延迟。晃动时往 0 方向调。",
+  "aero_suite.feature.starlight_casing_particles": "星空机壳粒子",
+  "aero_suite.feature.starlight_casing_particles.desc": "星空机壳与星空套壳管道的星光闪烁粒子总开关。关闭后方块本身与配方不受影响,仅不再冒粒子。",
+  "aero_suite.tunables.particle_distance": "星空机壳:粒子渲染距离",
+  "aero_suite.tunables.particle_distance.tooltip": "玩家距星空机壳/套壳管道超过该距离(格)后不再渲染星光粒子,节省开销。默认 32,范围 1-128。"
 }

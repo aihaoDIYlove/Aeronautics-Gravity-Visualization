@@ -28,6 +28,7 @@ public class StarlightCasingBlock extends CasingBlock {
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (random.nextInt(10) != 0) return; // 每方块约每秒 2 次,与 mycelium 同密度
         if (!FeatureGates.isEnabled("starlight_casing")) return; // 门控关闭,世界内残留方块不再冒粒子
+        if (!sparkleAllowed(level, pos)) return; // 粒子开关关闭或最近玩家超出可调距离
         // 六个面等概率;被相邻方块贴住的面用与区块渲染同一套剔除逻辑跳过
         Direction face = Direction.getRandom(random);
         if (!Block.shouldRenderFace(state, level, pos, face, pos.relative(face))) return;
@@ -43,8 +44,25 @@ public class StarlightCasingBlock extends CasingBlock {
         return step == 0 ? (random.nextDouble() - 0.5) * 0.8 : 0;
     }
 
-    // 套壳管道同款发射(StarlightEncasedPipeBlock 调用),保持单一实现
+    // 套壳管道同款渲染(StarlightEncasedPipeBlock 调用),保持单一实现
     public static void addSparkle(ParticleOptions type, Level level, double x, double y, double z) {
         level.addParticle(type, x, y, z, 0, 0, 0);
+    }
+
+    /**
+     * 粒子渲染总闸(机壳与套壳管道共用): starlight_casing_particles 开关关闭,或
+     * 最近玩家距离超过可调渲染距离(默认 32 格,1-128)则返回 false。
+     * animateTick 本身只对玩家周围区块随机调用,但范围可达 64 格+,超出配置距离的不再白算。
+     */
+    public static boolean sparkleAllowed(Level level, BlockPos pos) {
+        if (!FeatureGates.isEnabled("starlight_casing_particles")) return false;
+        double max = 32;
+        var c = FeatureGates.CONFIG;
+        if (c != null) max = c.tunables.starlightCasingParticleDistance.get();
+        double maxSq = max * max;
+        double cx = pos.getX() + 0.5, cy = pos.getY() + 0.5, cz = pos.getZ() + 0.5;
+        for (var p : level.players())
+            if (p.distanceToSqr(cx, cy, cz) <= maxSq) return true;
+        return false;
     }
 }
