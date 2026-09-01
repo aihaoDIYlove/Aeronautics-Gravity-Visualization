@@ -13,7 +13,6 @@
   "client": [
     "client.CreativeModeInventoryScreenAccessor",
     "client.CreativeModeItemPickerMenuAccessor",
-    "gravity.GoggleOverlayRendererMixin",
     "gravity.EntityTurnMixin",
     "starlight.ClipboardScreenMixin"
   ],

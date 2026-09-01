@@ -1,12 +1,4 @@
 {
-  "advancements.simplification_related.obtain_convenient_analog_transmission.description": "获得一个更方便的模拟传动器",
-  "advancements.simplification_related.obtain_convenient_analog_transmission.title": "这恒河里",
-  "advancements.simplification_related.obtain_sequential_feeder.description": "获得一个顺序供料器",
-  "advancements.simplification_related.obtain_sequential_feeder.title": "按顺序来",
-  "advancements.simplification_related.obtain_variable_speed_engine.description": "获得一个变速式便携引擎",
-  "advancements.simplification_related.obtain_variable_speed_engine.title": "油门踩到底",
-  "advancements.simplification_related.root.description": "让机器更听话的小玩意儿",
-  "advancements.simplification_related.root.title": "航空学：方便物品",
   "block.simplification_related.black_variable_speed_portable_engine": "黑色变速式便携引擎",
   "block.simplification_related.blue_variable_speed_portable_engine": "蓝色变速式便携引擎",
   "block.simplification_related.brown_variable_speed_portable_engine": "棕色变速式便携引擎",

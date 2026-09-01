@@ -9,14 +9,10 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.Optional;
 
 /**
- * 自定义成就触发器:玩家使用火花魔杖击杀节肢生物时触发。
+ * 通用"恒真"自定义成就触发器(matches 恒真),被多个成就按各自 trigger ID 复用。
  *
- * 触发点在 SparkWandItem.hurtEnemy 末尾 -- 此时普攻伤害(可能致死)与附加的 onFire 火伤
- * (可能致死)都已结算,只要 target.isDeadOrDying() 且属于 EntityTypeTags.ARTHROPOD 即调用 trigger。
- *
- * 不复用 vanilla player_killed_entity:火花魔杖的火伤走 damageSources().onFire(),
- * 该伤害源 causing entity 为 null,无法被 player_killed_entity 的 source_entity 谓词匹配;
- * 而节肢生物的火伤(8 点)远大于普攻(1 点),几乎全部由火伤完成击杀,纯数据驱动会失效。
+ * 全部击杀/触发条件判定都在 Java 触发点完成(见 ModTriggers 各条目注释),
+ * 这里不做任何过滤 -- JSON 只负责引用 trigger ID 与挂 display/parent。
  */
 public class SparkWandKillTrigger extends SimpleCriterionTrigger<SparkWandKillTrigger.TriggerInstance> {
     @Override

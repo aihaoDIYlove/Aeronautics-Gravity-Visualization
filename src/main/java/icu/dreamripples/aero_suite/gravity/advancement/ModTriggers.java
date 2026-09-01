@@ -15,23 +15,14 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * 直接调用会抛 "Registry is already frozen"。改用 DeferredRegister 在 RegisterEvent
  * (冻结前) 注入条目,与注册方块/物品同构。
  *
- * JSON 中 "trigger": "gravity_visualization:spark_wand_kill" 由 CriteriaTriggers.CODEC
+ * JSON 中 "trigger": "gravity_visualization:pearl_package_teleport" 由 CriteriaTriggers.CODEC
  * 从 TRIGGER_TYPES Registry 按 id 查找,DeferredRegister 注册后即可命中。
  */
 public class ModTriggers {
     public static final DeferredRegister<CriterionTrigger<?>> TRIGGERS =
             DeferredRegister.create(BuiltInRegistries.TRIGGER_TYPES, GravityVisualization.MOD_ID);
 
-    public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> SPARK_WAND_KILL =
-            TRIGGERS.register("spark_wand_kill", SparkWandKillTrigger::new);
-
-    // 复用 SparkWandKillTrigger 类(matches 恒真),仅 ID 不同 -- 两个成就各自指向自己的 trigger ID。
-    // CriteriaTrigger 实例 per-ID 维护 listener map,同 new 两个实例注册两个 ID 完全独立。
-    public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> CREEPER_BUSTER_KILL =
-            TRIGGERS.register("creeper_buster_kill", SparkWandKillTrigger::new);
-
-    public static final DeferredHolder<CriterionTrigger<?>, SparkWandKillTrigger> GOGGLE_OBSERVE =
-            TRIGGERS.register("goggle_observe", SparkWandKillTrigger::new);
+    // 复用 SparkWandKillTrigger 类(matches 恒真),仅 ID 不同 -- 各成就指向自己的 trigger ID。
 
     // 打包自己成就: 含激活珍珠的包裹破裂并生成末影珍珠(玩家在线)时触发.
     // 触发点在 PackageEntityMixin 破裂分支(player != null), 语义已确保, matches 恒真.
