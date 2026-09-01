@@ -396,6 +396,22 @@ public class StabilizerBlockEntity extends SmartBlockEntity
             withFormatter(i -> i + "°");
         }
 
+        // 独立剪贴板键:Create 默认全部 ValueSettingsBehaviour 共用 "Settings",会把死区角度
+        // 粘到配重块/配轻块等其他方块,或反向把别人的档位值粘进来。键不同则粘贴时
+        // tag.getCompound(key) 为空直接失败;读侧再按 0..30 校验兜底。
+        @Override
+        public String getClipboardKey() {
+            return "AeroStabilizerDeadband";
+        }
+
+        @Override
+        public boolean readFromClipboard(HolderLookup.Provider registries, CompoundTag tag, Player player,
+                                         Direction side, boolean simulate) {
+            if (tag.getInt("Row") != 0 || tag.getInt("Value") < MIN_DEADBAND || tag.getInt("Value") > MAX_DEADBAND)
+                return false;
+            return super.readFromClipboard(registries, tag, player, side, simulate);
+        }
+
         @Override
         public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
             return new ValueSettingsBoard(label, MAX_DEADBAND, 1,

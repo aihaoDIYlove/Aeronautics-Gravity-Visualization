@@ -10,6 +10,8 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollVa
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
@@ -76,6 +78,22 @@ public class CounterweightBlockEntity extends SmartBlockEntity {
         public MassTierScrollValueBehaviour(Component label, SmartBlockEntity be, ValueBoxTransform slot) {
             super(label, be, slot);
             withFormatter(i -> i + " kpg");
+        }
+
+        // 独立剪贴板键:Create 默认全部 ValueSettingsBehaviour 共用 "Settings",会把本档位值
+        // 粘到配轻块/稳定器等其他方块(反之亦然)。键不同则粘贴时 tag.getCompound(key) 为空直接失败。
+        @Override
+        public String getClipboardKey() {
+            return "AeroMassTier";
+        }
+
+        // 读侧再按本方块值域校验(行 0、值 0..MAX-1,弹板 +1 显示),越界拒绝粘贴
+        @Override
+        public boolean readFromClipboard(HolderLookup.Provider registries, CompoundTag tag, Player player,
+                                         Direction side, boolean simulate) {
+            if (tag.getInt("Row") != 0 || tag.getInt("Value") < MIN_TIER - 1 || tag.getInt("Value") > MAX_TIER - 1)
+                return false;
+            return super.readFromClipboard(registries, tag, player, side, simulate);
         }
 
         @Override

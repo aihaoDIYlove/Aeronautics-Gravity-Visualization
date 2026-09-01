@@ -5,6 +5,7 @@
   "advancements.gravity_visualization.root.description": "火花魔杖、便携图解与配重系列",
   "block.gravity_visualization.counterweight": "配重块",
   "block.gravity_visualization.counterweight.mass_tier": "质量档位",
+  "block.gravity_visualization.counterweight_light.lift_tier": "浮力档位",
   "block.gravity_visualization.counterweight_light": "配“轻”块",
   "advancements.gravity_visualization.root.description": "便携图解与配重系列",
   "block.gravity_visualization.counterweight_light_pearl": "珠光配“轻”块",
