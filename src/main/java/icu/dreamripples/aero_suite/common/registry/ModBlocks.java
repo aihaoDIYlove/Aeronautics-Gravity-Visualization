@@ -14,6 +14,8 @@ import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmis
 import icu.dreamripples.aero_suite.simplification.block.ConvenientAnalogTransmissionBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlock;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
+import icu.dreamripples.aero_suite.simplification.block.RollingTableBlock;
+import icu.dreamripples.aero_suite.simplification.block.RollingTableBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.FilteredSingleSlotHopperBlock;
 import icu.dreamripples.aero_suite.simplification.block.FilteredSingleSlotHopperBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.SingleSlotHopperBlock;
@@ -546,6 +548,33 @@ public class ModBlocks {
     public static final DeferredHolder<Item, BlockItem> FILTERED_SINGLE_SLOT_HOPPER_ITEM =
             ModItems.SIMPLIFICATION_ITEMS.register("filtered_single_slot_hopper",
                     () -> new BlockItem(FILTERED_SINGLE_SLOT_HOPPER_BLOCK.get(), new Item.Properties()));
+
+    // 滚动加工台:伪装式滚动的单物品台面(ItemDrain 式滚动 + Depot 式上方加工器对接,
+    // 终点黄铜/安山漏斗吸取或弹出)。见 RollingTableBlockEntity。
+    public static final DeferredHolder<Block, RollingTableBlock> ROLLING_TABLE_BLOCK =
+            SIMPLIFICATION_BLOCKS.register("rolling_table",
+                    () -> new RollingTableBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.COPPER)
+                                    .strength(3.5f)
+                                    .noOcclusion()
+                                    .requiresCorrectToolForDrops()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<RollingTableBlockEntity>> ROLLING_TABLE_BE =
+            SIMPLIFICATION_BLOCK_ENTITIES.register("rolling_table",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createRollingTableBlockEntity,
+                                    ROLLING_TABLE_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> ROLLING_TABLE_ITEM =
+            ModItems.SIMPLIFICATION_ITEMS.register("rolling_table",
+                    () -> new BlockItem(ROLLING_TABLE_BLOCK.get(), new Item.Properties()));
+
+    private static RollingTableBlockEntity createRollingTableBlockEntity(BlockPos pos, BlockState state) {
+        return new RollingTableBlockEntity(ROLLING_TABLE_BE.get(), pos, state);
+    }
 
     // 珍珠滞留台: 单槽物品台(恒 1 个, 无 GUI, 右键存取), 物品渲染在方块内 4px 高处。
     // 红石上升沿触发: 内部是已绑定玩家的激活末影珍珠时把该玩家传送到台上方并消耗珍珠。

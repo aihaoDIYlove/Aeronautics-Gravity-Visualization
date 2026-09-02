@@ -43,26 +43,42 @@ public class CreativeTabInjections {
     public static void buildCreateBaseTab(BuildCreativeModeTabContentsEvent event) {
         if (!event.getTabKey().equals(CREATE_BASE_TAB)) return;
 
+        // 小堆锌粒: 紧挨 create:zinc_nugget 之后
         Item zincNugget = BuiltInRegistries.ITEM.get(
                 ResourceLocation.fromNamespaceAndPath("create", "zinc_nugget"));
         if (zincNugget == Items.AIR) { // Create 是硬依赖,走到这说明 Create 改了名
             icu.dreamripples.aero_suite.common.AeroSuite.LOGGER.warn(
                     "[AeroSuite] 找不到 create:zinc_nugget 锚点(Create 改名?), 小堆锌粒跳过创造页注入");
-            return;
+        } else {
+            ItemStack anchor = event.getParentEntries().stream()
+                    .filter(s -> s.getItem() == zincNugget)
+                    .findFirst()
+                    .orElse(null);
+            ItemStack lump = new ItemStack(ModItems.ZINC_LUMP.get());
+            if (anchor != null) {
+                event.insertAfter(anchor, lump, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            } else {
+                event.accept(lump, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            }
         }
 
-        ItemStack lump = new ItemStack(ModItems.ZINC_LUMP.get());
-
-        // 从已填充条目里捞真身锚点,缺锚点则回退到末尾追加(不抛异常)。
-        ItemStack anchor = event.getParentEntries().stream()
-                .filter(s -> s.getItem() == zincNugget)
+        // 滚动加工台: 紧挨 create:item_drain 之后(外形/语义最近)
+        Item itemDrain = BuiltInRegistries.ITEM.get(
+                ResourceLocation.fromNamespaceAndPath("create", "item_drain"));
+        if (itemDrain == Items.AIR) {
+            icu.dreamripples.aero_suite.common.AeroSuite.LOGGER.warn(
+                    "[AeroSuite] 找不到 create:item_drain 锚点(Create 改名?), 滚动加工台跳过创造页注入");
+            return;
+        }
+        ItemStack drainAnchor = event.getParentEntries().stream()
+                .filter(s -> s.getItem() == itemDrain)
                 .findFirst()
                 .orElse(null);
-
-        if (anchor != null) {
-            event.insertAfter(anchor, lump, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        ItemStack rollingTable = new ItemStack(ModBlocks.ROLLING_TABLE_ITEM.get());
+        if (drainAnchor != null) {
+            event.insertAfter(drainAnchor, rollingTable, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         } else {
-            event.accept(lump, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            event.accept(rollingTable, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         }
     }
 }

@@ -127,6 +127,8 @@ public final class AeroSuiteFeatures {
             new Feature("filtered_single_slot_hopper", Group.SIMPLIFICATION, true,
                     List.of(ModBlocks.FILTERED_SINGLE_SLOT_HOPPER_ITEM), ModBlocks.FILTERED_SINGLE_SLOT_HOPPER_ITEM)
                     .under("single_slot_hopper"),
+            new Feature("rolling_table", Group.SIMPLIFICATION, true,
+                    List.of(ModBlocks.ROLLING_TABLE_ITEM), ModBlocks.ROLLING_TABLE_ITEM),
             // ── 航空学: 星空物流 ───────────────────────────────────
             new Feature("stabilizer", Group.STARLIGHT, true,
                     List.of(ModBlocks.STABILIZER_ITEM, ModItems.INCOMPLETE_STABILIZER), ModBlocks.STABILIZER_ITEM),

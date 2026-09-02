@@ -45,5 +45,7 @@
   "simplification_related.ponder.convenient_analog_transmission_clutch.text_2": "When input through its cogwheel faces only, they relay stress like ordinary cogwheels",
   "simplification_related.ponder.convenient_analog_transmission_lookup.text_3": "With cogwheel-face input, both shaft faces act as outputs",
   "simplification_related.ponder.convenient_analog_transmission_shaft_in.text_1": "When input through a shaft face, the other 5 faces all act as outputs",
-  "simplification_related.ponder.convenient_analog_transmission_pass_through.text_1": "With shaft-face input, the opposite shaft face can output as well. Extremely convenient"
+  "simplification_related.ponder.convenient_analog_transmission_pass_through.text_1": "With shaft-face input, the opposite shaft face can output as well. Extremely convenient",
+  "block.simplification_related.rolling_table": "Rolling Table",
+  "block.simplification_related.rolling_table.desc": "Items roll across this table; deployers/saws above can intercept and process them, belt funnels at the end can catch the result"
 }

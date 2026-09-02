@@ -1,7 +1,6 @@
 {
   "advancements.gravity_visualization.obtain_portable_diagram.description": "Craft a Portable Contraption Diagram",
   "advancements.gravity_visualization.obtain_portable_diagram.title": "Pocket-Sized",
-  "advancements.gravity_visualization.root.description": "Portable Diagram and counterweight blocks",
   "advancements.gravity_visualization.root.description": "Spark Wand, Portable Diagram and counterweight blocks",
   "block.gravity_visualization.counterweight": "Counterweight",
   "block.gravity_visualization.counterweight.mass_tier": "Mass Tier",
@@ -151,5 +150,7 @@
   "aero_suite.feature.starlight_casing_particles": "Starlight Casing Particles",
   "aero_suite.feature.starlight_casing_particles.desc": "Master toggle for the sparkle particles of Starlight Casings and Starlight Encased Pipes. The blocks and recipes are unaffected; only the particles stop.",
   "aero_suite.tunables.particle_distance": "Starlight casing: particle range",
-  "aero_suite.tunables.particle_distance.tooltip": "Blocks farther than this distance (in blocks) from every player stop emitting sparkle particles to save overhead. Default 32, range 1-128."
+  "aero_suite.tunables.particle_distance.tooltip": "Blocks farther than this distance (in blocks) from every player stop emitting sparkle particles to save overhead. Default 32, range 1-128.",
+  "aero_suite.feature.rolling_table": "Rolling Table",
+  "aero_suite.feature.rolling_table.desc": "Rolling Table block (fake-scrolling surface processable by machines above)"
 }

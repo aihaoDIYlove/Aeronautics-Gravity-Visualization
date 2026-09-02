@@ -44,5 +44,10 @@ public class ModCapabilities {
                 Capabilities.ItemHandler.BLOCK,
                 ModBlocks.PEARL_STASIS_BE.get(),
                 (be, context) -> be.getItemHandler());
+        // 滚动加工台:单槽台面物品(机械臂经 ArmInteractionPoint 走此 capability 取放)
+        event.registerBlockEntity(
+                Capabilities.ItemHandler.BLOCK,
+                ModBlocks.ROLLING_TABLE_BE.get(),
+                (be, context) -> be.getItemHandler());
     }
 }

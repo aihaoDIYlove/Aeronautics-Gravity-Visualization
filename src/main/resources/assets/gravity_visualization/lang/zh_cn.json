@@ -2,12 +2,11 @@
   "advancements.gravity_visualization.obtain_portable_diagram.description": "合成一个便携图解",
   "advancements.gravity_visualization.obtain_portable_diagram.title": "随身便携",
   "advancements.gravity_visualization.root.title": "航空学：重力可视化",
-  "advancements.gravity_visualization.root.description": "火花魔杖、便携图解与配重系列",
+  "advancements.gravity_visualization.root.description": "便携图解与配重系列",
   "block.gravity_visualization.counterweight": "配重块",
   "block.gravity_visualization.counterweight.mass_tier": "质量档位",
   "block.gravity_visualization.counterweight_light.lift_tier": "浮力档位",
   "block.gravity_visualization.counterweight_light": "配“轻”块",
-  "advancements.gravity_visualization.root.description": "便携图解与配重系列",
   "block.gravity_visualization.counterweight_light_pearl": "珠光配“轻”块",
   "block.gravity_visualization.counterweight_light_pearl_redstone": "红石珠光配“轻”块",
   "block.gravity_visualization.counterweight_light_redstone": "红石配“轻”块",
@@ -152,5 +151,7 @@
   "aero_suite.feature.starlight_casing_particles": "星空机壳粒子",
   "aero_suite.feature.starlight_casing_particles.desc": "星空机壳与星空套壳管道的星光闪烁粒子总开关。关闭后方块本身与配方不受影响,仅不再冒粒子。",
   "aero_suite.tunables.particle_distance": "星空机壳:粒子渲染距离",
-  "aero_suite.tunables.particle_distance.tooltip": "玩家距星空机壳/套壳管道超过该距离(格)后不再渲染星光粒子,节省开销。默认 32,范围 1-128。"
+  "aero_suite.tunables.particle_distance.tooltip": "玩家距星空机壳/套壳管道超过该距离(格)后不再渲染星光粒子,节省开销。默认 32,范围 1-128。",
+  "aero_suite.feature.rolling_table": "滚动加工台",
+  "aero_suite.feature.rolling_table.desc": "滚动加工台方块(伪装式滚动,可被上方加工器拦截加工)"
 }

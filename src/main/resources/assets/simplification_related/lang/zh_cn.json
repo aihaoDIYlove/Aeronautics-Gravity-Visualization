@@ -45,5 +45,7 @@
   "simplification_related.ponder.convenient_analog_transmission_clutch.text_2": "但侧面齿轮面可像正常齿轮一样传播应力",
   "simplification_related.ponder.convenient_analog_transmission_lookup.text_3": "由齿轮面输入时,两个传动杆面为输出面",
   "simplification_related.ponder.convenient_analog_transmission_shaft_in.text_1": "当由传动杆面输入时,齿轮面和另一个传动杆面均为输出面",
-  "simplification_related.ponder.convenient_analog_transmission_pass_through.text_1": "传动杆面输入时,其对面的传动杆面也可输出。这极其方便"
+  "simplification_related.ponder.convenient_analog_transmission_pass_through.text_1": "传动杆面输入时,其对面的传动杆面也可输出。这极其方便",
+  "block.simplification_related.rolling_table": "滚动加工台",
+  "block.simplification_related.rolling_table.desc": "物品在台面上伪装式滚动的加工台:上方部署器/动力锯等可拦截加工,终点由黄铜/安山漏斗吸取或弹出"
 }

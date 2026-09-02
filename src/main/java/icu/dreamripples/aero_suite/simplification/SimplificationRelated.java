@@ -6,6 +6,7 @@ import icu.dreamripples.aero_suite.common.AeroSuiteIds;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
 import icu.dreamripples.aero_suite.simplification.block.ModMenus;
+import icu.dreamripples.aero_suite.simplification.block.RollingTableArmPointType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -24,6 +25,8 @@ public class SimplificationRelated {
         ModBlocks.SIMPLIFICATION_BLOCKS.register(modEventBus);
         ModBlocks.SIMPLIFICATION_BLOCK_ENTITIES.register(modEventBus);
         ModMenus.MENUS.register(modEventBus);
+        // 机械臂交互点类型走 Create 自定义 registry(注册期已冻结), 经 RegisterEvent 注册
+        modEventBus.addListener(RollingTableArmPointType::onRegister);
         modEventBus.addListener(SimplificationRelated::onCommonSetup);
         AeroSuite.LOGGER.info("Aeronautics: Simplification Related loaded!");
     }
