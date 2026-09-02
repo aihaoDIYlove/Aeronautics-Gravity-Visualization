@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": true
   },
-  "parent": "starlight_logistics:collect_starlight",
+  "parent": "starlight_logistics:starlight_logistics_root",
   "criteria": {
     "teleport": {
       "trigger": "gravity_visualization:pearl_package_teleport",
