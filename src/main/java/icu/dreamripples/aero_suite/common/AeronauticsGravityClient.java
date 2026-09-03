@@ -18,6 +18,7 @@ import icu.dreamripples.aero_suite.simplification.client.SingleSlotHopperScreen;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlock;
 import icu.dreamripples.aero_suite.starlight.block.AddressingSignBlockEntity;
 import icu.dreamripples.aero_suite.starlight.ModParticles;
+import icu.dreamripples.aero_suite.starlight.client.AddressingSignCopycatModel;
 import icu.dreamripples.aero_suite.starlight.client.AddressingSignRenderer;
 import icu.dreamripples.aero_suite.starlight.client.ModPartialModels;
 import icu.dreamripples.aero_suite.starlight.client.PearlStasisRenderer;
@@ -76,6 +77,21 @@ public class AeronauticsGravityClient {
         modEventBus.addListener(AeronauticsGravityClient::onRegisterMenuScreens);
         // 星光闪烁粒子 Provider(RegisterParticleProvidersEvent 走 MOD bus)
         modEventBus.addListener(AeronauticsGravityClient::onRegisterParticleProviders);
+        // 寻址牌伪装板材质染 tintindex 材质(草/树叶等)——RegisterColorHandlersEvent.Block 走 MOD bus
+        modEventBus.addListener(AeronauticsGravityClient::onRegisterBlockColors);
+    }
+
+    // 寻址牌贴材质后的 tint 透传(逻辑同 Create CopycatBlock.wrappedColor):
+    // 材质方块带 tintindex 时按材质方块颜色染色,未贴材质返回 -1(不染色)。
+    private static void onRegisterBlockColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.Block event) {
+        event.register((state, level, pos, tint) -> {
+            if (level == null || pos == null)
+                return -1;
+            if (level.getBlockEntity(pos) instanceof AddressingSignBlockEntity be && be.hasCustomMaterial())
+                return Minecraft.getInstance().getBlockColors()
+                        .getColor(be.getMaterial(), level, pos, tint);
+            return -1;
+        }, ModBlocks.ADDRESSING_SIGN_BLOCK.get());
     }
 
     private static void onRegisterParticleProviders(net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent event) {
@@ -152,6 +168,24 @@ public class AeronauticsGravityClient {
         registerGlassCT(event, "ultralight_glass");
         registerCasingCT(event, "starlight_casing");
         registerEncasedPipeCT(event, "starlight_encased_fluid_pipe");
+        registerAddressingSignCopycat(event);
+    }
+
+    // 寻址牌伪装板模型包装:材质方块 quads 裁剪到寻址牌 AABB(原生纹素密度,不拉伸),
+    // 无材质回退原始空模型保持透明。见 AddressingSignCopycatModel。
+    private static void registerAddressingSignCopycat(ModelEvent.ModifyBakingResult event) {
+        ResourceLocation blockId = ResourceLocation.fromNamespaceAndPath(StarlightLogistics.MOD_ID, "addressing_sign");
+        Block block = BuiltInRegistries.BLOCK.get(blockId);
+        if (block == Blocks.AIR) return;
+        int wrapped = 0;
+        for (BlockState state : block.getStateDefinition().getPossibleStates()) {
+            ModelResourceLocation mrl = BlockModelShaper.stateToModelLocation(blockId, state);
+            BakedModel original = event.getModels().get(mrl);
+            if (original != null) {
+                event.getModels().put(mrl, new AddressingSignCopycatModel(original));
+                wrapped++;
+            }
+        }
     }
 
     private static void registerGlassCT(ModelEvent.ModifyBakingResult event, String name) {

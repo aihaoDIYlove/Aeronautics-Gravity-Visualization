@@ -13,9 +13,15 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+
+import net.neoforged.neoforge.client.model.data.ModelData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +58,80 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
 
     private int selected = 0;
     private int selfHealCounter = 0;
+
+    // 伪装板材质(copycat):AIR = 未贴(保持透明)。consumedItem 记录玩家消耗的物品,拆下返还/破坏掉落。
+    private BlockState material = Blocks.AIR.defaultBlockState();
+    private ItemStack consumedItem = ItemStack.EMPTY;
+
+    public boolean hasCustomMaterial() {
+        return !material.isAir();
+    }
+
+    public BlockState getMaterial() {
+        return material;
+    }
+
+    public ItemStack getConsumedItem() {
+        return consumedItem;
+    }
+
+    // 仅 server 调用;sendBlockUpdated -> getUpdateTag 带 Material/Item -> 客户端 loadAdditional redraw
+    public void setMaterial(BlockState state, ItemStack consumed) {
+        material = state;
+        consumedItem = consumed.copyWithCount(1);
+        notifyMaterialChanged();
+    }
+
+    public void clearMaterial() {
+        material = Blocks.AIR.defaultBlockState();
+        consumedItem = ItemStack.EMPTY;
+        notifyMaterialChanged();
+    }
+
+    // 同款 Create CopycatBlockEntity.cycleMaterial:循环朝向类属性,循环不动则 false
+    public boolean cycleMaterial() {
+        BlockState next = material;
+        if (next.hasProperty(BlockStateProperties.FACING))
+            next = next.cycle(BlockStateProperties.FACING);
+        else if (next.hasProperty(BlockStateProperties.HORIZONTAL_FACING))
+            next = next.cycle(BlockStateProperties.HORIZONTAL_FACING);
+        else if (next.hasProperty(BlockStateProperties.AXIS))
+            next = next.cycle(BlockStateProperties.AXIS);
+        else if (next.hasProperty(BlockStateProperties.HORIZONTAL_AXIS))
+            next = next.cycle(BlockStateProperties.HORIZONTAL_AXIS);
+        else if (next.hasProperty(BlockStateProperties.LIT))
+            next = next.cycle(BlockStateProperties.LIT);
+        else
+            return false;
+        material = next;
+        notifyMaterialChanged();
+        return true;
+    }
+
+    private void notifyMaterialChanged() {
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    // 客户端收到 Material 变化后重建模型数据并触发重渲染(CopycatBlockEntity.redraw 同款)
+    private void redrawMaterial() {
+                requestModelDataUpdate();
+        if (level != null) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 16);
+        }
+    }
+
+    @Override
+    public ModelData getModelData() {
+        if (!hasCustomMaterial())
+            return super.getModelData();
+        return ModelData.builder()
+                .with(icu.dreamripples.aero_suite.starlight.client.AddressingSignCopycatModel.MATERIAL_PROPERTY, material)
+                .build();
+    }
+
 
     public AddressingSignBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -165,6 +245,8 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
                 registries.createSerializationContext(NbtOps.INSTANCE), components())
             .result()
             .ifPresent(encoded -> tag.put("components", encoded));
+        tag.put("AddressingMaterial", NbtUtils.writeBlockState(material));
+        tag.put("AddressingConsumedItem", consumedItem.saveOptional(registries));
         return tag;
     }
 
@@ -173,6 +255,8 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("AddressingSelected", selected);
+        tag.put("AddressingMaterial", NbtUtils.writeBlockState(material));
+        tag.put("AddressingConsumedItem", consumedItem.saveOptional(registries));
     }
 
     @Override
@@ -180,5 +264,14 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
         super.loadAdditional(tag, registries);
         // components 由 vanilla loadWithComponents 在本方法之后解码,故此处不 recompute
         selected = tag.getInt("AddressingSelected");
+        BlockState prevMaterial = material;
+        if (tag.contains("AddressingMaterial"))
+            material = NbtUtils.readBlockState(registries.lookupOrThrow(net.minecraft.core.registries.Registries.BLOCK), tag.getCompound("AddressingMaterial"));
+        if (tag.contains("AddressingConsumedItem"))
+            consumedItem = ItemStack.parseOptional(registries, tag.getCompound("AddressingConsumedItem"));
+        // update packet(客户端)且材质变化:重建模型数据触发重渲染
+        if (level != null && level.isClientSide && prevMaterial != material) {
+            redrawMaterial();
+        }
     }
 }

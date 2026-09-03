@@ -65,7 +65,10 @@ public class AddressingSignRenderer implements BlockEntityRenderer<AddressingSig
 
         pose.pushPose();
         float ts = 0.015625F * RENDER_SCALE;
-        pose.translate(0.0F, TEXT_OFFSET_Y, TEXT_OFFSET_Z);
+        // 贴了伪装板材质时,材质正面在方块边缘(0.5),文字基准面(0.4375+offset≈0.484)会被盖住,
+        // 往外推 0.03 露在材质表面之上
+        float zOffset = TEXT_OFFSET_Z + (be.hasCustomMaterial() ? 0.03F : 0.0F);
+        pose.translate(0.0F, TEXT_OFFSET_Y, zOffset);
         pose.scale(ts, -ts, ts);
 
         List<String> addresses = be.getAddresses();
