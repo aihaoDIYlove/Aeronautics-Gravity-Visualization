@@ -109,12 +109,22 @@ public class AddressingSignCopycatGameTests {
         if (be.isWaxed())
             helper.fail("初始不应为涂蜡状态");
 
-        // 2. 荧光墨囊 → 被拦截,不消耗
+        // 2. 荧光墨囊 → 点亮为发光方块(亮度 8)+ 消耗 1 个;再点一次熄灭回 0
         ItemStack glow = new ItemStack(Items.GLOW_INK_SAC, 2);
         player.setItemInHand(InteractionHand.MAIN_HAND, glow);
         use(state, level, player, glow, abs);
-        if (glow.getCount() != 2)
-            helper.fail("荧光墨囊应被拦截不消耗: count=" + glow.getCount());
+        BlockState glowState = helper.getBlockState(pos);
+        if (glowState.getValue(ModBlocks.ADDRESSING_SIGN_BLOCK.get().GLOWING) != Boolean.TRUE)
+            helper.fail("荧光墨囊未点亮发光态");
+        if (ModBlocks.ADDRESSING_SIGN_BLOCK.get().getLightEmission(glowState, level, abs) != 8)
+            helper.fail("发光态亮度不是 8");
+        if (glow.getCount() != 1)
+            helper.fail("荧光墨囊未消耗: count=" + glow.getCount());
+        use(helper.getBlockState(pos), level, player, glow, abs);
+        BlockState offState = helper.getBlockState(pos);
+        if (offState.getValue(ModBlocks.ADDRESSING_SIGN_BLOCK.get().GLOWING) != Boolean.FALSE
+                || ModBlocks.ADDRESSING_SIGN_BLOCK.get().getLightEmission(offState, level, abs) != 0)
+            helper.fail("二次点击未熄灭发光态");
 
         // 3. 蜜脾 → 涂蜡 + 消耗 1 个
         ItemStack honeycomb = new ItemStack(Items.HONEYCOMB, 2);
@@ -141,6 +151,13 @@ public class AddressingSignCopycatGameTests {
         use(state, level, player, axe, abs);
         if (be.isWaxed())
             helper.fail("斧头未除蜡");
+
+        // 6. 支撑墙消失 → 牌子不消失(canSurvive 恒真,物理搬移不被判死)
+        BlockState signState = helper.getBlockState(pos);
+        helper.setBlock(abs.relative(signState.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING).getOpposite()),
+                Blocks.AIR.defaultBlockState());
+        if (!helper.getBlockState(pos).getBlock().equals(ModBlocks.ADDRESSING_SIGN_BLOCK.get()))
+            helper.fail("失去支撑后寻址牌被销毁");
 
         helper.succeed();
     }
