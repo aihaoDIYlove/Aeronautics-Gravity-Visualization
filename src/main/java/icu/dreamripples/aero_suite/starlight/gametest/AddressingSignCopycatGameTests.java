@@ -21,8 +21,8 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 
 /**
  * 寻址牌伪装板服务端交互 gametest:
- * 放置寻址牌 → 模拟玩家非潜行右键持石头 → 断言材质贴上且物品消耗;
- * 再验证已有材质时换方块被拒;最后 clearMaterial 回到 AIR。
+ * 放置寻址牌 → 模拟玩家非潜行右键持石头 → 断言材质贴上且不消耗物品;
+ * 再验证已有材质时可直接换方块;最后 clearMaterial 回到 AIR。
  */
 @GameTestHolder(GravityVisualization.MOD_ID)
 public class AddressingSignCopycatGameTests {
@@ -34,7 +34,7 @@ public class AddressingSignCopycatGameTests {
     }
 
     @GameTest(template = "copycat_test")
-    public static void copycatApplyAndReject(GameTestHelper helper) {
+    public static void copycatApplyAndReplace(GameTestHelper helper) {
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, ModBlocks.ADDRESSING_SIGN_BLOCK.get().defaultBlockState());
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -42,7 +42,7 @@ public class AddressingSignCopycatGameTests {
         BlockPos abs = helper.absolutePos(pos);
         BlockState state = helper.getBlockState(pos);
 
-        // 1. 非潜行右键持石头 → 贴材质 + 消耗 1 个
+        // 1. 非潜行右键持石头 → 贴材质,不消耗物品
         ItemStack stone = new ItemStack(Items.STONE, 16);
         player.setItemInHand(InteractionHand.MAIN_HAND, stone);
         use(state, level, player, stone, abs);
@@ -55,17 +55,17 @@ public class AddressingSignCopycatGameTests {
             helper.fail("材质未贴上(服务端 useItemOn 未生效)");
         if (!be.getMaterial().is(Blocks.STONE))
             helper.fail("材质方块错误: " + be.getMaterial());
-        if (stone.getCount() != 15)
-            helper.fail("物品未消耗: count=" + stone.getCount());
+        if (stone.getCount() != 16)
+            helper.fail("不应消耗物品: count=" + stone.getCount());
 
-        // 2. 已贴材质时持另一种有效方块(圆石)→ PASS,材质保持
+        // 2. 已贴材质时持另一种有效方块(圆石)→ 直接替换
         ItemStack cobble = new ItemStack(Items.COBBLESTONE, 4);
         player.setItemInHand(InteractionHand.MAIN_HAND, cobble);
         use(helper.getBlockState(pos), level, player, cobble, abs);
-        if (!be.getMaterial().is(Blocks.STONE))
-            helper.fail("已有材质时不应换材质: " + be.getMaterial());
+        if (!be.getMaterial().is(Blocks.COBBLESTONE))
+            helper.fail("已有材质时应可直接换材质: " + be.getMaterial());
         if (cobble.getCount() != 4)
-            helper.fail("PASS 路径不应消耗物品");
+            helper.fail("换材质不应消耗物品");
 
         // 3. 拆除(clearMaterial,扳手路径的落点)→ 回到 AIR
         be.clearMaterial();

@@ -14,7 +14,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
@@ -59,9 +58,8 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
     private int selected = 0;
     private int selfHealCounter = 0;
 
-    // 伪装板材质(copycat):AIR = 未贴(保持透明)。consumedItem 记录玩家消耗的物品,拆下返还/破坏掉落。
+    // 伪装板材质(copycat):AIR = 未贴(保持透明)。不消耗物品,仅记录展示用的 BlockState。
     private BlockState material = Blocks.AIR.defaultBlockState();
-    private ItemStack consumedItem = ItemStack.EMPTY;
 
     public boolean hasCustomMaterial() {
         return !material.isAir();
@@ -71,20 +69,14 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
         return material;
     }
 
-    public ItemStack getConsumedItem() {
-        return consumedItem;
-    }
-
-    // 仅 server 调用;sendBlockUpdated -> getUpdateTag 带 Material/Item -> 客户端 loadAdditional redraw
-    public void setMaterial(BlockState state, ItemStack consumed) {
+    // 仅 server 调用;sendBlockUpdated -> getUpdateTag 带 Material -> 客户端 loadAdditional redraw
+    public void setMaterial(BlockState state) {
         material = state;
-        consumedItem = consumed.copyWithCount(1);
         notifyMaterialChanged();
     }
 
     public void clearMaterial() {
         material = Blocks.AIR.defaultBlockState();
-        consumedItem = ItemStack.EMPTY;
         notifyMaterialChanged();
     }
 
@@ -246,7 +238,6 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
             .result()
             .ifPresent(encoded -> tag.put("components", encoded));
         tag.put("AddressingMaterial", NbtUtils.writeBlockState(material));
-        tag.put("AddressingConsumedItem", consumedItem.saveOptional(registries));
         return tag;
     }
 
@@ -256,7 +247,6 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
         super.saveAdditional(tag, registries);
         tag.putInt("AddressingSelected", selected);
         tag.put("AddressingMaterial", NbtUtils.writeBlockState(material));
-        tag.put("AddressingConsumedItem", consumedItem.saveOptional(registries));
     }
 
     @Override
@@ -267,8 +257,6 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
         BlockState prevMaterial = material;
         if (tag.contains("AddressingMaterial"))
             material = NbtUtils.readBlockState(registries.lookupOrThrow(net.minecraft.core.registries.Registries.BLOCK), tag.getCompound("AddressingMaterial"));
-        if (tag.contains("AddressingConsumedItem"))
-            consumedItem = ItemStack.parseOptional(registries, tag.getCompound("AddressingConsumedItem"));
         // update packet(客户端)且材质变化:重建模型数据触发重渲染
         if (level != null && level.isClientSide && prevMaterial != material) {
             redrawMaterial();

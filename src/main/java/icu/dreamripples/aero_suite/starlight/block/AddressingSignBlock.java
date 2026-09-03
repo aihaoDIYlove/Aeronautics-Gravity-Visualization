@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -56,11 +55,12 @@ import net.neoforged.api.distmarker.OnlyIn;
  *       {@code asItem().getDescriptionId()} 在 BlockItem 注册时递归的陷阱)。</li>
  *   <li>{@link #getCollisionShape}:返回 empty(玩家可穿过);{@code getShape} 不覆写,继承
  *       {@code AABBS.get(FACING)} 供 raytrace 选取。</li>
- *   <li>{@link #useItemOn}:伪装板交互(Create copycat 同款)——非潜行右键持有效方块物品 → 贴材质
- *       (消耗 1 个,再右键同方块循环朝向属性);否则返回 {@code PASS_TO_DEFAULT_BLOCK_INTERACTION}
+ *   <li>{@link #useItemOn}:伪装板交互(Create copycat 同款)——非潜行右键持有效方块物品 → 贴/换材质
+ *       (不消耗物品;再右键同方块循环朝向属性);否则返回 {@code PASS_TO_DEFAULT_BLOCK_INTERACTION}
  *       拦截 SignApplicator(染料/墨囊/蜂巢),转 {@link #useWithoutItem}。潜行右键持方块仍开 GUI。</li>
  *   <li>{@link #useWithoutItem}:shift+右键打开 Create {@link ClipboardScreen} 编辑地址;普通右键无反应。</li>
- *   <li>{@link #onWrenched}:扳手拆下材质并返还消耗物品(潜行扳手 = 先拆材质再破坏方块,IWrenchable 默认)。</li>
+ *   <li>{@link #onWrenched}:扳手拆下材质(材质不消耗,无需返还;潜行扳手 = 先拆材质再破坏方块,
+ *       IWrenchable 默认)。</li>
  * </ul>
  *
  * 木牌渲染由 {@code AddressingSignRenderer} 接管(不画木牌,只画歌词式文字),故 block model 为空。
@@ -127,16 +127,9 @@ public class AddressingSignBlock extends WallSignBlock implements IWrenchable {
                     level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, .75f, .95f);
                     return ItemInteractionResult.SUCCESS;
                 }
-                if (be.hasCustomMaterial())
-                    return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-
-                be.setMaterial(accepted, stack);
-                                level.playSound(null, pos, accepted.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1, .75f);
-                if (!player.isCreative()) {
-                    stack.shrink(1);
-                    if (stack.isEmpty())
-                        player.setItemInHand(hand, ItemStack.EMPTY);
-                }
+                // 不消耗物品:直接贴上/覆盖已有材质(地址数据在 BE,不受影响)
+                be.setMaterial(accepted);
+                level.playSound(null, pos, accepted.getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1, .75f);
                 return ItemInteractionResult.SUCCESS;
             }
         }
@@ -179,16 +172,14 @@ public class AddressingSignBlock extends WallSignBlock implements IWrenchable {
         return applied;
     }
 
-    // 扳手:有材质则拆下并返还消耗物品;无材质 PASS。潜行扳手走 IWrenchable 默认(先本方法再破坏方块)。
+    // 扳手:有材质则拆下材质(物品不返还,材质本就不消耗);无材质 PASS。
+    // 潜行扳手走 IWrenchable 默认(先本方法再破坏方块)。
     @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         if (!(context.getLevel().getBlockEntity(context.getClickedPos()) instanceof AddressingSignBlockEntity be))
             return InteractionResult.PASS;
         if (!be.hasCustomMaterial())
             return InteractionResult.PASS;
-        Player player = context.getPlayer();
-        if (context.getLevel() instanceof ServerLevel serverLevel && player != null && !player.isCreative())
-            player.getInventory().placeItemBackInInventory(be.getConsumedItem());
         context.getLevel().levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, context.getClickedPos(), Block.getId(be.getBlockState()));
         be.clearMaterial();
         return InteractionResult.SUCCESS;
@@ -198,25 +189,6 @@ public class AddressingSignBlock extends WallSignBlock implements IWrenchable {
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
         onWrenched(state, context);
         return IWrenchable.super.onSneakWrenched(state, context);
-    }
-
-    // 破坏方块:掉落已消耗的材质物品(创造破坏由 playerWillDestroy 清空防双掉)
-    @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.hasBlockEntity() || state.getBlock() == newState.getBlock())
-            return;
-        if (!isMoving && level.getBlockEntity(pos) instanceof AddressingSignBlockEntity be
-                && be.hasCustomMaterial())
-            Block.popResource(level, pos, be.getConsumedItem());
-        super.onRemove(state, level, pos, newState, isMoving);
-    }
-
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        super.playerWillDestroy(level, pos, state, player);
-        if (player.isCreative() && level.getBlockEntity(pos) instanceof AddressingSignBlockEntity be)
-            be.clearMaterial();
-        return state;
     }
 
     // ctrl+选取:贴了材质时优先给材质方块(潜行给寻址牌本身)。NeoForge IForgeBlock 签名(带 player)。
