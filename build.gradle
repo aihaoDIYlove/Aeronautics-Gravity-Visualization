@@ -132,10 +132,10 @@ dependencies {
     compileOnly files('libs/flywheel.jar')
     // Create
     implementation "maven.modrinth:LNytGWDc:UjX6dr61"
-    // Sable physics engine library (2.0.3+mc1.21.1 - bumped from 2.0.0 for Create: Enchantment Industry compat; changelog 仅修 sub-level 边界崩溃，无 API 破坏)
-    implementation "maven.modrinth:T9PomCSv:1L6XJqnY"
-    // Create Aeronautics main mod
-    implementation "maven.modrinth:oWaK0Q19:w7zlLnea"
+    // Sable physics engine library (2.0.5+mc1.21.1 - 2026-09 从 2.0.3 升级,测试物理解除刷物品是否修复)
+    implementation "maven.modrinth:T9PomCSv:U678xqle"
+    // Create Aeronautics main mod (1.3.2+mc1.21.1 - 2026-09 从 1.3.0 升级,测试新版物理解除是否仍刷物品)
+    implementation "maven.modrinth:oWaK0Q19:44pLdPGg"
 
     // JEI (dev-env only: API visible at compile time, full JAR loaded at runtime via localRuntime, not transitive to downstream)
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
