@@ -102,8 +102,15 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
 
     private void notifyMaterialChanged() {
         setChanged();
-        if (level != null && !level.isClientSide) {
-            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        if (level != null) {
+            if (level.isClientSide) {
+                // 客户端预测路径(如 Create 扳手两侧都调 onWrenched -> clearMaterial):客户端先把 material
+                // 清成 AIR,服务端 update packet 回来时 loadAdditional 的 prevMaterial==material 不再触发
+                // redraw -> MATERIAL_PROPERTY 残留,材质 quads 挂在区块网格上不消失。客户端直接重建模型数据。
+                redrawMaterial();
+            } else {
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
         }
     }
 
