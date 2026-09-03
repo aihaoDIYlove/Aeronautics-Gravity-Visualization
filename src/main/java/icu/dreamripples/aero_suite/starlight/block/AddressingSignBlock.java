@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -112,6 +113,24 @@ public class AddressingSignBlock extends WallSignBlock implements IWrenchable {
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hitResult) {
+        // 荧光墨囊不支持:高亮行自带发光,吞掉交互
+        // 其余 SignApplicator(染料染色/蜜脾涂蜡)透传原版 SignBlock.useItemOn——自带 isWaxed 门控与音效
+        // 斧头:涂蜡的寻址牌除蜡(原版蜡质方块语义)
+        if (player != null && !player.isShiftKeyDown() && player.mayBuild()) {
+            if (stack.getItem() instanceof net.minecraft.world.item.GlowInkSacItem)
+                return ItemInteractionResult.SUCCESS;
+            if (stack.getItem() instanceof net.minecraft.world.item.SignApplicator)
+                return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+            if (stack.getItem() instanceof net.minecraft.world.item.AxeItem
+                    && level.getBlockEntity(pos) instanceof AddressingSignBlockEntity beWax && beWax.isWaxed()) {
+                if (level instanceof ServerLevel serverLevel) {
+                    beWax.setWaxed(false);
+                    serverLevel.levelEvent(LevelEvent.PARTICLES_WAX_OFF, pos, 0);
+                    serverLevel.playSound(null, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1f, 1f);
+                }
+                return ItemInteractionResult.SUCCESS;
+            }
+        }
         // 伪装板交互:非潜行 + 有效方块物品 → 贴材质;其余(SignApplicator 染料/墨囊/蜂巢等)走默认
         if (player != null && !player.isShiftKeyDown() && player.mayBuild()
                 && level.getBlockEntity(pos) instanceof AddressingSignBlockEntity be) {
@@ -208,6 +227,12 @@ public class AddressingSignBlock extends WallSignBlock implements IWrenchable {
                                                BlockHitResult hitResult) {
         if (player.isShiftKeyDown()
                 && level.getBlockEntity(pos) instanceof AddressingSignBlockEntity be) {
+            // 涂蜡后封锁编辑(原版语义:失败音效 + SUCCESS,不开 GUI)
+            if (be.isWaxed()) {
+                if (!level.isClientSide)
+                    level.playSound(null, pos, be.getSignInteractionFailedSoundEvent(), SoundSource.BLOCKS);
+                return InteractionResult.SUCCESS;
+            }
             if (level.isClientSide) {
                 openClipboardScreen(be.components(), pos, player);
             }

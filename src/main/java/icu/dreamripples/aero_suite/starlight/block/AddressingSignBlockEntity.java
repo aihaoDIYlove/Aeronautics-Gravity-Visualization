@@ -11,7 +11,6 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.level.block.Blocks;
@@ -136,10 +135,9 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
         super(type, pos, state);
     }
 
-    @Override
-    public boolean isWaxed() {
-        return true;
-    }
+    // 涂蜡:使用继承的 vanilla isWaxed 字段(存档/update tag 自动持久化同步),不再覆写恒 true——
+    // 原防 vanilla 编辑 GUI 的目的已由本类 useWithoutItem 拦截 shift 达成,恒 true 反而挡死原版
+    // SignApplicator(染料/蜜脾)通道。涂蜡后:染料失效、ClipboardScreen 不开(斧头可除蜡)。
 
     // ClipboardEditPacket mixin 调用(server 端)
     @Override
@@ -228,8 +226,9 @@ public class AddressingSignBlockEntity extends SignBlockEntity {
             int idx = Mth.clamp(selected, 0, addrs.size() - 1);
             address = addrs.get(idx);
         }
+        // 保留染料染上的颜色(染色只改 SignText 颜色,不随地址切换被覆写回白);高亮行发光由 BER 负责
         SignText newText = new SignText()
-                .setColor(DyeColor.WHITE)
+                .setColor(getText(true).getColor())
                 .setHasGlowingText(true)
                 .setMessage(0, Component.literal(address));
         setText(newText, true);

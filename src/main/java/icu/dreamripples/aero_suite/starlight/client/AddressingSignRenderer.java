@@ -24,9 +24,10 @@ import java.util.List;
  * mulPose(YP, -yRot) + wall extra translate(0, -0.3125, -0.4375)。文字 scale = 0.015625 * 0.6666667,
  * TEXT_OFFSET = (0, 0.33333334, 0.046666667),lineHeight = 10,4 行居中 j = 20(复刻 SignRenderer 常量)。
  *
- * 第 2 行(displayLine=1) = 选中地址:白色 + 发光({@code drawInBatch8xOutline},满光 15728880)。
- * 其余 3 行 = 上下文 [sel-1, sel+1, sel+2]:灰色({@code drawInBatch} + POLYGON_OFFSET 防 z-fighting)。
- * 空列表时第 2 行显示 "shift+右键" 灰色提示。只画正面(不 mulPose 180)。
+ * 第 2 行(displayLine=1) = 选中地址:SignText 染色基色 + 发光({@code drawInBatch8xOutline},满光
+ * 15728880,outline = vanilla getDarkColor 0.4×)。其余 3 行 = 上下文 [sel-1, sel+1, sel+2]:同基色的
+ * 0.4× 暗色、不发光({@code drawInBatch} + POLYGON_OFFSET 防 z-fighting)。染料染色经原版 SignApplicator
+ * 通道改 SignText color 后此处自动跟随。空列表时第 2 行显示 "shift+右键" 灰色提示。只画正面(不 mulPose 180)。
  */
 @OnlyIn(Dist.CLIENT)
 public class AddressingSignRenderer implements BlockEntityRenderer<AddressingSignBlockEntity> {
@@ -38,14 +39,19 @@ public class AddressingSignRenderer implements BlockEntityRenderer<AddressingSig
     private static final int VERTICAL_CENTER = 4 * LINE_HEIGHT / 2;  // 20
     private static final int MAX_TEXT_WIDTH = 90;
 
-    private static final int SELECTED_COLOR = 0xFFFFFF;   // 白(选中行)
-    // 白色发光文字的 outline 色 = SignRenderer.getDarkColor(白色) = RGB*0.4 = (102,102,102) 深灰。
-    // 注意:-988212(BLACK_TEXT_OUTLINE_COLOR)是浅米色,给黑色发光文字用的,白字用它会对比不足发糊。
-    private static final int SELECTED_DARK = 0x666666;
-    private static final int CONTEXT_COLOR = 0x666666;     // 灰(上下文行)
     private static final int FULL_LIGHT = 15728880;        // 满光(发光行)
 
     private final Font font;
+
+    // RGB 各通道 ×0.4(vanilla SignRenderer.getDarkColor 的主体逻辑,去掉黑字发光的米色特判)
+    private static int dimColor(int argb) {
+        return net.minecraft.util.FastColor.ARGB32.color(
+                0,
+                (int) (net.minecraft.util.FastColor.ARGB32.red(argb) * 0.4),
+                (int) (net.minecraft.util.FastColor.ARGB32.green(argb) * 0.4),
+                (int) (net.minecraft.util.FastColor.ARGB32.blue(argb) * 0.4));
+    }
+
 
     public AddressingSignRenderer(BlockEntityRendererProvider.Context context) {
         this.font = context.getFont();
@@ -56,6 +62,14 @@ public class AddressingSignRenderer implements BlockEntityRenderer<AddressingSig
                        MultiBufferSource buffer, int packedLight, int packedOverlay) {
         BlockState state = be.getBlockState();
         if (!(state.getBlock() instanceof AddressingSignBlock signBlock)) return;
+
+        // 染料染色:4 行统一走 SignText 颜色(染料改 SignText color)。高亮行 = 基色 + 发光(outline 色 =
+        // vanilla getDarkColor:0.4×,黑字发光特判米色——该特判只用于描边);其余行 = 纯 0.4× 暗色不发光,
+        // 不能用 getDarkColor——其黑字发光特判返回浅米色,黑染料时正文会变白(2026-09 踩坑)。
+        // 未染色时基色为白:高亮白字深灰 outline、其余 ≈0x636665 灰,与旧硬编码观感一致。
+        int baseColor = be.getText(true).getColor().getTextColor();
+        int outlineColor = net.minecraft.client.renderer.blockentity.SignRenderer.getDarkColor(be.getText(true));
+        int contextColor = dimColor(baseColor);
 
         pose.pushPose();
         // translateSign (wall 分支)
@@ -94,10 +108,10 @@ public class AddressingSignRenderer implements BlockEntityRenderer<AddressingSig
             float y = line * LINE_HEIGHT - VERTICAL_CENTER;
 
             if (isHighlight) {
-                font.drawInBatch8xOutline(fcs, x, y, SELECTED_COLOR, SELECTED_DARK,
+                font.drawInBatch8xOutline(fcs, x, y, baseColor, outlineColor,
                         pose.last().pose(), buffer, FULL_LIGHT);
             } else {
-                font.drawInBatch(fcs, x, y, CONTEXT_COLOR, false,
+                font.drawInBatch(fcs, x, y, contextColor, false,
                         pose.last().pose(), buffer, Font.DisplayMode.POLYGON_OFFSET, 0, packedLight);
             }
         }

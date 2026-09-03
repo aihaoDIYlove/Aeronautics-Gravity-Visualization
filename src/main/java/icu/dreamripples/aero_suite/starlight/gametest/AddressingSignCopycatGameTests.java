@@ -74,4 +74,74 @@ public class AddressingSignCopycatGameTests {
 
         helper.succeed();
     }
+
+    // 染料/蜜脾/斧头走原版 SignApplicator 通道:染料染色(不消耗在 wax 前提下消耗染料)、蜜脾涂蜡、
+    // 涂蜡后染料失效、斧头除蜡、荧光墨囊被吞不掉落。染色面可能是正面或背面(mock 玩家朝向不定),两 face 都接受。
+    @GameTest(template = "copycat_test")
+    public static void copycatDyeWax(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, ModBlocks.ADDRESSING_SIGN_BLOCK.get().defaultBlockState());
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        ServerLevel level = helper.getLevel();
+        BlockPos abs = helper.absolutePos(pos);
+        BlockState state = helper.getBlockState(pos);
+
+        if (!(helper.getBlockEntity(pos) instanceof AddressingSignBlockEntity be)) {
+            helper.fail("寻址牌 BE 不存在");
+            return;
+        }
+
+        // 0. 原版 canApplyToSign 要求牌面有文字(空牌不可染色),两面各写一行
+        be.setText(new net.minecraft.world.level.block.entity.SignText()
+                .setMessage(0, net.minecraft.network.chat.Component.literal("a")), true);
+        be.setText(new net.minecraft.world.level.block.entity.SignText()
+                .setMessage(0, net.minecraft.network.chat.Component.literal("a")), false);
+
+        // 1. 红色染料 → 染色成功 + 消耗 1 个,未涂蜡
+        ItemStack dye = new ItemStack(Items.RED_DYE, 4);
+        player.setItemInHand(InteractionHand.MAIN_HAND, dye);
+        use(state, level, player, dye, abs);
+        if (be.getText(true).getColor() != net.minecraft.world.item.DyeColor.RED
+                && be.getText(false).getColor() != net.minecraft.world.item.DyeColor.RED)
+            helper.fail("染料未染色: " + be.getText(true).getColor());
+        if (dye.getCount() != 3)
+            helper.fail("染料未消耗: count=" + dye.getCount());
+        if (be.isWaxed())
+            helper.fail("初始不应为涂蜡状态");
+
+        // 2. 荧光墨囊 → 被拦截,不消耗
+        ItemStack glow = new ItemStack(Items.GLOW_INK_SAC, 2);
+        player.setItemInHand(InteractionHand.MAIN_HAND, glow);
+        use(state, level, player, glow, abs);
+        if (glow.getCount() != 2)
+            helper.fail("荧光墨囊应被拦截不消耗: count=" + glow.getCount());
+
+        // 3. 蜜脾 → 涂蜡 + 消耗 1 个
+        ItemStack honeycomb = new ItemStack(Items.HONEYCOMB, 2);
+        player.setItemInHand(InteractionHand.MAIN_HAND, honeycomb);
+        use(state, level, player, honeycomb, abs);
+        if (!be.isWaxed())
+            helper.fail("蜜脾未涂蜡");
+        if (honeycomb.getCount() != 1)
+            helper.fail("蜜脾未消耗: count=" + honeycomb.getCount());
+
+        // 4. 涂蜡后再染色 → 原版门控拒绝,颜色不变
+        ItemStack dye2 = new ItemStack(Items.BLUE_DYE, 4);
+        player.setItemInHand(InteractionHand.MAIN_HAND, dye2);
+        use(state, level, player, dye2, abs);
+        if (be.getText(true).getColor() == net.minecraft.world.item.DyeColor.BLUE
+                || be.getText(false).getColor() == net.minecraft.world.item.DyeColor.BLUE)
+            helper.fail("涂蜡后染料不应生效");
+        if (dye2.getCount() != 4)
+            helper.fail("涂蜡后染料不应消耗");
+
+        // 5. 斧头 → 除蜡
+        ItemStack axe = new ItemStack(Items.IRON_AXE, 1);
+        player.setItemInHand(InteractionHand.MAIN_HAND, axe);
+        use(state, level, player, axe, abs);
+        if (be.isWaxed())
+            helper.fail("斧头未除蜡");
+
+        helper.succeed();
+    }
 }
