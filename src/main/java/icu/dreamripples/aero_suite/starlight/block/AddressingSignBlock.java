@@ -57,8 +57,9 @@ import net.neoforged.api.distmarker.OnlyIn;
  *       {@code BlockEntityType.SIGN} 的陷阱)。</li>
  *   <li>{@link #getDescriptionId}:返回固定语言键(避开 {@code WallSignBlock.getDescriptionId} 返回
  *       {@code asItem().getDescriptionId()} 在 BlockItem 注册时递归的陷阱)。</li>
- *   <li>{@link #getCollisionShape}:返回 empty(玩家可穿过);{@code getShape} 不覆写,继承
- *       {@code AABBS.get(FACING)} 供 raytrace 选取。</li>
+ *   <li>{@link #getCollisionShape}:返回与选取箱一致的墙牌薄板(=伪装板显示区域;Sable 以
+ *       碰撞箱非空判质量,不可为空);{@code getShape} 不覆写,继承 {@code AABBS.get(FACING)}
+ *       供 raytrace 选取。</li>
  *   <li>{@link #useItemOn}:伪装板交互(Create copycat 同款)——非潜行右键持有效方块物品 → 贴/换材质
  *       (不消耗物品;再右键同方块循环朝向属性);否则返回 {@code PASS_TO_DEFAULT_BLOCK_INTERACTION}
  *       拦截 SignApplicator(染料/墨囊/蜂巢),转 {@link #useWithoutItem}。潜行右键持方块仍开 GUI。</li>
@@ -125,19 +126,20 @@ public class AddressingSignBlock extends WallSignBlock implements IWrenchable {
         return "block.starlight_logistics.addressing_sign";
     }
 
-    // 碰撞箱不可为空:Sable 以"碰撞箱非空"判方块质量(getMass→isSolid),空碰撞箱 = 零质量方块。
-    // 物理化解除时逐块扣质量,总质量 ≤0 的瞬间 destroyAllBlocks 带掉落清空 plot,未清到的零质量
-    // 方块(寻址牌)会被连带掉落而方块本身已在目的地落位 → 刷物品(2026-09 踩坑)。给一个 0.01³
-    // 的微碰撞箱让 Sable 视其为有质量方块,玩家仍可穿过,游戏内无感。
+    // 碰撞箱 = 显示区域:伪装板材质就是裁剪进选取箱(墙牌贴墙薄板 AABBS.get(FACING))渲染的,
+    // 返回同款形状两者天然对齐,玩家撞到的是看得见的板而不是中心幽灵箱。
+    // 同时满足 Sable 约束:碰撞箱不可为空——Sable 以"碰撞箱非空"判方块质量(getMass→isSolid,
+    // 只看非空不看大小),空碰撞箱 = 零质量方块;物理化解除时逐块扣质量,总质量 ≤0 的瞬间
+    // destroyAllBlocks 带掉落清空 plot,未清到的零质量方块会被连带掉落 → 刷物品(2026-09 踩坑)。
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level,
                                            BlockPos pos, CollisionContext context) {
-        return Block.box(8.0, 8.0, 8.0, 8.01, 8.01, 8.01);
+        return state.getShape(level, pos, context);
     }
 
     // Sable 物理(装)解除逐块搬移方块:邻域更新/旋转中间态下支撑墙可能尚未落位,canSurvive=false
     // 会让寻址牌被判为无支撑而遭销毁(破坏音效+掉落),随后搬移又把牌子落回原位 → 刷物品。
-    // 本体是无碰撞悬浮装饰,恒可存活;放置时的贴墙校验由 getStateForPlacement 自行完成。
+    // 本体是悬浮装饰(失去支撑也不该消失),恒可存活;放置时的贴墙校验由 getStateForPlacement 自行完成。
     @Override
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         return true;

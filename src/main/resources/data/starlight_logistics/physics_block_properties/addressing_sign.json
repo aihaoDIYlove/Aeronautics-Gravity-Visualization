@@ -1,0 +1,8 @@
+{
+  "priority": 1002,
+  "selector": "starlight_logistics:addressing_sign",
+
+  "properties": {
+    "sable:mass": 0.1
+  }
+}
