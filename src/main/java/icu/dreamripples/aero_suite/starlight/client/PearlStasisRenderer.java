@@ -3,6 +3,8 @@ package icu.dreamripples.aero_suite.starlight.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.simibubi.create.content.kinetics.belt.BeltHelper;
+import dev.ryanhcode.sable.Sable;
+import dev.ryanhcode.sable.sublevel.SubLevel;
 import icu.dreamripples.aero_suite.starlight.block.PearlStasisBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -10,6 +12,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -50,8 +53,7 @@ public class PearlStasisRenderer implements BlockEntityRenderer<PearlStasisBlock
 
         if (upright) {
             // 直立物品 billboard 朝向相机(复刻 DepotRenderer.renderItem upright 分支)
-            Vec3 cameraPosition = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-            Vec3 diff = Vec3.atCenterOf(be.getBlockPos()).subtract(cameraPosition);
+            Vec3 diff = cameraDirection(be.getBlockPos());
             float yRot = (float) (Mth.atan2(diff.x, diff.z) + Math.PI);
             pose.mulPose(Axis.YP.rotation(yRot));
             pose.translate(0, 3 / 32F, -1 / 16F);
@@ -73,5 +75,21 @@ public class PearlStasisRenderer implements BlockEntityRenderer<PearlStasisBlock
 
         itemRenderer.render(stack, ItemDisplayContext.FIXED, false, pose, buffer, packedLight, packedOverlay, model);
         pose.popPose();
+    }
+
+    /**
+     * 方块中心指向相机的向量(BE 局部系)。
+     * 物理化结构上 BE 坐标是 plot 空间的远坐标, 相机世界坐标须先经 sublevel
+     * {@code logicalPose().transformPositionInverse()} 逆变换到 BE 局部系再相减,
+     * 否则方向近似恒定、直立物品在船上永远朝一边(2026-09-04, 同悬挂展示架)。
+     * 主世界(无 sublevel)时该变换为恒等。纯 double, 无精度问题。
+     */
+    private static Vec3 cameraDirection(BlockPos blockPos) {
+        Vec3 cameraPosition = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        SubLevel subLevel = Sable.HELPER.getContaining(Minecraft.getInstance().level, blockPos);
+        if (subLevel != null) {
+            cameraPosition = subLevel.logicalPose().transformPositionInverse(cameraPosition);
+        }
+        return Vec3.atCenterOf(blockPos).subtract(cameraPosition);
     }
 }
