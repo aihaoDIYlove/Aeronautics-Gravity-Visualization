@@ -67,6 +67,8 @@
   "aero_suite.feature.single_slot_hopper.desc": "原版漏斗行为,但只有 1 格且每格恒 1 个物品(不堆叠);搭配顺序供料器防重复物品被合并。",
   "aero_suite.feature.filtered_single_slot_hopper": "带过滤的纸板漏斗",
   "aero_suite.feature.filtered_single_slot_hopper.desc": "可标记过滤的纸板漏斗",
+  "aero_suite.feature.hanging_display_rack": "悬挂展示架(测试)",
+  "aero_suite.feature.hanging_display_rack.desc": "测试物件:纯透明 8x8 薄板,无碰撞箱(零质量),右键存取单件物品。有意复现 Sable 零质量方块刷物品 bug。",
   "aero_suite.feature.stabilizer": "自稳定方块",
   "aero_suite.feature.stabilizer.desc": "PD 控制器维持载具水平,质量/浮力双模式;含半成品删除。",
   "aero_suite.feature.world_anchor": "世界锚点",

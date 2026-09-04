@@ -127,6 +127,9 @@ public final class AeroSuiteFeatures {
             new Feature("filtered_single_slot_hopper", Group.SIMPLIFICATION, true,
                     List.of(ModBlocks.FILTERED_SINGLE_SLOT_HOPPER_ITEM), ModBlocks.FILTERED_SINGLE_SLOT_HOPPER_ITEM)
                     .under("single_slot_hopper"),
+            // 测试物件(无合成, 仅创造栏): noCollission 零质量, 有意复现 Sable 零质量刷物品 bug, 勿修
+            new Feature("hanging_display_rack", Group.SIMPLIFICATION, true,
+                    List.of(ModBlocks.HANGING_DISPLAY_RACK_ITEM), ModBlocks.HANGING_DISPLAY_RACK_ITEM),
             // ── 航空学: 星空物流 ───────────────────────────────────
             new Feature("stabilizer", Group.STARLIGHT, true,
                     List.of(ModBlocks.STABILIZER_ITEM, ModItems.INCOMPLETE_STABILIZER), ModBlocks.STABILIZER_ITEM),

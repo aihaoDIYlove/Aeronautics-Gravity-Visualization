@@ -17,7 +17,7 @@ import net.minecraft.resources.ResourceLocation;
  * 行布局(ROW_SIZE=9):
  * <pre>
  * row 0: 横幅 gravity        row 1: 重力可视化 8+1 件
- * row 2: 横幅 simplification row 3: 方便物品 5+1 件
+ * row 2: 横幅 simplification row 3: 方便物品 6+1 件
  * row 4: 横幅 starlight      row 5-6: 星空物流 11-2 件
  * </pre>
  * 物品顺序必须与 {@code ModCreativeTabs} 的 displayItems 一致——bannerRow 由
@@ -30,7 +30,7 @@ public final class AeroSuiteCreativeBannerLayout {
     public record Section(ResourceLocation id, Component title, ResourceLocation texture, int bannerRow) {}
 
     /** 每段物品数,顺序 = ModCreativeTabs.displayItems 的分组顺序。 */
-    private static final int[] SECTION_ITEM_COUNTS = {9, 6, 9};
+    private static final int[] SECTION_ITEM_COUNTS = {9, 7, 9};
 
     public static final List<Section> SECTIONS = build();
 

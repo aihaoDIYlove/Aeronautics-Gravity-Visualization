@@ -1,0 +1,7 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "simplification_related:block/hanging_display_rack_empty"
+  },
+  "elements": []
+}

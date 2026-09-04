@@ -29,13 +29,14 @@ public class ModCreativeTabs {
                         output.accept(ModBlocks.COUNTERWEIGHT_LIGHT_REDSTONE_ITEM.get());
                         output.accept(ModBlocks.COUNTERWEIGHT_LIGHT_PEARL_REDSTONE_ITEM.get());
                         output.accept(ModBlocks.STABILIZER_ITEM.get());
-                        // --- simplification_related (6) ---
+                        // --- simplification_related (7) ---
                         output.accept(ModBlocks.CONVENIENT_ANALOG_TRANSMISSION_ITEM.get());
                         output.accept(ModBlocks.VARIABLE_SPEED_PORTABLE_ENGINE_ITEMS.get(DyeColor.RED).get());
                         output.accept(ModBlocks.SEQUENTIAL_FEEDER_ITEM.get());
                         output.accept(ModBlocks.SINGLE_SLOT_HOPPER_ITEM.get());
                         output.accept(ModBlocks.FILTERED_SINGLE_SLOT_HOPPER_ITEM.get());
                         output.accept(ModBlocks.ADDRESSING_SIGN_ITEM.get());
+                        output.accept(ModBlocks.HANGING_DISPLAY_RACK_ITEM.get());
                         // --- starlight_logistics (9) ---
                         output.accept(ModItems.STARLIGHT_BUCKET.get());
                         output.accept(ModItems.STARLIGHT_BOTTLE.get());

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=down":  { "model": "simplification_related:block/hanging_display_rack" },
+    "facing=up":    { "model": "simplification_related:block/hanging_display_rack" },
+    "facing=north": { "model": "simplification_related:block/hanging_display_rack" },
+    "facing=south": { "model": "simplification_related:block/hanging_display_rack" },
+    "facing=east":  { "model": "simplification_related:block/hanging_display_rack" },
+    "facing=west":  { "model": "simplification_related:block/hanging_display_rack" }
+  }
+}

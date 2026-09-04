@@ -16,6 +16,8 @@ import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlock;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.FilteredSingleSlotHopperBlock;
 import icu.dreamripples.aero_suite.simplification.block.FilteredSingleSlotHopperBlockEntity;
+import icu.dreamripples.aero_suite.simplification.block.HangingDisplayRackBlock;
+import icu.dreamripples.aero_suite.simplification.block.HangingDisplayRackBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.SingleSlotHopperBlock;
 import icu.dreamripples.aero_suite.simplification.block.SingleSlotHopperBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.VariableSpeedPortableEngineBlock;
@@ -547,6 +549,34 @@ public class ModBlocks {
             ModItems.SIMPLIFICATION_ITEMS.register("filtered_single_slot_hopper",
                     () -> new BlockItem(FILTERED_SINGLE_SLOT_HOPPER_BLOCK.get(), new Item.Properties()));
 
+    // 悬挂展示架(测试物件, 无合成): 挂在天花板下的纯透明 8x8x1 薄板, 右键存取单件物品(参考珍珠滞留台)。
+    // .noCollission() = 空碰撞箱 = Sable 零质量方块 -- 有意复现"物理解除刷物品"bug 的夹具, 勿修!
+    // 详见 HangingDisplayRackBlock Javadoc。
+    public static final DeferredHolder<Block, HangingDisplayRackBlock> HANGING_DISPLAY_RACK_BLOCK =
+            SIMPLIFICATION_BLOCKS.register("hanging_display_rack",
+                    () -> new HangingDisplayRackBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.NONE)
+                                    .sound(SoundType.GLASS)
+                                    .strength(0.3f)
+                                    .noCollission()
+                                    .noOcclusion()
+                                    .isValidSpawn((state, level, pos, entity) -> false)
+                                    .isRedstoneConductor((state, level, pos) -> false)
+                                    .isSuffocating((state, level, pos) -> false)
+                                    .isViewBlocking((state, level, pos) -> false)));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HangingDisplayRackBlockEntity>> HANGING_DISPLAY_RACK_BE =
+            SIMPLIFICATION_BLOCK_ENTITIES.register("hanging_display_rack",
+                    () -> BlockEntityType.Builder
+                            .of(ModBlocks::createHangingDisplayRackBlockEntity,
+                                    HANGING_DISPLAY_RACK_BLOCK.get())
+                            .build(null));
+
+    public static final DeferredHolder<Item, BlockItem> HANGING_DISPLAY_RACK_ITEM =
+            ModItems.SIMPLIFICATION_ITEMS.register("hanging_display_rack",
+                    () -> new BlockItem(HANGING_DISPLAY_RACK_BLOCK.get(), new Item.Properties()));
+
     // 珍珠滞留台: 单槽物品台(恒 1 个, 无 GUI, 右键存取), 物品渲染在方块内 4px 高处。
     // 红石上升沿触发: 内部是已绑定玩家的激活末影珍珠时把该玩家传送到台上方并消耗珍珠。
     // 详见 PearlStasisBlockEntity Javadoc。
@@ -577,5 +607,9 @@ public class ModBlocks {
 
     private static PearlStasisBlockEntity createPearlStasisBlockEntity(BlockPos pos, BlockState state) {
         return new PearlStasisBlockEntity(PEARL_STASIS_BE.get(), pos, state);
+    }
+
+    private static HangingDisplayRackBlockEntity createHangingDisplayRackBlockEntity(BlockPos pos, BlockState state) {
+        return new HangingDisplayRackBlockEntity(HANGING_DISPLAY_RACK_BE.get(), pos, state);
     }
 }

@@ -1,10 +1,12 @@
 package icu.dreamripples.aero_suite.simplification;
 
+import com.simibubi.create.api.contraption.BlockMovementChecks;
 import com.simibubi.create.api.stress.BlockStressValues;
 import icu.dreamripples.aero_suite.common.AeroSuite;
 import icu.dreamripples.aero_suite.common.AeroSuiteIds;
 import icu.dreamripples.aero_suite.common.registry.ModBlocks;
 import icu.dreamripples.aero_suite.common.registry.ModItems;
+import icu.dreamripples.aero_suite.simplification.block.HangingDisplayRackBlock;
 import icu.dreamripples.aero_suite.simplification.block.ModMenus;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -25,7 +27,26 @@ public class SimplificationRelated {
         ModBlocks.SIMPLIFICATION_BLOCK_ENTITIES.register(modEventBus);
         ModMenus.MENUS.register(modEventBus);
         modEventBus.addListener(SimplificationRelated::onCommonSetup);
+        registerMovementChecks();
         AeroSuite.LOGGER.info("Aeronautics: Simplification Related loaded!");
+    }
+
+    // 悬挂展示架:向 Create 装配检查注册"脆性 + 朝支撑附着",与火把/告示牌同款待遇。
+    // 必要性:Simulated/Sable 的物理化搜索(SimAssemblyContraption.moveBlock)直接查
+    // BlockMovementChecks.isBlockAttachedTowards;而 Create 兜底 isMovementNecessaryFallback
+    // 对"空碰撞箱"方块一律判 false —— 零质量测试夹具(故意 noCollission)若不注册,
+    // 物理化时不会跟着支撑方块进 sublevel,且支撑被静默搬走不触发 updateShape,
+    // 架子无声悬空、也不随支撑破坏而掉落(2026-09-04 测试反馈)。
+    // brittle → isMovementNecessaryFallback 首行判 true,Create 原生机械动力装配同样带上。
+    private static void registerMovementChecks() {
+        BlockMovementChecks.registerBrittleCheck(state -> state.getBlock() instanceof HangingDisplayRackBlock
+                ? BlockMovementChecks.CheckResult.SUCCESS
+                : BlockMovementChecks.CheckResult.PASS);
+        BlockMovementChecks.registerAttachedCheck((state, world, pos, direction) ->
+                state.getBlock() instanceof HangingDisplayRackBlock
+                        ? BlockMovementChecks.CheckResult.of(
+                                state.getValue(HangingDisplayRackBlock.FACING).getOpposite() == direction)
+                        : BlockMovementChecks.CheckResult.PASS);
     }
 
     // 变速式便携引擎:注册应力容量(超热 ×2 由 BE.calculateAddedStressCapacity 覆盖)
