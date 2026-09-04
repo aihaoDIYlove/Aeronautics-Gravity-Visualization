@@ -1,7 +1,6 @@
 {
   "advancements.gravity_visualization.obtain_portable_diagram.description": "Craft a Portable Contraption Diagram",
   "advancements.gravity_visualization.obtain_portable_diagram.title": "Pocket-Sized",
-  "advancements.gravity_visualization.root.description": "Portable Diagram and counterweight blocks",
   "advancements.gravity_visualization.root.description": "Spark Wand, Portable Diagram and counterweight blocks",
   "block.gravity_visualization.counterweight": "Counterweight",
   "block.gravity_visualization.counterweight.mass_tier": "Mass Tier",
