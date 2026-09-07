@@ -23,14 +23,14 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 /**
- * 配重方块 BE - 注册 ScrollValueBehaviour,玩家右键弹板调档(1..20)。
+ * 配重方块 BE - 注册 ScrollValueBehaviour,玩家右键弹板调档(1..36)。
  * 值变化时通过 callback 把新档位写入 BlockState.MASS_TIER,Sable 自动检测并增量更新质量。
  * 同时在 tick 中反向同步 BlockState -> behaviour.value(防止外部修改 BlockState 时 UI 不同步)。
  */
 public class CounterweightBlockEntity extends SmartBlockEntity {
 
     private static final int MIN_TIER = 1;
-    private static final int MAX_TIER = 20;
+    private static final int MAX_TIER = 36;
 
     private ScrollValueBehaviour massTier;
 
@@ -98,7 +98,7 @@ public class CounterweightBlockEntity extends SmartBlockEntity {
 
         @Override
         public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
-            // Create 弹板列为 0..maxValue 含端点:传 MAX_TIER-1 得 0..19 共 20 格,formatter +1 显示为 1..20
+            // Create 弹板列为 0..maxValue 含端点:传 MAX_TIER-1 得 0..35 共 36 格,formatter +1 显示为 1..36
             return new ValueSettingsBoard(label, MAX_TIER - 1, 1,
                     ImmutableList.of(Component.translatable("gravity_visualization.unit.mass_kpg")),
                     new ValueSettingsFormatter(this::formatSettings));

@@ -43,7 +43,7 @@
   "aero_suite.feature.portable_diagram": "Portable Diagram",
   "aero_suite.feature.portable_diagram.desc": "Right-click a physics vehicle to open its machine diagram directly.",
   "aero_suite.feature.counterweight": "Counterweight",
-  "aero_suite.feature.counterweight.desc": "Manually adjustable mass block (1-20) via sequenced assembly; includes intermediate deletion.",
+  "aero_suite.feature.counterweight.desc": "Manually adjustable mass block (1-36) via sequenced assembly; includes intermediate deletion.",
   "aero_suite.feature.counterweight_redstone": "Redstone Counterweight",
   "aero_suite.feature.counterweight_redstone.desc": "Redstone-driven mass tier (1-16) with light strip indicator.",
   "aero_suite.feature.counterweight_light": "Counterweight \"Light\"",

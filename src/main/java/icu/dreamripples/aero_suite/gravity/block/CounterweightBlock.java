@@ -11,14 +11,14 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 /**
- * 配重方块 - 通过 ScrollValueBehaviour 调节 mass_tier 1..20,对应 Sable mass 1..20 kpg。
+ * 配重方块 - 通过 ScrollValueBehaviour 调节 mass_tier 1..36,对应 Sable mass 1..36 kpg(与配轻块 lift_tier 上限对齐)。
  * BlockState 变化由 Sable 的 SubLevelPhysicsSystem.handleBlockChange 自动检测并增量更新 MassTracker,
  * 无需 Mixin 或手动通知。质量到 mass_tier 的映射由 physics_block_properties/counterweight.json 的
  * overrides 字段定义。
  */
 public class CounterweightBlock extends Block implements IBE<CounterweightBlockEntity>, IWrenchable {
 
-    public static final IntegerProperty MASS_TIER = IntegerProperty.create("mass_tier", 1, 20);
+    public static final IntegerProperty MASS_TIER = IntegerProperty.create("mass_tier", 1, 36);
 
     public CounterweightBlock(Properties properties) {
         super(properties);

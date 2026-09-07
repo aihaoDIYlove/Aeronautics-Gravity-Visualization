@@ -44,7 +44,7 @@
   "aero_suite.feature.portable_diagram": "便携图解",
   "aero_suite.feature.portable_diagram.desc": "右键物理载具直接打开 Simulated 机器图纸页面,免放置图纸方块。",
   "aero_suite.feature.counterweight": "配重块",
-  "aero_suite.feature.counterweight.desc": "手调质量方块(质量 1-20),序列装配获取;含半成品删除。",
+  "aero_suite.feature.counterweight.desc": "手调质量方块(质量 1-36),序列装配获取;含半成品删除。",
   "aero_suite.feature.counterweight_redstone": "红石配重块",
   "aero_suite.feature.counterweight_redstone.desc": "红石信号驱动质量档位(1-16),灯带显示档位。",
   "aero_suite.feature.counterweight_light": "配“轻”块",
