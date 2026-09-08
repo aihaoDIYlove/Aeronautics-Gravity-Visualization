@@ -176,7 +176,8 @@ public class AeroSuiteConfigScreen extends Screen {
 
     /**
      * 数值页全部行, 顺序即显示顺序:
-     * 机械手开关 -> 机械手 4 项数值 -> 星空机壳粒子开关 -> 粒子距离 -> 星空酿造基底。
+     * 机械手开关 -> 机械手 4 项数值 -> 星空机壳粒子开关 -> 粒子距离 -> 星空酿造基底
+     * -> 自稳定方块 6 项增益(控制律详见 StabilizerBlockEntity Javadoc)。
      */
     private List<TunRow> tunRows() {
         List<TunRow> list = new ArrayList<>();
@@ -203,6 +204,30 @@ public class AeroSuiteConfigScreen extends Screen {
                 () -> { var c = config(); return c != null ? c.tunables.starlightCasingParticleDistance.get() : 0; },
                 v -> { var c = config(); if (c != null) c.tunables.starlightCasingParticleDistance.set((int) v); })));
         list.add(TunRow.of(findGate("recipe_starlight_brewing")));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.stabilizer_kp", "aero_suite.tunables.stabilizer_kp.tooltip",
+                10, 0, 5000, false,
+                () -> { var c = config(); return c != null ? c.tunables.stabilizerKp.getF() : 0; },
+                v -> { var c = config(); if (c != null) c.tunables.stabilizerKp.set(v); })));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.stabilizer_kd", "aero_suite.tunables.stabilizer_kd.tooltip",
+                0.1, 0, 20, false,
+                () -> { var c = config(); return c != null ? c.tunables.stabilizerKd.getF() : 0; },
+                v -> { var c = config(); if (c != null) c.tunables.stabilizerKd.set(v); })));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.stabilizer_kd_alpha", "aero_suite.tunables.stabilizer_kd_alpha.tooltip",
+                0.1, 0, 5, false,
+                () -> { var c = config(); return c != null ? c.tunables.stabilizerKdAlpha.getF() : 0; },
+                v -> { var c = config(); if (c != null) c.tunables.stabilizerKdAlpha.set(v); })));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.stabilizer_damp_tilt_gain", "aero_suite.tunables.stabilizer_damp_tilt_gain.tooltip",
+                0.5, 0, 10, false,
+                () -> { var c = config(); return c != null ? c.tunables.stabilizerDampTiltGain.getF() : 0; },
+                v -> { var c = config(); if (c != null) c.tunables.stabilizerDampTiltGain.set(v); })));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.stabilizer_kd_max", "aero_suite.tunables.stabilizer_kd_max.tooltip",
+                0.5, 0.1, 50, false,
+                () -> { var c = config(); return c != null ? c.tunables.stabilizerKdMax.getF() : 0; },
+                v -> { var c = config(); if (c != null) c.tunables.stabilizerKdMax.set(v); })));
+        list.add(TunRow.of(new NumRow("aero_suite.tunables.stabilizer_k_heave", "aero_suite.tunables.stabilizer_k_heave.tooltip",
+                0.01, 0, 1, false,
+                () -> { var c = config(); return c != null ? c.tunables.stabilizerKHeave.getF() : 0; },
+                v -> { var c = config(); if (c != null) c.tunables.stabilizerKHeave.set(v); })));
         return list;
     }
 
@@ -215,6 +240,12 @@ public class AeroSuiteConfigScreen extends Screen {
         c.tunables.extendoGrabAir.set(AeroSuiteConfig.Tunables.AIR_DEFAULT);
         c.tunables.extendoGrabSoftness.set((double) AeroSuiteConfig.Tunables.SOFTNESS_DEFAULT);
         c.tunables.starlightCasingParticleDistance.set(AeroSuiteConfig.Tunables.PARTICLE_DISTANCE_DEFAULT);
+        c.tunables.stabilizerKp.set((double) AeroSuiteConfig.Tunables.STABILIZER_KP_DEFAULT);
+        c.tunables.stabilizerKd.set((double) AeroSuiteConfig.Tunables.STABILIZER_KD_DEFAULT);
+        c.tunables.stabilizerKdAlpha.set((double) AeroSuiteConfig.Tunables.STABILIZER_KD_ALPHA_DEFAULT);
+        c.tunables.stabilizerDampTiltGain.set((double) AeroSuiteConfig.Tunables.STABILIZER_DAMP_TILT_GAIN_DEFAULT);
+        c.tunables.stabilizerKdMax.set((double) AeroSuiteConfig.Tunables.STABILIZER_KD_MAX_DEFAULT);
+        c.tunables.stabilizerKHeave.set((double) AeroSuiteConfig.Tunables.STABILIZER_K_HEAVE_DEFAULT);
     }
 
     private List<AeroSuiteFeatures.Feature> pageFeatures() {

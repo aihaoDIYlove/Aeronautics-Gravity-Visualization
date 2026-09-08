@@ -24,7 +24,7 @@ public class AeroSuiteConfig extends ConfigBase {
     /** key -> ConfigBool(全部开关, 含三组)。ConcurrentHashMap: 配置屏(客户端线程)写 / 服务端读 */
     public final Map<String, ConfigBool> byKey = new ConcurrentHashMap<>();
 
-    /** 数值特性组(配置屏"数值特性相关"页编辑; 现为机械手抓取的三个消耗值, 读取方 ExtendoGrabServer) */
+    /** 数值特性组(配置屏"数值特性相关"页编辑; 机械手消耗值读取方 ExtendoGrabServer, 稳定器增益读取方 StabilizerBlockEntity) */
     public final Tunables tunables = nested(0, Tunables::new);
 
     public AeroSuiteConfig() {
@@ -52,6 +52,12 @@ public class AeroSuiteConfig extends ConfigBase {
         public static final int AIR_DEFAULT = 15;
         public static final float SOFTNESS_DEFAULT = 0.75f;
         public static final int PARTICLE_DISTANCE_DEFAULT = 32;
+        public static final float STABILIZER_KP_DEFAULT = 100.0f;
+        public static final float STABILIZER_KD_DEFAULT = 0.6f;
+        public static final float STABILIZER_KD_ALPHA_DEFAULT = 0.6f;
+        public static final float STABILIZER_DAMP_TILT_GAIN_DEFAULT = 2.0f;
+        public static final float STABILIZER_KD_MAX_DEFAULT = 4.0f;
+        public static final float STABILIZER_K_HEAVE_DEFAULT = 0.05f;
 
         /** 抓取时每秒消耗的饥饿值(点); 0 = 不消耗 */
         public final ConfigFloat extendoGrabHunger =
@@ -71,6 +77,31 @@ public class AeroSuiteConfig extends ConfigBase {
         /** 星空机壳粒子渲染距离(格); 玩家超出此距离的机壳/套壳管道不再冒星光粒子 */
         public final ConfigInt starlightCasingParticleDistance =
                 i(PARTICLE_DISTANCE_DEFAULT, 1, 128, "starlight_casing_particle_distance");
+        /**
+         * 自稳定方块 P 项恢复力矩增益 [N·m/rad]:tau_P = Kp * (-ld.z, 0, ld.x)。
+         * 幅值 = Kp*sin(倾角), 天然饱和于 Kp。临界阻尼配比依赖船体惯量, 配合 stabilizer_kd 实测调
+         * (推歪后 1~2 个周期内稳定为达标)。读取方 StabilizerBlockEntity
+         */
+        public final ConfigFloat stabilizerKp =
+                f(STABILIZER_KP_DEFAULT, 0f, 5000f, "stabilizer_kp");
+        /** 自稳定方块 D 项基础阻尼增益 [N·m·s], 阻 pitch/roll 角速度, 不碰 yaw */
+        public final ConfigFloat stabilizerKd =
+                f(STABILIZER_KD_DEFAULT, 0f, 20f, "stabilizer_kd");
+        /** D 项速度自适应系数: 阻尼随角速度线性放大(过冲点速度峰值处自动最强), KD_eff = kd*(1+alpha*tiltSpeed) */
+        public final ConfigFloat stabilizerKdAlpha =
+                f(STABILIZER_KD_ALPHA_DEFAULT, 0f, 5f, "stabilizer_kd_alpha");
+        /** D 项大倾角附加增益: 压制大幅慢摆, KD_eff 再乘 (1+gain*|tiltDeg|/30) */
+        public final ConfigFloat stabilizerDampTiltGain =
+                f(STABILIZER_DAMP_TILT_GAIN_DEFAULT, 0f, 10f, "stabilizer_damp_tilt_gain");
+        /** KD_eff 上限(离散阻尼稳定护栏): 每子步角冲量过大时会反向过冲抖振, 自适应放大到此即封顶 */
+        public final ConfigFloat stabilizerKdMax =
+                f(STABILIZER_KD_MAX_DEFAULT, 0.1f, 50f, "stabilizer_kd_max");
+        /**
+         * 垂直阻尼(heave)系数: 中心线性冲量 = -k*总质量*竖直速度*timeStep, 抗上下颠簸。
+         * 阻尼器不阻止到达新高度, 只压低巡航速度; 0 = 关闭。读取方 StabilizerBlockEntity
+         */
+        public final ConfigFloat stabilizerKHeave =
+                f(STABILIZER_K_HEAVE_DEFAULT, 0f, 1f, "stabilizer_k_heave");
 
         @Override
         public String getName() {

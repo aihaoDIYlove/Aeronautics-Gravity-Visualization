@@ -17,6 +17,11 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 import java.util.List;
 
+/**
+ * 自稳定方块 - 纯姿态力矩 PD 控制器(控制律详见 {@link StabilizerBlockEntity} Javadoc)。
+ * BlockState 双档位为纯灯带显示载体(Sable 不读):LIFT_TIER = 输出强度(青色带),
+ * MASS_TIER 恒 1,仅为 blockstate schema 兼容保留(旧存档方块无缝加载,遗留点亮值由 BE 首 tick 归一)。
+ */
 public class StabilizerBlock extends Block implements IBE<StabilizerBlockEntity>, IWrenchable {
 
     public static final IntegerProperty MASS_TIER = IntegerProperty.create("mass_tier", 1, 16);

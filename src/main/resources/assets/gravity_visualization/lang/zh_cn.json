@@ -68,7 +68,7 @@
   "aero_suite.feature.filtered_single_slot_hopper": "带过滤的纸板漏斗",
   "aero_suite.feature.filtered_single_slot_hopper.desc": "可标记过滤的纸板漏斗",
   "aero_suite.feature.stabilizer": "自稳定方块",
-  "aero_suite.feature.stabilizer.desc": "PD 控制器维持载具水平,质量/浮力双模式;含半成品删除。",
+  "aero_suite.feature.stabilizer.desc": "姿态式 PD 控制器维持载具水平,任意位置放置即生效;含半成品删除。",
   "aero_suite.feature.world_anchor": "世界锚点",
   "aero_suite.feature.world_anchor.desc": "跨维度物流方块,复用包裹派送;含半成品删除。",
   "aero_suite.feature.addressing_sign": "寻址牌",
@@ -151,5 +151,17 @@
   "aero_suite.feature.starlight_casing_particles": "星空机壳粒子",
   "aero_suite.feature.starlight_casing_particles.desc": "星空机壳与星空套壳管道的星光闪烁粒子总开关。关闭后方块本身与配方不受影响,仅不再冒粒子。",
   "aero_suite.tunables.particle_distance": "星空机壳:粒子渲染距离",
-  "aero_suite.tunables.particle_distance.tooltip": "玩家距星空机壳/套壳管道超过该距离(格)后不再渲染星光粒子,节省开销。默认 32,范围 1-128。"
+  "aero_suite.tunables.particle_distance.tooltip": "玩家距星空机壳/套壳管道超过该距离(格)后不再渲染星光粒子,节省开销。默认 32,范围 1-128。",
+  "aero_suite.tunables.stabilizer_kp": "自稳定方块:刚度 Kp",
+  "aero_suite.tunables.stabilizer_kp.tooltip": "自稳定方块 P 项恢复力矩增益(力矩 = Kp×sin(倾角),沿倾斜轴转回)。越大扶正越猛;与阻尼配合调,推歪后 1~2 个摆动周期内稳定为达标。",
+  "aero_suite.tunables.stabilizer_kd": "自稳定方块:阻尼 Kd",
+  "aero_suite.tunables.stabilizer_kd.tooltip": "消耗摆动角速度的阻尼增益,在即将过冲的水平穿越点自动达到峰值。与 Kp 配合调。",
+  "aero_suite.tunables.stabilizer_kd_alpha": "自稳定方块:阻尼速度增益",
+  "aero_suite.tunables.stabilizer_kd_alpha.tooltip": "阻尼随角速度线性放大(KD_eff = Kd×(1+alpha×角速度)):过冲前咬得最狠,不拖慢慢速机动。",
+  "aero_suite.tunables.stabilizer_damp_tilt_gain": "自稳定方块:大倾角阻尼加成",
+  "aero_suite.tunables.stabilizer_damp_tilt_gain.tooltip": "大倾角时阻尼额外乘 (1+增益×倾角/30°),压制大幅慢摆。0 = 关闭。",
+  "aero_suite.tunables.stabilizer_kd_max": "自稳定方块:阻尼上限",
+  "aero_suite.tunables.stabilizer_kd_max.tooltip": "自适应阻尼的封顶值。防止物理子步间自适应增益过大导致高频抖振。",
+  "aero_suite.tunables.stabilizer_k_heave": "自稳定方块:垂直阻尼",
+  "aero_suite.tunables.stabilizer_k_heave.tooltip": "经载具质心施加的起伏阻尼:上下颠簸指数衰减,主动爬升仍可行(略慢)。0 = 关闭。"
 }

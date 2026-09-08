@@ -67,7 +67,7 @@
   "aero_suite.feature.filtered_single_slot_hopper": "Filtered Cardboard Hopper",
   "aero_suite.feature.filtered_single_slot_hopper.desc": "Markable and filterable cardboard funnel",
   "aero_suite.feature.stabilizer": "Stabilizer Block",
-  "aero_suite.feature.stabilizer.desc": "PD controller keeping contraptions level, mass/buoyancy modes; includes intermediate deletion.",
+  "aero_suite.feature.stabilizer.desc": "Attitude-based PD controller keeping contraptions level; works from any placement; includes intermediate deletion.",
   "aero_suite.feature.world_anchor": "World Anchor",
   "aero_suite.feature.world_anchor.desc": "Cross-dimensional logistics block using package delivery; includes intermediate deletion.",
   "aero_suite.feature.addressing_sign": "Addressing Sign",
@@ -150,5 +150,17 @@
   "aero_suite.feature.starlight_casing_particles": "Starlight Casing Particles",
   "aero_suite.feature.starlight_casing_particles.desc": "Master toggle for the sparkle particles of Starlight Casings and Starlight Encased Pipes. The blocks and recipes are unaffected; only the particles stop.",
   "aero_suite.tunables.particle_distance": "Starlight casing: particle range",
-  "aero_suite.tunables.particle_distance.tooltip": "Blocks farther than this distance (in blocks) from every player stop emitting sparkle particles to save overhead. Default 32, range 1-128."
+  "aero_suite.tunables.particle_distance.tooltip": "Blocks farther than this distance (in blocks) from every player stop emitting sparkle particles to save overhead. Default 32, range 1-128.",
+  "aero_suite.tunables.stabilizer_kp": "Stabilizer: stiffness Kp",
+  "aero_suite.tunables.stabilizer_kp.tooltip": "Restoring torque gain of the stabilizer block (torque = Kp * sin(tilt) about the tilt axis). Higher = stronger righting. Tune together with damping: the craft should settle within 1-2 swings after being nudged.",
+  "aero_suite.tunables.stabilizer_kd": "Stabilizer: damping Kd",
+  "aero_suite.tunables.stabilizer_kd.tooltip": "Angular damping gain that bleeds swing speed. It peaks automatically at the level crossing point, exactly where overshoot would happen. Tune together with Kp.",
+  "aero_suite.tunables.stabilizer_kd_alpha": "Stabilizer: damping velocity gain",
+  "aero_suite.tunables.stabilizer_kd_alpha.tooltip": "Damping scales up linearly with tilt speed (Kd_eff = Kd * (1 + alpha * tilt speed)): it bites hardest right before overshoot and never fights slow maneuvers.",
+  "aero_suite.tunables.stabilizer_damp_tilt_gain": "Stabilizer: large-tilt damping bonus",
+  "aero_suite.tunables.stabilizer_damp_tilt_gain.tooltip": "Extra damping multiplier at large tilt angles (1 + gain * tilt/30), taming big slow swings. 0 = disabled.",
+  "aero_suite.tunables.stabilizer_kd_max": "Stabilizer: damping cap",
+  "aero_suite.tunables.stabilizer_kd_max.tooltip": "Upper clamp for the adaptive damping. Prevents high-frequency jitter when the adaptive gain would over-correct between discrete physics ticks.",
+  "aero_suite.tunables.stabilizer_k_heave": "Stabilizer: vertical damping",
+  "aero_suite.tunables.stabilizer_k_heave.tooltip": "Heave damping applied through the vessel's center of mass: vertical bobbing decays exponentially while intentional climbs still work (slightly slower). 0 = disabled."
 }

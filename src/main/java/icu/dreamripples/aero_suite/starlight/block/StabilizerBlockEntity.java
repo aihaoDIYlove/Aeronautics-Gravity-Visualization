@@ -13,16 +13,14 @@ import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOp
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
 import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.utility.CreateLang;
-import dev.ryanhcode.sable.Sable;
 import dev.ryanhcode.sable.api.block.BlockEntitySubLevelActor;
-import dev.ryanhcode.sable.api.physics.force.ForceGroup;
-import dev.ryanhcode.sable.api.physics.force.ForceGroups;
-import dev.ryanhcode.sable.api.physics.force.QueuedForceGroup;
 import dev.ryanhcode.sable.api.physics.handle.RigidBodyHandle;
 import dev.ryanhcode.sable.api.physics.mass.MassData;
 import dev.ryanhcode.sable.companion.math.Pose3dc;
 import dev.ryanhcode.sable.physics.config.dimension_physics.DimensionPhysicsData;
 import dev.ryanhcode.sable.sublevel.ServerSubLevel;
+import icu.dreamripples.aero_suite.common.config.AeroSuiteConfig;
+import icu.dreamripples.aero_suite.common.config.FeatureGates;
 import net.createmod.catnip.math.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -31,7 +29,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -39,67 +36,52 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
-import org.joml.Vector3dc;
 
 import java.util.List;
+import java.util.function.Function;
 
 /**
- * 自稳定方块 BE - PD 混合 + 倾斜速度自适应,P 项走连续点力(同螺旋桨通路)。
+ * 自稳定方块 BE - 纯姿态力矩 PD + 垂直阻尼(heave),与 simulated:gimbal_sensor 同构的"姿态黑盒"。
  *
- * **P 项(恢复力,直接施力)**:每物理 tick 在 sable$physicsTick 里算。
- *   - 姿态:世界 DOWN 经 orientation.transformInverse 到本地 = ld。
- *     pitch = atan2(ld.z, -ld.y);roll = atan2(ld.x, -ld.y);tilt = sqrt(pitch²+roll²)。
- *   - 死区(总倾斜角)由侧面 4 面 ScrollValueBehaviour 调 0..30°。tilt < deadband -> 休眠。
- *   - **模式判据 = 世界竖直高度差**(h):h = rel·ld,rel = 方块中心-质心(SubLevel 本地系)。
- *     h > 0 -> 我在低端 -> 向上力(BALLOON_LIFT 组);h < 0 -> 高端 -> 向下力(GRAVITY 组)。
- *     方向每 tick 按符号重算,无锁存/滞回:施力不改变质量分布,质心不漂移,不存在换向反馈。
- *   - **力是连续值**:F = frac × MAX_FORCE_KPG(单位 = kpg 等效重力,乘维度 |g| 换算成力),
- *     无 1..16 档量化,也就无需档位斜坡/换向冷却/滞回三件套(旧质量方案防震荡的全部补丁)。
- *   - **过零衰减**:frac 乘 min(1, |heightDiff|/TIER_FADE_BLOCKS),接近水平位输出收束到零,
- *     防满幅力矩冲过平衡点泵能。施力不挪质心,h 不会因自身出力而自拆力臂,衰减只做空间增益整形。
- *   - **自适应满档角**(按倾斜速度):tiltSpeed = sqrt(ωx²+ωz²)。
- *     maxAngleEff = MAX_ANGLE_BASE - BETA * tiltSpeed,clamp 到 [MIN_MAX_ANGLE, MAX_ANGLE_BASE]。
- *     慢速:30° 满档(温和);快速(tiltSpeed=2):10° 满档(早响应,抢在 45° 物理失效前)。
- *   - **施力通路**(照搬 Sable 螺旋桨 BlockEntitySubLevelPropellerActor):
- *     subLevel.getOrCreateQueuedForceGroup(组).applyAndRecordPointForce(方块中心, F·g·timeStep)。
- *     QueuedForceGroup 只累加力/力矩,完全不触碰 MassTracker —— 质量、惯性张量、质心全部不变,
- *     消除旧方案"加质量拉近质心自拆力臂"+"质心实时漂移引发换向抖动"两大震荡源。
- *   - MASS_TIER/LIFT_TIER blockstate **降级为纯灯带显示**(physics_block_properties/stabilizer.json
- *     固定 mass=1/材料,Sable 不再读档位):低端点 LIFT_TIER、高端点 MASS_TIER,数值 = 1+round(15×frac),
- *     渲染器/护目镜照旧读 blockstate,无需 NBT sync。
+ * 控制律只读整船姿态(logicalPose),不读质心、不读方块自身位置:任意位置放置行为一致,
+ * 多块叠加 = 增益叠加。全部增益在 {@link AeroSuiteConfig.Tunables}(配置屏即改即生效),无代码常量。
  *
- * **D 项(阻尼,直接施角冲量)**:同在 sable$physicsTick。
- *   - 读载具全局角速度(handle.getAngularVelocity),转本地系,存 angVelLocalCache 供自适应满档角读。
- *   - **自适应 KD**:tiltSpeed = sqrt(ωx²+ωz²)。KD_eff = KD_BASE * (1 + ALPHA * tiltSpeed)。
- *   - 阻尼 pitch/roll 轴(本地 x/z),**不阻尼 yaw(本地 y)**保转向自由;KD_eff 随倾角线性增强。
- *   - 阻尼力矩 = -KD_eff * (ωx, 0, ωz),角冲量 = 力矩 * timeStep,handle.applyAngularImpulse(本地)。
+ * **P 项(恢复力矩)**:每物理 tick 在 sable$physicsTick 里算。
+ *   - 姿态:世界 DOWN 经 orientation.transformInverse 到本地 = ld(与 gimbal_sensor 同款公式)。
+ *     tilt = atan2(len(ld.xz), -ld.y)。
+ *   - 死区(总倾斜角)由侧面 4 面 ScrollValueBehaviour 调 0..30°。tilt < 死区 -> P/D 全停(灯带归零):
+ *     未倾斜不出力。
+ *   - tau_P = Kp * (-ld.z, 0, ld.x)(本地系,Y 分量恒 0 不碰偏航)。ld 的水平分量指向高端
+ *     (世界竖直在船体系里偏向抬起侧),绕竖直轴转 -90° 即"把船转回竖直"的力矩轴;
+ *     幅值 = Kp*sin(tilt),天然饱和、连续无换向。
+ *   - **D 项(阻尼)**:tau_D = -KD_eff * (wx, 0, wz),不阻 yaw 保转向自由。
+ *     KD_eff = min(KD_MAX, KD*(1+ALPHA*tiltSpeed)*(1+DAMP_TILT_GAIN*tiltDeg/30)):
+ *     阻尼只跟速度走 -> 过冲点(穿越水平位)速度峰值处自动最强、极端位置自动归零;
+ *     KD_MAX 是离散稳定护栏(每子步角冲量过大 -> 反向过冲高频抖振)。
+ *   - 合并 tau_P+tau_D 后 handle.applyAngularImpulse(本地系角冲量,· timeStep)。
  *
- * **红石模式(上下两面 ScrollOptionBehaviour 切换)**:ACTIVE_WHEN_OFF(默认,无红石时工作) /
- *   ACTIVE_WHEN_ON(有红石时工作)。非工作状态时灯带归零档、P/D 均不施力。
- * KD_BASE/ALPHA/MAX_ANGLE_BASE/BETA/MAX_FORCE_KPG 是代码常量(开发者实测调);死区是玩家右键调。
+ * **heave 垂直阻尼(与姿态无关,仅受红石门控)**:竖直速度 v_y = v_world·up,
+ *   up = 维度重力反方向(DimensionPhysicsData.getGravity,不硬编码 Y 轴);中心线性冲量
+ *   = -k_heave * 总质量(MassData.getMass,含装置)* v_y * timeStep,转本地系后
+ *   applyLinearImpulse。质心施加不产生寄生力矩;阻尼器不阻止到达新高度,只压低巡航速度。
+ *   水平静止但上下颠簸时也要工作,故不受死区门控。k_heave = 0 关闭。
+ *
+ * **红石模式(上下两面 ScrollOptionBehaviour 切换)**:ACTIVE_WHEN_OFF(默认,无红石时工作)/
+ *   ACTIVE_WHEN_ON(有红石时工作)。非工作状态时 P/D/heave 全部不施力,灯带归零。
+ *
+ * **灯带显示**:单一输出强度档 1+round(15*sin(tilt)) 写入 BlockState.LIFT_TIER(青色带,
+ *   渲染器按档插值);MASS_TIER 恒 1,纯为 blockstate schema 兼容保留(旧存档的点亮值首 tick 归一)。
+ *   停摆即回 1,tick 里刷 blockstate,值变才 setBlock。
  */
 public class StabilizerBlockEntity extends SmartBlockEntity
         implements IHaveGoggleInformation, BlockEntitySubLevelActor {
 
     private static final int MIN_DEADBAND = 0;
     private static final int MAX_DEADBAND = 30;
-    // P 项自适应满档角:慢速 MAX_ANGLE_BASE 满档,快速按 BETA 递减(早满档抢救),下限 MIN_MAX_ANGLE。
-    private static final double MAX_ANGLE_BASE = 30.0;  // 慢速满档角 [度]
-    private static final double BETA = 10.0;            // 满档角随角速度递减 [度/(rad/s)]
-    private static final double MIN_MAX_ANGLE = 5.0;    // 满档角下限 [度]
-    // D 项自适应阻尼:KD_eff = KD_BASE * (1 + ALPHA * tiltSpeed)。
-    private static final double KD_BASE = 0.6;          // 基础 D 增益 [N·m·s]
-    private static final double ALPHA = 0.6;            // D 自适应系数 [s/rad]
-    // P 项最大力 [kpg 等效]:frac=1 时施加相当于 16 kpg 重量的力(与旧档位上限同量级,便于迁移手感)。
-    private static final double MAX_FORCE_KPG = 16.0;
-    // 过零衰减 [格]:输出按 |heightDiff| 线性收束到 0,越过此距离才允许满幅。
-    // 防"满幅力矩冲过水平位"每半周泵能 -> 大角度等幅摆。施力不挪质心,纯空间整形,无自拆副作用。
-    private static final double TIER_FADE_BLOCKS = 1.8;
-    // 倾斜增强阻尼:kdEff 随倾角线性放大,30° 时 x2、60° 时 x3(慢速大幅摆动的额外耗散)。
-    private static final double DAMP_TILT_GAIN = 2.0;
+    /** 大倾角阻尼加成的归一化分母(度):|tilt| 达此值时加成满幅 (1+gain) */
+    private static final double DAMP_TILT_NORM_DEG = 30.0;
 
-    // 灯带显示档位目标(服务端 physicsTick 写,tick 刷进 blockstate;不持久化,停摆即回 1)。
-    private byte pendingMassTier = 1;
+    // 灯带显示档位目标(服务端 physicsTick 写,tick 刷进 blockstate;不持久化,停摆即回 1)
     private byte pendingLiftTier = 1;
 
     private ScrollValueBehaviour deadbandBehaviour;
@@ -107,10 +89,6 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     // 用 RedstoneModeBehaviour(独立 BehaviourType)而非裸 ScrollOptionBehaviour:后者继承
     // ScrollValueBehaviour.TYPE,会与 deadbandBehaviour 在 SmartBlockEntity 的 behaviours map 里冲突覆盖。
     private RedstoneModeBehaviour redstoneModeBehaviour;
-    // sable$physicsTick 写(最新物理 tick 的本地角速度)。初始 0。
-    // 线程安全说明: Sable 物理同步跑在服务端主线程(SubLevelPhysicsSystem.tick -> prePhysicsTick
-    // -> sable$physicsTick,全链路无 Thread/Executor,_research 源码已核实),故无需 volatile/快照。
-    private final Vector3d angVelLocalCache = new Vector3d();
 
     public StabilizerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -138,7 +116,6 @@ public class StabilizerBlockEntity extends SmartBlockEntity
 
     /** 休眠:灯带显示归零档(下个 tick 刷进 blockstate)。 */
     private void setDormant() {
-        pendingMassTier = 1;
         pendingLiftTier = 1;
     }
 
@@ -146,161 +123,121 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     public void tick() {
         super.tick();
         if (level == null || level.isClientSide) return;
-        setVisualTiers(pendingMassTier, pendingLiftTier);
+        setVisualTiers(pendingLiftTier);
     }
 
-    /** 灯带显示档位写入 blockstate(纯视觉,Sable 不再读档位质量)。值变才 setBlock,防刷更新。 */
-    private void setVisualTiers(int massTarget, int liftTarget) {
+    /** 灯带显示档位写入 blockstate(纯视觉,Sable 不读档位)。LIFT_TIER 承载输出强度;MASS_TIER 归 1(兼容旧存档遗留的点亮值)。值变才 setBlock,防刷更新。 */
+    private void setVisualTiers(int liftTarget) {
         BlockState state = getBlockState();
-        int newMass = Mth.clamp(massTarget, 1, 16);
         int newLift = Mth.clamp(liftTarget, 1, 16);
-        int curMass = state.getValue(StabilizerBlock.MASS_TIER);
         int curLift = state.getValue(StabilizerBlock.LIFT_TIER);
-        if (newMass == curMass && newLift == curLift) return;
+        int curMass = state.getValue(StabilizerBlock.MASS_TIER);
+        if (newLift == curLift && curMass == 1) return;
         level.setBlockAndUpdate(worldPosition, state
-                .setValue(StabilizerBlock.MASS_TIER, newMass)
-                .setValue(StabilizerBlock.LIFT_TIER, newLift));
+                .setValue(StabilizerBlock.LIFT_TIER, newLift)
+                .setValue(StabilizerBlock.MASS_TIER, 1));
     }
 
     @Override
     public void sable$physicsTick(ServerSubLevel subLevel, RigidBodyHandle handle, double timeStep) {
         if (level == null || level.isClientSide) return;
 
-        // 全局角速度转本地系,存缓存供自适应满档角读
-        Pose3dc pose = subLevel.logicalPose();
-        Vector3d angVelGlobal = handle.getAngularVelocity(new Vector3d());
-        Vector3d angVelLocal = pose.orientation().transformInverse(angVelGlobal, new Vector3d());
-        angVelLocalCache.set(angVelLocal);
-
+        // 红石停用:P/D/heave 全部不施力,灯带归零
         if (!redstoneModeBehaviour.get().isActiveFor(level.getBestNeighborSignal(worldPosition))) {
-            setDormant();  // 停用:P 不施力、灯带归零
-        } else {
-            MassData massData = subLevel.getMassTracker();
-            Vector3dc com = massData.getCenterOfMass();
-            if (com == null) {
-                setDormant();
-            } else {
-                tickForces(subLevel, pose, com, timeStep);
-            }
-        }
-
-        // D 项:阻尼 pitch/roll(本地 x/z),不阻尼 yaw(本地 y)以保转向自由
-        Vector3d ld = new Vector3d(0, -1, 0);
-        pose.orientation().transformInverse(ld);
-        double tiltSpeed = Math.sqrt(angVelLocal.x() * angVelLocal.x() + angVelLocal.z() * angVelLocal.z());
-        double tiltDeg = Math.toDegrees(Math.atan2(Math.sqrt(ld.x() * ld.x() + ld.z() * ld.z()), -ld.y()));
-        double kdEff = KD_BASE * (1.0 + ALPHA * tiltSpeed) * (1.0 + DAMP_TILT_GAIN * Math.abs(tiltDeg) / MAX_ANGLE_BASE);
-        Vector3d dampTorqueLocal = new Vector3d(-kdEff * angVelLocal.x(), 0, -kdEff * angVelLocal.z());
-        // 角冲量 = 力矩 * timeStep;applyAngularImpulse 接受本地系角冲量
-        handle.applyAngularImpulse(dampTorqueLocal.mul(timeStep));
-    }
-
-    /** P 项:按姿态偏差算连续恢复力,经 QueuedForceGroup 施点力(同螺旋桨通路,不碰 MassTracker)。 */
-    private void tickForces(ServerSubLevel subLevel, Pose3dc pose, Vector3dc com, double timeStep) {
-        // 姿态:世界 DOWN 的本地表示
-        Vector3d ld = new Vector3d(0, -1, 0);
-        pose.orientation().transformInverse(ld);
-        double pitch = Math.atan2(ld.z(), -ld.y());
-        double roll = Math.atan2(ld.x(), -ld.y());
-        double tilt = Math.sqrt(pitch * pitch + roll * roll);
-
-        int deadbandDeg = deadbandBehaviour.getValue();
-        if (tilt < Math.toRadians(deadbandDeg)) {
             setDormant();
             return;
         }
 
-        // 高度判据:方块中心相对质心沿世界重力轴的偏移 h [格]。
-        // h = (blockLocal - comLocal)·ld = "质心在世界系下高出我的格数"。
-        // h > 0 -> 质心在我上方 -> 我在低端 -> 向上力;h < 0 -> 高端 -> 向下力。
-        // 每 tick 按符号重算,无锁存:施力不改质量分布,质心不动,不存在换向自反馈。
-        double bx = worldPosition.getX() + 0.5 - com.x();
-        double by = worldPosition.getY() + 0.5 - com.y();
-        double bz = worldPosition.getZ() + 0.5 - com.z();
-        double heightDiff = bx * ld.x() + by * ld.y() + bz * ld.z();
-        boolean lowSide = heightDiff >= 0;
+        Pose3dc pose = subLevel.logicalPose();
 
-        // 自适应满档角:倾斜速度大 -> 满档角小 -> 早满档(抢在 45° 物理失效前)。
-        double tiltSpeed = Math.sqrt(angVelLocalCache.x() * angVelLocalCache.x()
-                + angVelLocalCache.z() * angVelLocalCache.z());
-        double maxAngleEff = MAX_ANGLE_BASE - BETA * tiltSpeed;
-        if (maxAngleEff < MIN_MAX_ANGLE) maxAngleEff = MIN_MAX_ANGLE;
+        // heave 垂直阻尼:与姿态无关(水平静止但上下颠簸时也要工作),仅受红石门控
+        applyHeaveDamping(subLevel, pose, handle, timeStep);
 
-        double frac = Math.toDegrees(tilt) / maxAngleEff;
-        if (frac < 0) frac = 0;
-        else if (frac > 1) frac = 1;
+        // 姿态:世界 DOWN 的本地表示(与 gimbal_sensor 同款)
+        Vector3d ld = new Vector3d(0, -1, 0);
+        pose.orientation().transformInverse(ld);
+        double tiltRad = Math.atan2(Math.sqrt(ld.x() * ld.x() + ld.z() * ld.z()), -ld.y());
+        double tiltDeg = Math.toDegrees(tiltRad);
 
-        // 过零衰减:接近水平位时输出收束,防止满幅力矩冲过平衡点泵能。
-        double fade = Math.min(1.0, Math.abs(heightDiff) / TIER_FADE_BLOCKS);
-        frac *= fade;
-
-        // 连续恢复力 [kpg 等效] x 维度 |g| -> 力 [N],冲量 = 力 * timeStep。方向:低端沿世界 UP(-ld),高端 DOWN(ld)。
-        double forceKpg = frac * MAX_FORCE_KPG;
-        if (forceKpg > 1e-3) {
-            Vector3d gravity = DimensionPhysicsData.getGravity(level);
-            double g = gravity.length();
-            if (g > 1e-4) {
-                Vector3d dirLocal = new Vector3d(ld).mul(lowSide ? -1.0 : 1.0);
-                Vector3d impulse = dirLocal.mul(forceKpg * g * timeStep);
-                Vector3d at = new Vector3d(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5);
-                // 不经 ForceGroups 的任何成员(其字段类型 RegistryObject 来自 Veil,不在编译类路径,
-                // 连字段引用都会触发该类加载):按注册路径从 vanilla Registry 直取 ForceGroup 实例。
-                ResourceLocation groupId = Sable.sablePath(lowSide ? "balloon_lift" : "gravity");
-                ForceGroup group = ForceGroups.REGISTRY.get(groupId);
-                QueuedForceGroup queued = subLevel.getOrCreateQueuedForceGroup(group);
-                queued.applyAndRecordPointForce(at, impulse);
-            }
+        // 死区:未倾斜不出力(P/D 全停;heave 已处理)
+        if (tiltDeg < deadbandBehaviour.getValue()) {
+            setDormant();
+            return;
         }
 
-        // 灯带显示档位(1..16)随连续输出取整,低端点 lift、高端点 mass;tick 里刷 blockstate。
-        int vis = Mth.clamp(1 + (int) Math.round(15 * frac), 1, 16);
-        pendingMassTier = (byte) (lowSide ? 1 : vis);
-        pendingLiftTier = (byte) (lowSide ? vis : 1);
+        // P 项:恢复力矩。ld 水平分量指向高端,绕竖直轴转 -90° 得回正力矩轴;幅值 = Kp*sin(tilt) 天然饱和
+        Vector3d torque = new Vector3d(-ld.z(), 0, ld.x())
+                .mul(cfg(t -> t.stabilizerKp.getF(), AeroSuiteConfig.Tunables.STABILIZER_KP_DEFAULT));
+
+        // D 项:自适应阻尼(过冲点速度峰值处自动最强),不阻 yaw(本地 y)保转向自由;KD_MAX 封顶防离散抖振
+        Vector3d angVelLocal = handle.getAngularVelocity(new Vector3d());
+        pose.orientation().transformInverse(angVelLocal);
+        double tiltSpeed = Math.sqrt(angVelLocal.x() * angVelLocal.x() + angVelLocal.z() * angVelLocal.z());
+        double kdEff = cfg(t -> t.stabilizerKd.getF(), AeroSuiteConfig.Tunables.STABILIZER_KD_DEFAULT)
+                * (1.0 + cfg(t -> t.stabilizerKdAlpha.getF(), AeroSuiteConfig.Tunables.STABILIZER_KD_ALPHA_DEFAULT) * tiltSpeed)
+                * (1.0 + cfg(t -> t.stabilizerDampTiltGain.getF(), AeroSuiteConfig.Tunables.STABILIZER_DAMP_TILT_GAIN_DEFAULT) * tiltDeg / DAMP_TILT_NORM_DEG);
+        double kdMax = cfg(t -> t.stabilizerKdMax.getF(), AeroSuiteConfig.Tunables.STABILIZER_KD_MAX_DEFAULT);
+        if (kdEff > kdMax) kdEff = kdMax;
+        torque.add(new Vector3d(-kdEff * angVelLocal.x(), 0, -kdEff * angVelLocal.z()));
+
+        // 角冲量 = 力矩 * timeStep;applyAngularImpulse 接受本地系角冲量
+        handle.applyAngularImpulse(torque.mul(timeStep));
+
+        // 灯带:输出强度按 sin(tilt)(P 项相对幅值),1..16 写 LIFT_TIER
+        pendingLiftTier = (byte) Mth.clamp(1 + (int) Math.round(15 * Math.sin(tiltRad)), 1, 16);
+    }
+
+    /** heave 垂直阻尼:中心线性冲量(不产生寄生力矩),抗上下颠簸。乘总质量使减速度与船重无关。 */
+    private void applyHeaveDamping(ServerSubLevel subLevel, Pose3dc pose, RigidBodyHandle handle, double timeStep) {
+        float kHeave = cfg(t -> t.stabilizerKHeave.getF(), AeroSuiteConfig.Tunables.STABILIZER_K_HEAVE_DEFAULT);
+        if (kHeave <= 0) return;
+        MassData massData = subLevel.getMassTracker();
+        if (massData.isInvalid()) return;
+        // up = 维度重力反方向(不硬编码 Y 轴)
+        Vector3d up = DimensionPhysicsData.getGravity(level);
+        if (up.lengthSquared() < 1e-8) return;
+        up.normalize();
+        double vUp = handle.getLinearVelocity(new Vector3d()).dot(up);
+        // 世界系冲量 = -k * M * vUp * dt * up;applyLinearImpulse 收本地系,转轴后施加
+        Vector3d impulseWorld = new Vector3d(up).mul(-kHeave * massData.getMass() * vUp * timeStep);
+        handle.applyLinearImpulse(pose.orientation().transformInverse(impulseWorld, new Vector3d()));
+    }
+
+    /** null-safe 配置读取:配置未就绪时回退 Tunables 默认常量(同 ExtendoGrabServer 模式)。 */
+    private static float cfg(Function<AeroSuiteConfig.Tunables, Float> getter, float def) {
+        AeroSuiteConfig c = FeatureGates.CONFIG;
+        return c != null ? getter.apply(c.tunables) : def;
     }
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         BlockState state = getBlockState();
-        int massTier = state.getValue(StabilizerBlock.MASS_TIER);
         int liftTier = state.getValue(StabilizerBlock.LIFT_TIER);
+        boolean active = liftTier > 1;
 
         CreateLang.builder()
                 .add(Component.translatable("block.starlight_logistics.stabilizer")
                         .withStyle(ChatFormatting.WHITE))
                 .forGoggles(tooltip);
 
-        String modeKey;
-        int currentTier;
-        ChatFormatting modeColor;
-        if (massTier > 1) {
-            modeKey = "tooltip.starlight_logistics.stabilizer.mass_mode";
-            currentTier = massTier;
-            modeColor = ChatFormatting.RED;
-        } else if (liftTier > 1) {
-            modeKey = "tooltip.starlight_logistics.stabilizer.lift_mode";
-            currentTier = liftTier;
-            modeColor = ChatFormatting.AQUA;
-        } else {
-            modeKey = "tooltip.starlight_logistics.stabilizer.idle";
-            currentTier = 0;
-            modeColor = ChatFormatting.DARK_GRAY;
-        }
         CreateLang.builder()
-                .add(Component.translatable("tooltip.starlight_logistics.stabilizer.mode")
+                .add(Component.translatable("tooltip.starlight_logistics.stabilizer.status")
                         .withStyle(ChatFormatting.GRAY))
                 .add(Component.literal(": ")
                         .withStyle(ChatFormatting.DARK_GRAY))
-                .add(Component.translatable(modeKey)
-                        .withStyle(modeColor))
+                .add(Component.translatable(active
+                                ? "tooltip.starlight_logistics.stabilizer.active"
+                                : "tooltip.starlight_logistics.stabilizer.idle")
+                        .withStyle(active ? ChatFormatting.AQUA : ChatFormatting.DARK_GRAY))
                 .forGoggles(tooltip, 1);
 
-        if (currentTier > 0) {
+        if (active) {
             CreateLang.builder()
                     .add(Component.translatable("tooltip.starlight_logistics.stabilizer.output")
                             .withStyle(ChatFormatting.GRAY))
                     .forGoggles(tooltip, 1);
-            CreateLang.number(currentTier)
-                    .add(CreateLang.text(" kpg"))
+            CreateLang.number(liftTier)
+                    .add(CreateLang.text(" / 15"))
                     .style(ChatFormatting.GOLD)
                     .forGoggles(tooltip, 2);
         }
@@ -329,7 +266,7 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     }
 
     /**
-     * ScrollValueBehaviour 子类 - 死区角度 0..30°。tilt < deadband 时休眠(防小扰动)。
+     * ScrollValueBehaviour 子类 - 死区角度 0..30°。tilt < 死区时 P/D 全停(防小扰动)。
      */
     private static class DeadbandScrollValueBehaviour extends ScrollValueBehaviour {
         public DeadbandScrollValueBehaviour(Component label, SmartBlockEntity be, ValueBoxTransform slot) {
