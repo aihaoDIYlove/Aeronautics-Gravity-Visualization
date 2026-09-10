@@ -67,6 +67,8 @@
   "aero_suite.feature.filtered_single_slot_hopper": "Filtered Cardboard Hopper",
   "aero_suite.feature.filtered_single_slot_hopper.desc": "Markable and filterable cardboard funnel",
   "aero_suite.feature.stabilizer": "Stabilizer Block",
+  "aero_suite.feature.mcu.desc": "A chip that can be attached to any block surface (6 orientations). Decorative only for now, no logic yet.",
+  "aero_suite.feature.mcu": "Microcontroller Unit (MCU)",
   "aero_suite.feature.stabilizer.desc": "PD controller keeping contraptions level, mass/buoyancy modes; includes intermediate deletion.",
   "aero_suite.feature.world_anchor": "World Anchor",
   "aero_suite.feature.world_anchor.desc": "Cross-dimensional logistics block using package delivery; includes intermediate deletion.",

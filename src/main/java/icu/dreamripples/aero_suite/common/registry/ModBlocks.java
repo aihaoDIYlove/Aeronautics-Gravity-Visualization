@@ -16,6 +16,7 @@ import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlock;
 import icu.dreamripples.aero_suite.simplification.block.SequentialFeederBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.FilteredSingleSlotHopperBlock;
 import icu.dreamripples.aero_suite.simplification.block.FilteredSingleSlotHopperBlockEntity;
+import icu.dreamripples.aero_suite.simplification.block.McuBlock;
 import icu.dreamripples.aero_suite.simplification.block.SingleSlotHopperBlock;
 import icu.dreamripples.aero_suite.simplification.block.SingleSlotHopperBlockEntity;
 import icu.dreamripples.aero_suite.simplification.block.VariableSpeedPortableEngineBlock;
@@ -546,6 +547,22 @@ public class ModBlocks {
     public static final DeferredHolder<Item, BlockItem> FILTERED_SINGLE_SLOT_HOPPER_ITEM =
             ModItems.SIMPLIFICATION_ITEMS.register("filtered_single_slot_hopper",
                     () -> new BlockItem(FILTERED_SINGLE_SLOT_HOPPER_BLOCK.get(), new Item.Properties()));
+
+    // 单片机: 纯装饰方块(无 BE 无逻辑, 暂无配方), 6 向贴附任意方块表面(同紫水晶簇),
+    // 碰撞箱只含芯片主体不含引脚。模型/贴图来自 Blockbench 工程(Blockbench/单片机.bbmodel),
+    // 顶面单独一张 96x128 高清贴图(mcu_top), 其余面用 mcu。
+    public static final DeferredHolder<Block, McuBlock> MCU_BLOCK =
+            SIMPLIFICATION_BLOCKS.register("mcu",
+                    () -> new McuBlock(
+                            BlockBehaviour.Properties.of()
+                                    .mapColor(MapColor.METAL)
+                                    .sound(SoundType.AMETHYST)
+                                    .strength(1.0f)
+                                    .noOcclusion()));
+
+    public static final DeferredHolder<Item, BlockItem> MCU_ITEM =
+            ModItems.SIMPLIFICATION_ITEMS.register("mcu",
+                    () -> new BlockItem(MCU_BLOCK.get(), new Item.Properties()));
 
     // 珍珠滞留台: 单槽物品台(恒 1 个, 无 GUI, 右键存取), 物品渲染在方块内 4px 高处。
     // 红石上升沿触发: 内部是已绑定玩家的激活末影珍珠时把该玩家传送到台上方并消耗珍珠。
