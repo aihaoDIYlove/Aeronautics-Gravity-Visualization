@@ -13,30 +13,35 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 import java.util.List;
 
 /**
  * 自稳定方块 - 纯姿态力矩 PD 控制器(控制律详见 {@link StabilizerBlockEntity} Javadoc)。
- * BlockState 双档位为纯灯带显示载体(Sable 不读):LIFT_TIER = 输出强度(青色带),
- * MASS_TIER 恒 1,仅为 blockstate schema 兼容保留(旧存档方块无缝加载,遗留点亮值由 BE 首 tick 归一)。
+ * BlockState 为纯灯带显示载体(Sable 不读):LIFT_TIER = 输出强度(青色带,1=灭),
+ * OVERDRIVE = 过载(任一轴倾斜超过该轴满档角,输出档 +1 到 16,灯带转红),
+ * MASS_TIER 恒 1,仅为 blockstate schema 兼容保留(旧存档方块无缝加载,遗留点亮值由 BE 首 tick 归一;
+ * 新增 OVERDRIVE 属性对旧存档同样透明,缺省即 false)。
  */
 public class StabilizerBlock extends Block implements IBE<StabilizerBlockEntity>, IWrenchable {
 
     public static final IntegerProperty MASS_TIER = IntegerProperty.create("mass_tier", 1, 16);
     public static final IntegerProperty LIFT_TIER = IntegerProperty.create("lift_tier", 1, 16);
+    public static final BooleanProperty OVERDRIVE = BooleanProperty.create("overdrive");
 
     public StabilizerBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any()
                 .setValue(MASS_TIER, 1)
-                .setValue(LIFT_TIER, 1));
+                .setValue(LIFT_TIER, 1)
+                .setValue(OVERDRIVE, Boolean.FALSE));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(MASS_TIER, LIFT_TIER);
+        builder.add(MASS_TIER, LIFT_TIER, OVERDRIVE);
     }
 
     @Override

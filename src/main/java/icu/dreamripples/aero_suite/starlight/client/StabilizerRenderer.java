@@ -13,14 +13,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * 自稳定方块 BER - 仅画灯带(染色)。换皮后方块本体为不透明 cube_all,灯带用 72 突出版(REDSTONE_INDICATOR)。
- * 颜色按输出档(LIFT_TIER):青色带暗->亮插值,休眠灰。无 NBT sync(tier 在 BlockState 自动同步)。
- * 原星空(portal)视觉已迁移至世界锚点(WorldAnchorRenderer)。
+ * 颜色按输出档(LIFT_TIER):青色带暗->亮插值,休眠灰;OVERDRIVE(任一轴倾斜超过满档角)转旧满档红。
+ * 无 NBT sync(档位/过载都在 BlockState 自动同步)。原星空(portal)视觉已迁移至世界锚点(WorldAnchorRenderer)。
  */
 public class StabilizerRenderer extends SafeBlockEntityRenderer<StabilizerBlockEntity> {
 
     // 输出强度色带:暗青 -> 亮青(沿用旧 lift 模式的视觉,同红石配轻)
     private static final int LIFT_OFF = 0xFF013A3A;
     private static final int LIFT_ON  = 0xFF00CDCD;
+    // 过载:任一轴倾斜超过满档角 -> 旧 mass 模式的满档亮红(0xFFCD0000),纯警示
+    private static final int OVERDRIVE_RED = 0xFFCD0000;
     // 休眠:暗灰
     private static final int IDLE     = 0xFF222222;
 
@@ -40,6 +42,9 @@ public class StabilizerRenderer extends SafeBlockEntityRenderer<StabilizerBlockE
     }
 
     private static int computeColor(BlockState state) {
+        if (state.getValue(StabilizerBlock.OVERDRIVE)) {
+            return OVERDRIVE_RED;
+        }
         int liftTier = state.getValue(StabilizerBlock.LIFT_TIER);
         if (liftTier > 1) {
             return icu.dreamripples.aero_suite.common.client.AeroSuiteColors.mixArgb(LIFT_OFF, LIFT_ON, (liftTier - 1) / 15F);

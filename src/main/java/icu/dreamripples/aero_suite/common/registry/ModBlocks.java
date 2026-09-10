@@ -249,7 +249,7 @@ public class ModBlocks {
                             .lightLevel(state -> 7)));  // 流体方块投射光亮度 7(岩浆 15/火把 14; 此处走 BlockBehaviour.Properties, FluidType.lightLevel 只让桶贴图发光不投射)
 
     // 自稳定方块:纯姿态力矩 PD + 垂直阻尼,只读整船姿态,放置位置无关,多块叠加 = 增益叠加。
-    // LIFT_TIER 为灯带输出强度显示(Sable 不读);红石仅使能;右键 ScrollValueBehaviour 调死区 0..30°(默认 3°)。
+    // LIFT_TIER 为灯带输出强度显示(Sable 不读);红石仅使能;侧面点东西面调 X 轴/南北面调 Z 轴满档角,各 0..90°(默认 15°,0=关该轴)。
     // 详见 StabilizerBlockEntity Javadoc(权威规格)。
     public static final DeferredHolder<Block, StabilizerBlock> STABILIZER_BLOCK =
             STARLIGHT_BLOCKS.register("stabilizer",
