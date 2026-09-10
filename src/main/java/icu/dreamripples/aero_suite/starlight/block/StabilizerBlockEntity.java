@@ -50,13 +50,21 @@ import java.util.List;
  *   - 姿态:世界 DOWN 经 orientation.transformInverse 到本地 = ld。
  *     pitch = atan2(ld.z, -ld.y);roll = atan2(ld.x, -ld.y);tilt = sqrt(pitch²+roll²)。
  *   - 死区(总倾斜角)由侧面 4 面 ScrollValueBehaviour 调 0..30°。tilt < deadband -> 休眠。
- *   - **模式判据 = 世界竖直高度差**(h):h = rel·ld,rel = 方块中心-质心(SubLevel 本地系)。
- *     h > 0 -> 我在低端 -> 向上力(BALLOON_LIFT 组);h < 0 -> 高端 -> 向下力(GRAVITY 组)。
+ *   - **模式判据 = 扶正力矩投影**(p):回正角速度方向 ω* = u_v×世界UP(u_v=载具up轴世界方向,
+ *     其水平分量倒向沉侧,斜塔同理)。竖直力施在方块处,其力矩在 ω* 上的投影 = ±f·p,
+ *     恒等式 p = r_v_y − r_w_y·cosθ = by − heightDiff·ld.y [格](r_v_y=by=车体系高度差,常量;
+ *     heightDiff=rel·ld=−世界系高度差;r_w_y=−heightDiff;ld.y=−cosθ)。
+ *     p > 0 -> 向上力(BALLOON_LIFT 组);p < 0 -> 向下力(GRAVITY 组)。取符号后投影恒 = f·|p| ≥ 0:
+ *     任意摆放、任意倾角(含倒置)只回正不反推——横排退化跷跷板(低端↑/高端↓),竖列退化
+ *     桅顶↑/龙骨↓(气球/压舱),斜角块在越过质心竖直线处换向(该点竖直力零力矩,不泵能)。
+ *     旧判据 h=rel·ld ≥ 0 只在力臂近水平时等价:高于质心的方块倾斜 θ<90° 时世界系仍高于质心、
+ *     却已悬在低端上空,旧判据持续下拉 = 倒立摆加速翻船。
  *     方向每 tick 按符号重算,无锁存/滞回:施力不改变质量分布,质心不漂移,不存在换向反馈。
  *   - **力是连续值**:F = frac × MAX_FORCE_KPG(单位 = kpg 等效重力,乘维度 |g| 换算成力),
  *     无 1..16 档量化,也就无需档位斜坡/换向冷却/滞回三件套(旧质量方案防震荡的全部补丁)。
- *   - **过零衰减**:frac 乘 min(1, |heightDiff|/TIER_FADE_BLOCKS),接近水平位输出收束到零,
- *     防满幅力矩冲过平衡点泵能。施力不挪质心,h 不会因自身出力而自拆力臂,衰减只做空间增益整形。
+ *   - **过零衰减**:frac 乘 min(1, |p|/P_FADE_BLOCKS):p→0 即该块竖直力零力矩/换向点
+ *     (横排近水平线性归零、桅顶近水平二次归零、斜角块过质心竖直线),输出收束到零,
+ *     防满幅力矩冲过平衡点泵能并静音换向。施力不挪质心,衰减只做空间增益整形。
  *   - **自适应满档角**(按倾斜速度):tiltSpeed = sqrt(ωx²+ωz²)。
  *     maxAngleEff = MAX_ANGLE_BASE - BETA * tiltSpeed,clamp 到 [MIN_MAX_ANGLE, MAX_ANGLE_BASE]。
  *     慢速:30° 满档(温和);快速(tiltSpeed=2):10° 满档(早响应,抢在 45° 物理失效前)。
@@ -92,9 +100,11 @@ public class StabilizerBlockEntity extends SmartBlockEntity
     private static final double ALPHA = 0.6;            // D 自适应系数 [s/rad]
     // P 项最大力 [kpg 等效]:frac=1 时施加相当于 16 kpg 重量的力(与旧档位上限同量级,便于迁移手感)。
     private static final double MAX_FORCE_KPG = 16.0;
-    // 过零衰减 [格]:输出按 |heightDiff| 线性收束到 0,越过此距离才允许满幅。
-    // 防"满幅力矩冲过水平位"每半周泵能 -> 大角度等幅摆。施力不挪质心,纯空间整形,无自拆副作用。
-    private static final double TIER_FADE_BLOCKS = 1.8;
+    // 过零衰减 [格]:输出按 |p| 线性收束到 0(p 与旧 heightDiff 同为长度量纲),越过此距离才允许满幅。
+    // 锚扶正投影:p=0 即零力矩/换向点 -> 归零防"满幅力矩冲过水平位"每半周泵能,并静音换向。
+    // 旧锚 |heightDiff| 会在桅顶类方块 θ→90° 时归零,误压投影判据力矩最大的区间。
+    // 数值沿用旧 TIER_FADE_BLOCKS 起点实测再调。施力不挪质心,纯空间整形,无自拆副作用。
+    private static final double P_FADE_BLOCKS = 1.8;
     // 倾斜增强阻尼:kdEff 随倾角线性放大,30° 时 x2、60° 时 x3(慢速大幅摆动的额外耗散)。
     private static final double DAMP_TILT_GAIN = 2.0;
 
@@ -210,15 +220,21 @@ public class StabilizerBlockEntity extends SmartBlockEntity
             return;
         }
 
-        // 高度判据:方块中心相对质心沿世界重力轴的偏移 h [格]。
-        // h = (blockLocal - comLocal)·ld = "质心在世界系下高出我的格数"。
-        // h > 0 -> 质心在我上方 -> 我在低端 -> 向上力;h < 0 -> 高端 -> 向下力。
+        // 扶正力矩投影判据:竖直力施在方块处,力矩在回正轴 u_v×世界UP 上的投影 = ±f·p,
+        //   p = r_v_y − r_w_y·cosθ = by − heightDiff·ld.y [格]。
+        //   (r_v_y=by=车体系高度差常量;r_w_y=−heightDiff=世界系高度差;ld.y=−cosθ。)
+        // p > 0 -> 向上力回正 -> BALLOON_LIFT;p < 0 -> 向下力回正 -> GRAVITY。
+        // 取符号后投影恒 = f·|p| ≥ 0,任意摆放任意倾角(含倒置)只回正不反推;换向只发生在
+        // p 过零 = 方块越过质心竖直线、竖直力本来就没有力矩处,不泵能。
+        // 旧判据 heightDiff ≥ 0 = 世界竖直上下,力臂带竖直分量即失效:高于质心的方块倾斜时
+        // 仍高于质心、却已悬在低端上空,持续下拉 = 倒立摆加速翻船。
         // 每 tick 按符号重算,无锁存:施力不改质量分布,质心不动,不存在换向自反馈。
         double bx = worldPosition.getX() + 0.5 - com.x();
         double by = worldPosition.getY() + 0.5 - com.y();
         double bz = worldPosition.getZ() + 0.5 - com.z();
         double heightDiff = bx * ld.x() + by * ld.y() + bz * ld.z();
-        boolean lowSide = heightDiff >= 0;
+        double p = by - heightDiff * ld.y();
+        boolean lowSide = p >= 0;
 
         // 自适应满档角:倾斜速度大 -> 满档角小 -> 早满档(抢在 45° 物理失效前)。
         double tiltSpeed = Math.sqrt(angVelLocalCache.x() * angVelLocalCache.x()
@@ -230,11 +246,11 @@ public class StabilizerBlockEntity extends SmartBlockEntity
         if (frac < 0) frac = 0;
         else if (frac > 1) frac = 1;
 
-        // 过零衰减:接近水平位时输出收束,防止满幅力矩冲过平衡点泵能。
-        double fade = Math.min(1.0, Math.abs(heightDiff) / TIER_FADE_BLOCKS);
+        // 过零衰减:锚 |p| —— p→0 即零力矩/换向点,输出收束,防冲过平衡点泵能并静音换向。
+        double fade = Math.min(1.0, Math.abs(p) / P_FADE_BLOCKS);
         frac *= fade;
 
-        // 连续恢复力 [kpg 等效] x 维度 |g| -> 力 [N],冲量 = 力 * timeStep。方向:低端沿世界 UP(-ld),高端 DOWN(ld)。
+        // 连续恢复力 [kpg 等效] x 维度 |g| -> 力 [N],冲量 = 力 * timeStep。方向:p>0(lowSide)沿世界 UP(-ld),否则 DOWN(ld)。
         double forceKpg = frac * MAX_FORCE_KPG;
         if (forceKpg > 1e-3) {
             Vector3d gravity = DimensionPhysicsData.getGravity(level);
